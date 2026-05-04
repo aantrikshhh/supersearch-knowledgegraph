@@ -42,7 +42,7 @@ CATALOG_PATHS = {
 # Default to a Codex CLI model supported by the installed local CLI. Override
 # with KG_LLM_MODEL if the deployment has access to a smaller/faster model.
 LLM_MODEL = os.environ.get("KG_LLM_MODEL", "gpt-5.2")
-LLM_TIMEOUT = 120
+LLM_TIMEOUT = int(os.environ.get("KG_LLM_TIMEOUT", "120"))
 SQL_LLM_TIMEOUT = int(os.environ.get("KG_SQL_LLM_TIMEOUT", "45"))
 
 # Eval

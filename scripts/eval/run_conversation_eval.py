@@ -74,6 +74,12 @@ def summarize_turn(result):
         }
         for p in outfit.primary_products[:5]
     ]
+    day_plans = getattr(outfit, "_day_plans", [])
+    unique_product_ids = {
+        str(p.get("id"))
+        for p in outfit.primary_products
+        if p.get("id") is not None
+    }
     return {
         "workflow": result["workflow"],
         "is_followup": result["is_followup"],
@@ -83,7 +89,9 @@ def summarize_turn(result):
         "intents": result["intents"],
         "response_text": result["response_text"],
         "primary_product_count": len(outfit.primary_products),
+        "unique_primary_product_count": len(unique_product_ids),
         "primary_products": products,
+        "day_plan_count": len(day_plans),
         "db_product_count": db_debug["product_count"],
         "sql": db_debug["sql"],
         "db_errors": db_debug["errors"],
@@ -118,11 +126,27 @@ def check_expectations(turn_summary, expect):
         if needle not in joined_questions and needle not in response:
             failures.append(f"clarifying text missing {text!r}")
 
+    if "min_suggested_followups" in expect:
+        actual = len(turn_summary.get("suggested_followups", []))
+        if actual < expect["min_suggested_followups"]:
+            failures.append(f"suggested followups: expected >= {expect['min_suggested_followups']}, got {actual}")
+    joined_followups = " ".join(turn_summary.get("suggested_followups", [])).lower()
+    for text in expect.get("suggested_contains", []):
+        if text.lower() not in joined_followups:
+            failures.append(f"suggested followups missing {text!r}")
+
     intents = turn_summary["intents"]
     for key, expected in expect.get("intent_equals", {}).items():
         actual = intents.get(key)
         if actual != expected:
             failures.append(f"intent {key}: expected {expected!r}, got {actual!r}")
+    for key, expected_values in expect.get("intent_contains", {}).items():
+        actual = str(intents.get(key, "")).lower()
+        if isinstance(expected_values, str):
+            expected_values = [expected_values]
+        for expected in expected_values:
+            if str(expected).lower() not in actual:
+                failures.append(f"intent {key}: expected to contain {expected!r}, got {intents.get(key)!r}")
     for key in expect.get("intent_truthy", []):
         if not intents.get(key):
             failures.append(f"intent {key} should be truthy")
@@ -138,6 +162,14 @@ def check_expectations(turn_summary, expect):
         actual = turn_summary["primary_product_count"]
         if actual > expect["max_primary_products"]:
             failures.append(f"primary products: expected <= {expect['max_primary_products']}, got {actual}")
+    if "min_unique_primary_products" in expect:
+        actual = turn_summary["unique_primary_product_count"]
+        if actual < expect["min_unique_primary_products"]:
+            failures.append(f"unique primary products: expected >= {expect['min_unique_primary_products']}, got {actual}")
+    if "min_day_plans" in expect:
+        actual = turn_summary["day_plan_count"]
+        if actual < expect["min_day_plans"]:
+            failures.append(f"day plans: expected >= {expect['min_day_plans']}, got {actual}")
     if "min_db_products" in expect:
         actual = turn_summary["db_product_count"]
         if actual < expect["min_db_products"]:
@@ -151,6 +183,14 @@ def check_expectations(turn_summary, expect):
             if not any(product_type_matches(expected, actual_type) for expected in allowed_types):
                 failures.append(
                     f"product type {actual_type!r} did not match allowed {allowed_types!r}"
+                )
+    excluded_types = expect.get("product_types_none", [])
+    if excluded_types and products:
+        for product in products:
+            actual_type = product.get("product_type", "")
+            if any(product_type_matches(excluded, actual_type) for excluded in excluded_types):
+                failures.append(
+                    f"product type {actual_type!r} matched excluded {excluded_types!r}"
                 )
 
     sql = turn_summary.get("sql", "")

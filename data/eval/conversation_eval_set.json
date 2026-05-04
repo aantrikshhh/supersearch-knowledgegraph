@@ -59,6 +59,37 @@
     ]
   },
   {
+    "id": "clarify_gift_gender_before_results",
+    "brand": "aza",
+    "description": "Gift query with a product but no recipient gender should ask a blocking gender question instead of assuming.",
+    "turns": [
+      {
+        "user": "Baby shower gift dress",
+        "expect": {
+          "workflow": "gifting",
+          "needs_clarification": true,
+          "clarifying_contains": ["women, men, or kids"],
+          "intent_equals": {"occasion": "baby shower", "product_type": "dress"},
+          "intent_truthy": ["_is_gift"],
+          "max_primary_products": 0
+        }
+      },
+      {
+        "user": "women",
+        "expect": {
+          "workflow": "gifting",
+          "needs_clarification": false,
+          "is_followup": true,
+          "intent_equals": {"occasion": "baby shower", "gender": "female", "product_type": "dress"},
+          "intent_truthy": ["_is_gift"],
+          "min_db_products": 1,
+          "min_primary_products": 1,
+          "product_types_all": ["dress"]
+        }
+      }
+    ]
+  },
+  {
     "id": "gifting_result_then_cheaper_followup",
     "brand": "aza",
     "description": "Gift query should route to gifting; follow-up should preserve gift/product context and return another result set.",
@@ -86,6 +117,25 @@
           "min_db_products": 1,
           "min_primary_products": 1,
           "product_types_all": ["dress"]
+        }
+      }
+    ]
+  },
+  {
+    "id": "retirement_gift_shawl_routes_to_scarf",
+    "brand": "aza",
+    "description": "Shawl gift should route to gifting and map to scarf-like catalog types.",
+    "turns": [
+      {
+        "user": "Retirement gift shawl women colleague",
+        "expect": {
+          "workflow": "gifting",
+          "needs_clarification": false,
+          "intent_equals": {"occasion": "retirement party", "relation": "colleague", "gender": "female", "product_type": "scarf"},
+          "intent_truthy": ["_is_gift"],
+          "min_db_products": 1,
+          "min_primary_products": 1,
+          "product_types_all": ["scarf"]
         }
       }
     ]
@@ -123,20 +173,258 @@
     ]
   },
   {
-    "id": "retirement_gift_shawl_routes_to_scarf",
+    "id": "occasion_onam_saree_one_shot",
     "brand": "aza",
-    "description": "Shawl gift should route to gifting and map to scarf-like catalog types.",
+    "description": "Festival query should use the occasion workflow, preserve explicit saree/gender/location, and return catalog results.",
     "turns": [
       {
-        "user": "Retirement gift shawl women colleague",
+        "user": "Onam saree women Kerala",
         "expect": {
-          "workflow": "gifting",
+          "workflow": "occasion",
           "needs_clarification": false,
-          "intent_equals": {"occasion": "retirement party", "relation": "colleague", "gender": "female", "product_type": "scarf"},
-          "intent_truthy": ["_is_gift"],
+          "intent_equals": {"event": "Onam", "product_type": "saree", "gender": "female", "location": "Kerala"},
           "min_db_products": 1,
           "min_primary_products": 1,
-          "product_types_all": ["scarf"]
+          "product_types_all": ["saree"]
+        }
+      }
+    ]
+  },
+  {
+    "id": "occasion_navratri_chaniya_choli_not_holi",
+    "brand": "aza",
+    "description": "Chaniya choli should map to lehenga for Navratri and must not be confused with Holi.",
+    "turns": [
+      {
+        "user": "Navratri garba chaniya choli women",
+        "expect": {
+          "workflow": "occasion",
+          "needs_clarification": false,
+          "intent_equals": {"event": "Navratri", "product_type": "lehenga", "gender": "female"},
+          "min_db_products": 1,
+          "min_primary_products": 1,
+          "product_types_all": ["lehenga"]
+        }
+      }
+    ]
+  },
+  {
+    "id": "place_office_budget_weather_one_shot",
+    "brand": "kalki",
+    "description": "Place/profession flow should preserve product, budget, gender, and weather constraints.",
+    "turns": [
+      {
+        "user": "Office kurta for women in summer under 5000",
+        "expect": {
+          "workflow": "place_profession",
+          "needs_clarification": false,
+          "intent_equals": {"place": "office", "product_type": "kurta", "gender": "female", "weather": "summer", "price_max": 5000},
+          "min_db_products": 1,
+          "min_primary_products": 1,
+          "product_types_all": ["kurta"],
+          "sql_contains": ["price <=", "gender IN"]
+        }
+      }
+    ]
+  },
+  {
+    "id": "place_museum_waterproof_dress",
+    "brand": "aza",
+    "description": "Place flow should retain functional requirements and an explicit product type.",
+    "turns": [
+      {
+        "user": "Waterproof dress for museum women in rainy weather",
+        "expect": {
+          "workflow": "place_profession",
+          "needs_clarification": false,
+          "intent_equals": {"place": "museum", "product_type": "dress", "gender": "female", "weather": "rainy"},
+          "intent_contains": {"functional_needs": "waterproof"},
+          "min_db_products": 1,
+          "min_primary_products": 1,
+          "product_types_all": ["dress"]
+        }
+      }
+    ]
+  },
+  {
+    "id": "activity_hiking_functional_weather",
+    "brand": "aza",
+    "description": "Activity flow should preserve movement needs, weather, and practical fabric constraints.",
+    "turns": [
+      {
+        "user": "Breathable quick-dry hiking outfit women for hot weather",
+        "expect": {
+          "workflow": "activity",
+          "needs_clarification": false,
+          "intent_equals": {"activity": "hiking", "gender": "female", "weather": "summer"},
+          "intent_contains": {"functional_needs": ["breathable", "quick-dry"]},
+          "min_db_products": 1,
+          "min_primary_products": 1
+        }
+      }
+    ]
+  },
+  {
+    "id": "health_back_pain_primary",
+    "brand": "aza",
+    "description": "Health flow should own queries where comfort/health is the primary stated need.",
+    "turns": [
+      {
+        "user": "Comfortable outfit for back pain women",
+        "expect": {
+          "workflow": "health",
+          "needs_clarification": false,
+          "intent_equals": {"health": "back pain", "gender": "female"},
+          "min_db_products": 1,
+          "min_primary_products": 1
+        }
+      }
+    ]
+  },
+  {
+    "id": "occasion_with_secondary_functional_need",
+    "brand": "aza",
+    "description": "Occasion should win for office party while preserving sweat-proof/health constraints.",
+    "turns": [
+      {
+        "user": "Sweat-proof formal wear for office party women",
+        "expect": {
+          "workflow": "occasion",
+          "needs_clarification": false,
+          "intent_equals": {"occasion": "office party", "gender": "female", "health": "sweating"},
+          "intent_contains": {"functional_needs": "sweat-proof"},
+          "min_db_products": 1,
+          "min_primary_products": 1
+        }
+      }
+    ]
+  },
+  {
+    "id": "vacation_capsule_goa_three_days",
+    "brand": "aza",
+    "description": "Vacation/capsule flow should build day plans instead of a single product dump.",
+    "turns": [
+      {
+        "user": "3-day Goa vacation wardrobe set women December",
+        "expect": {
+          "workflow": "vacation",
+          "needs_clarification": false,
+          "intent_equals": {"location": "Goa", "month": "December", "duration": 3, "gender": "female"},
+          "min_day_plans": 3,
+          "min_unique_primary_products": 2
+        }
+      }
+    ]
+  },
+  {
+    "id": "negated_product_type_survives_sql",
+    "brand": "aza",
+    "description": "A negative product request should become an exclusion and should not leak excluded products into results.",
+    "turns": [
+      {
+        "user": "Diwali outfit women anything but lehenga under 8000",
+        "expect": {
+          "workflow": "occasion",
+          "needs_clarification": false,
+          "intent_equals": {"event": "Diwali", "gender": "female", "avoid_product_type": "lehenga", "price_max": 8000},
+          "min_db_products": 1,
+          "min_primary_products": 1,
+          "product_types_none": ["lehenga"],
+          "sql_contains": ["price <=", "NOT IN"]
+        }
+      }
+    ]
+  },
+  {
+    "id": "result_then_refinement_then_new_query_reset",
+    "brand": "kalki",
+    "description": "Short refinements should merge with context, while a new full query should reset stale context.",
+    "turns": [
+      {
+        "user": "Show sarees for sangeet women",
+        "expect": {
+          "workflow": "occasion",
+          "needs_clarification": false,
+          "intent_equals": {"occasion": "sangeet", "product_type": "saree", "gender": "female"},
+          "min_db_products": 1,
+          "min_primary_products": 1,
+          "product_types_all": ["saree"]
+        }
+      },
+      {
+        "user": "in red",
+        "expect": {
+          "workflow": "occasion",
+          "needs_clarification": false,
+          "is_followup": true,
+          "intent_equals": {"occasion": "sangeet", "product_type": "saree", "gender": "female", "colour": "red"},
+          "min_db_products": 1,
+          "min_primary_products": 1,
+          "product_types_all": ["saree"]
+        }
+      },
+      {
+        "user": "Kurta set under 2000 for Diwali women",
+        "expect": {
+          "workflow": "occasion",
+          "needs_clarification": false,
+          "is_followup": false,
+          "intent_equals": {"event": "Diwali", "product_type": "kurta", "gender": "female", "price_max": 2000},
+          "intent_absent": ["occasion"],
+          "min_db_products": 1,
+          "min_primary_products": 1,
+          "product_types_all": ["kurta"]
+        }
+      }
+    ]
+  },
+  {
+    "id": "explicit_followup_override_product_and_colour",
+    "brand": "kalki",
+    "description": "Follow-up override should replace product type/color while keeping still-relevant occasion, gender, and price cap.",
+    "turns": [
+      {
+        "user": "Show lehengas for mehendi women under 10000",
+        "expect": {
+          "workflow": "occasion",
+          "needs_clarification": false,
+          "intent_equals": {"occasion": "mehendi", "product_type": "lehenga", "gender": "female", "price_max": 10000},
+          "min_db_products": 1,
+          "min_primary_products": 1,
+          "product_types_all": ["lehenga"]
+        }
+      },
+      {
+        "user": "actually sarees in green",
+        "expect": {
+          "workflow": "occasion",
+          "needs_clarification": false,
+          "is_followup": true,
+          "intent_equals": {"occasion": "mehendi", "product_type": "saree", "gender": "female", "price_max": 10000, "colour": "green"},
+          "min_db_products": 1,
+          "min_primary_products": 1,
+          "product_types_all": ["saree"],
+          "sql_contains": ["price <=", "green"]
+        }
+      }
+    ]
+  },
+  {
+    "id": "result_suggested_followups_available",
+    "brand": "kalki",
+    "description": "Result turns should expose non-blocking refinement chips when optional slots are still missing.",
+    "turns": [
+      {
+        "user": "Kurta set for Diwali women",
+        "expect": {
+          "workflow": "occasion",
+          "needs_clarification": false,
+          "intent_equals": {"event": "Diwali", "product_type": "kurta", "gender": "female"},
+          "min_db_products": 1,
+          "min_primary_products": 1,
+          "min_suggested_followups": 1,
+          "suggested_contains": ["budget"],
+          "product_types_all": ["kurta"]
         }
       }
     ]
