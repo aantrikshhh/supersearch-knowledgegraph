@@ -1,4 +1,9 @@
-"""Workflow: activity — specific product or general outfit for activities."""
+"""Activity workflow for movement- or task-driven fashion requests.
+
+Handles queries such as yoga, hiking, swimming, cycling, or dance-friendly
+clubbing by preserving activity constraints while delegating retrieval and
+outfit assembly to the shared workflow base.
+"""
 
 from workflows.base import run_standard_pipeline, get_comp_graphs
 

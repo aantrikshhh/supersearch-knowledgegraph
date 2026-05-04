@@ -1,4 +1,9 @@
-"""Outfit composition — combines primary products with accessories using complementary graphs."""
+"""Outfit composition layer for SuperSearch recommendations.
+
+After `db_query.py` retrieves candidate garments, workflows call this module to
+score/diversify primary products, attach complementary accessories, build color
+palettes, and return a structured `OutfitResult` for response formatting.
+"""
 
 from dataclasses import dataclass, field
 from complementary_graphs import ComplementaryGraphs

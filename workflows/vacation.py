@@ -1,4 +1,9 @@
-"""Workflow: vacation — multi-day trip with pack_a_bag functionality."""
+"""Vacation workflow for capsule wardrobes and pack-a-bag requests.
+
+Unlike single-outfit workflows, this module expands a trip query into multiple
+daily outfits, applies weather/location inference, tracks color variety, and
+returns packing-oriented recommendations.
+"""
 
 import json
 import re

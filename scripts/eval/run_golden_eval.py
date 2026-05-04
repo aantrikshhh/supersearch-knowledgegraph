@@ -1,27 +1,31 @@
-"""Run the pipeline against the golden eval set and compute NDCG scores.
+"""Legacy single-file golden evaluator retained for historical comparison.
 
-Uses Claude Opus sub-agents to score each recommendation against the rubric,
-then computes NDCG@5, MRR, and Hit Rate.
+The maintained eval entry points are `run_golden_eval_parallel.py` and
+`run_golden_eval_all_brands.py`. This script documents the original eval loop
+and still uses shared config paths so it can be run for debugging if needed.
 """
 
 import json
 import os
-import subprocess
 import re
+import sys
 import time
 import math
+from pathlib import Path
 from datetime import datetime
+
+ROOT_DIR = Path(__file__).resolve().parents[2]
+if str(ROOT_DIR) not in sys.path:
+    sys.path.insert(0, str(ROOT_DIR))
+
 from knowledge_graph import KnowledgeGraph
 from db_query import query_products
 from prompts import RECOMMENDATION_SYSTEM, RECOMMENDATION_USER
+from config import KG_PATH, GOLDEN_EVAL_PATH, EVAL_RESULTS_DIR, BRAND_DB_PATHS
+from llm_client import call_llm
 
-KG_PATH = "Master_Graph.xlsx"
 BRANDS = ["masaba", "kalki", "aza"]
-DB_CHECK = {
-    "masaba": "masaba_products.db",
-    "kalki": "kalki_products.db",
-    "aza": "aza_products.db",
-}
+DB_CHECK = {b: BRAND_DB_PATHS[b] for b in BRANDS}
 
 BATCH_SCORER_SYSTEM = """You are a fashion recommendation evaluator. Score ALL products at once.
 
@@ -57,7 +61,7 @@ BATCH_SCORER_USER = """## User Query
 Score every product above. Return a JSON array with score and reason for each."""
 
 
-def call_claude_batch_scorer(query, rubric, expected, cultural, products):
+def call_llm_batch_scorer(query, rubric, expected, cultural, products):
     """Score ALL products in a single LLM call."""
     products_text = ""
     for i, p in enumerate(products):
@@ -75,13 +79,10 @@ def call_claude_batch_scorer(query, rubric, expected, cultural, products):
         products_list=products_text,
     )
 
-    cmd = ["claude", "-p", prompt, "--output-format", "text",
-           "--model", "claude-haiku-4-5-20251001",
-           "--system-prompt", BATCH_SCORER_SYSTEM]
-    result = subprocess.run(cmd, capture_output=True, text=True, timeout=120)
-    if result.returncode != 0:
+    try:
+        raw = call_llm(prompt, system_prompt=BATCH_SCORER_SYSTEM, timeout=120)
+    except Exception:
         return [{"score": 0, "reason": "Error"} for _ in products]
-    raw = result.stdout.strip()
     match = re.search(r'\[.*\]', raw, re.DOTALL)
     if match:
         try:
@@ -92,7 +93,7 @@ def call_claude_batch_scorer(query, rubric, expected, cultural, products):
     return [{"score": 0, "reason": "Parse error"} for _ in products]
 
 
-def call_claude_recommend(query, intents, kg_context, products, brand):
+def call_llm_recommend(query, intents, kg_context, products, brand):
     """Get LLM recommendations from candidate products."""
     products_json = json.dumps(products, indent=2)
     intents_str = json.dumps(intents, indent=2)
@@ -101,13 +102,10 @@ def call_claude_recommend(query, intents, kg_context, products, brand):
         query=query, intents=intents_str, kg_context=kg_context,
         count=len(products), brand_name=brand, products_json=products_json,
     )
-    cmd = ["claude", "-p", prompt, "--output-format", "text",
-           "--model", "claude-haiku-4-5-20251001",
-           "--system-prompt", system]
-    result = subprocess.run(cmd, capture_output=True, text=True, timeout=180)
-    if result.returncode != 0:
+    try:
+        raw = call_llm(prompt, system_prompt=system, timeout=180)
+    except Exception:
         return []
-    raw = result.stdout.strip()
     match = re.search(r'\[.*\]', raw, re.DOTALL)
     if match:
         try:
@@ -150,7 +148,7 @@ def run_eval():
     print("  GOLDEN EVAL: Pipeline → NDCG Scoring")
     print("=" * 70)
 
-    with open("golden_eval_set.json") as f:
+    with open(GOLDEN_EVAL_PATH) as f:
         golden = json.load(f)
     print(f"Loaded {len(golden)} golden queries")
 
@@ -159,6 +157,8 @@ def run_eval():
 
     # Check which brand DBs exist
     available_brands = [b for b in BRANDS if os.path.exists(DB_CHECK[b])]
+    if not available_brands:
+        raise FileNotFoundError("No brand DBs found. Run scripts/data/build_db.py first.")
     print(f"Available brand DBs: {available_brands}")
 
     all_results = []
@@ -215,7 +215,7 @@ def run_eval():
         } for p in db_products[:20]]
 
         print(f"  Recommending...")
-        recs = call_claude_recommend(query, intents, kg_context, products_for_llm, brand)
+        recs = call_llm_recommend(query, intents, kg_context, products_for_llm, brand)
         if not recs:
             recs = [{"title": p["title"], "product_id": p["product_id"],
                      "product_type": p["product_type"]} for p in products_for_llm[:5]]
@@ -236,7 +236,7 @@ def run_eval():
             })
 
         print(f"  Scoring {len(rec_products)} products (batch)...")
-        batch_scores = call_claude_batch_scorer(query, rubric, expected, cultural, rec_products)
+        batch_scores = call_llm_batch_scorer(query, rubric, expected, cultural, rec_products)
 
         scores = []
         scored_recs = []
@@ -314,9 +314,9 @@ def run_eval():
         print(f"    [{r['brand'].upper()}] NDCG={r['ndcg5']:.3f} | {r['query'][:55]}")
 
     # Save results
-    os.makedirs("eval_results", exist_ok=True)
+    os.makedirs(EVAL_RESULTS_DIR, exist_ok=True)
     ts = datetime.now().strftime("%Y%m%d_%H%M%S")
-    output_path = f"eval_results/golden_eval_{ts}.json"
+    output_path = os.path.join(EVAL_RESULTS_DIR, f"golden_eval_{ts}.json")
     with open(output_path, "w") as f:
         json.dump({
             "summary": {

@@ -1,4 +1,10 @@
-"""LLM-based intent extraction from user queries."""
+"""User-query understanding for the SuperSearch recommendation pipeline.
+
+The extractor converts free-form shopping language into structured intents
+such as occasion, product type, budget, size/body signals, weather, and travel
+duration. It combines an LLM parse with deterministic enrichment so downstream
+KG lookup and SQL generation receive stable constraints.
+"""
 
 import json
 import re

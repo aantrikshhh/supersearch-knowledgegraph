@@ -1,4 +1,10 @@
-"""Centralized LLM subprocess wrapper."""
+"""Centralized Codex CLI LLM wrapper.
+
+All core LLM calls route through this module so model selection, timeout
+handling, subprocess invocation, and future production replacement are managed
+in one place instead of scattered across intent extraction, SQL generation, and
+response formatting.
+"""
 
 import os
 import subprocess

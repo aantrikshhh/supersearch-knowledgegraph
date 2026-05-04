@@ -1,4 +1,9 @@
-"""Workflow: place/profession — weather-aware single outfit with complementary products."""
+"""Place/profession workflow for setting-specific SuperSearch requests.
+
+This path covers offices, museums, temples, airports, bars, schools, and
+professional roles. It enriches weather and setting context before using the
+standard recommendation pipeline.
+"""
 
 from workflows.base import run_standard_pipeline
 from weather_inference import enrich_intents_with_weather

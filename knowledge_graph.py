@@ -1,4 +1,10 @@
-"""Knowledge Graph loader and lookup engine."""
+"""Knowledge graph loader and semantic lookup engine.
+
+SuperSearch stores fashion knowledge as rows keyed by entity/value pairs such
+as `(occasion, sangeet)` or `(bodytype, petite)`. This module loads that graph,
+resolves aliases, merges recommendations/avoid rules, and formats the context
+used by workflows and SQL generation.
+"""
 
 import openpyxl
 from collections import defaultdict

@@ -1,6 +1,14 @@
+"""Generate synthetic brand-query workbooks for early SuperSearch eval design.
+
+This utility predates the JSON golden eval set. It is kept as a data-generation
+tool for creating exploratory spreadsheet query clusters from entity templates.
+The live recommendation path does not import it.
+"""
+
 import random
 import openpyxl
 from openpyxl.styles import Font, PatternFill, Alignment, Border, Side
+from pathlib import Path
 
 random.seed(42)
 
@@ -433,7 +441,7 @@ ws_summary.column_dimensions["A"].width = 18
 ws_summary.column_dimensions["B"].width = 15
 ws_summary.column_dimensions["C"].width = 65
 
-output_path = "Brand_Queries.xlsx"
+output_path = str(Path(__file__).resolve().parents[2] / "data" / "raw" / "Brand_Queries.xlsx")
 wb.save(output_path)
 print(f"Generated {output_path} with {len(brands)} brand sheets, {QUERIES_PER_BRAND} queries each")
 print(f"Total queries: {len(brands) * QUERIES_PER_BRAND}")

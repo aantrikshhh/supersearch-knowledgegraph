@@ -1,7 +1,9 @@
-"""LLM-driven product database querying.
+"""SQL retrieval layer for SuperSearch product recommendations.
 
-The LLM generates SQL from user intents + KG context,
-then we execute it against the product SQLite database.
+The workflows hand this module a user query, extracted intents, and formatted
+knowledge-graph context. It turns that semantic context into SQL, runs the
+brand-specific SQLite product database, and falls back to deterministic SQL
+when the LLM path fails or returns no candidates.
 """
 
 import sqlite3
@@ -633,7 +635,9 @@ def query_products(query, intents, kg_context_str, brand):
     """
     db_path = DB_PATHS.get(brand.lower())
     if not db_path or not os.path.exists(db_path):
-        raise FileNotFoundError(f"No database for brand: {brand}. Run build_db.py first.")
+        raise FileNotFoundError(
+            f"No database for brand: {brand}. Run scripts/data/build_db.py first."
+        )
 
     available_types = get_available_types(db_path)
 
@@ -755,7 +759,8 @@ if __name__ == "__main__":
     # Quick test
     from knowledge_graph import KnowledgeGraph
 
-    kg = KnowledgeGraph("Master_Graph.xlsx")
+    from config import KG_PATH
+    kg = KnowledgeGraph(KG_PATH)
     intents = {"place": "restaurant", "weather": "cloudy"}
     kg_result = kg.lookup(intents)
     kg_context = kg.format_context(kg_result)

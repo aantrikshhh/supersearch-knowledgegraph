@@ -1,4 +1,9 @@
-"""Infer weather from (location, month) using static table + LLM fallback."""
+"""Weather and climate enrichment for travel/place-aware fashion requests.
+
+Workflows call this before KG lookup when a query includes location, month, or
+region-level travel hints. It maps those signals into weather intents so SQL
+and outfit assembly can prioritize seasonally appropriate products.
+"""
 
 import json
 import time

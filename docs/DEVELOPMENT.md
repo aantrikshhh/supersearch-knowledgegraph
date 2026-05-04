@@ -3,7 +3,7 @@
 ## Prerequisites
 
 - Python 3.11+ (tested on 3.14)
-- Claude Code CLI installed and authenticated (`claude` command available)
+- Codex CLI installed and authenticated (`codex` command available)
 - Product catalog JSON files at `/Users/aant/repos/scraper-infra/data/`
 
 ## Setup
@@ -13,7 +13,7 @@
 pip3 install --break-system-packages openpyxl tqdm python-docx
 
 # 2. Build product databases from catalog JSONs
-python3 build_db.py
+python3 scripts/data/build_db.py
 
 # 3. Verify everything works
 python3 main.py -q "outfit for Diwali" -b masaba --trace
@@ -36,24 +36,21 @@ python3 main.py -q "What to wear to a sangeet?" -b kalki --trace
 
 ### Eval
 ```bash
-# Quick: 50 queries, 1 brand each (~13 min)
-python3 run_golden_eval_parallel.py
+# Quick: 55 queries, 1 brand each
+python3 scripts/eval/run_golden_eval_parallel.py
 
-# Full: 50 queries × 3 brands (~37 min)
-python3 run_golden_eval_all_brands.py
+# Full: 55 queries × 3 brands
+python3 scripts/eval/run_golden_eval_all_brands.py
 
 # Results saved to eval_results/golden_eval_{timestamp}.json
 ```
 
 ### Visualizer
 ```bash
-# Without LLM calls (fast, stages 1-5 only)
-python3 visualizer.py
+# Generate the saved-eval audit UI
+python3 scripts/eval/eval_audit_visualizer.py --eval eval_results/golden_eval_YYYYMMDD_HHMMSS.json
 
-# With live LLM calls (full pipeline, ~15 min)
-python3 visualizer.py --llm
-
-# Opens pipeline_visualizer.html in browser
+# Legacy pipeline visualizer lives under legacy/ for archaeology only.
 ```
 
 ## Adding a New Brand
@@ -71,7 +68,7 @@ class NewBrandAdapter:
 
 4. Build the database:
 ```python
-python3 build_db.py
+python3 scripts/data/build_db.py
 ```
 
 5. Test:
@@ -96,7 +93,7 @@ def run(query, intents, brand, session=None):
 
 ## Updating the Knowledge Graph
 
-Edit `Master_Graph.xlsx` (sheet: "graph"). Columns:
+Edit `data/graph/Master_Graph.xlsx` (sheet: "graph"). Columns:
 - entity, entity_value, category, tag, name, rank, gender
 
 After editing, no rebuild needed — the graph loads fresh each time from Excel.
@@ -111,10 +108,10 @@ Files are in `assistant/all_graph_components/`. Edit the Excel/CSV files directl
 
 | Problem | Cause | Fix |
 |---|---|---|
-| `claude` command not found | CLI not installed | Install Claude Code CLI |
+| `codex` command not found | CLI not installed | Install/authenticate Codex CLI |
 | 0 products returned | SQL too restrictive | Check db_query.py self-correction is working. Run with --trace |
 | Wrong product types | KG alias missing | Add alias to `INTENT_ALIASES` in knowledge_graph.py |
-| Slow eval (~2+ hours) | Sequential processing | Use `run_golden_eval_parallel.py` (8 workers) |
+| Slow eval (~2+ hours) | Sequential processing | Use `scripts/eval/run_golden_eval_parallel.py` (8 workers) |
 | Import errors | Circular imports | Workflows use lazy imports via router.get_workflow() |
 | SQLite locked | Concurrent writes | Each thread gets its own connection (read-only) |
-| Cultural color wrong | Missing cultural note | Add to `CULTURAL_NOTES` in db_query.py |
+| Cultural color wrong | Missing KG festival/occasion row | Add or correct rows in `data/graph/Master_Graph.xlsx`; use `CULTURAL_NOTES` only for role-based constraints |

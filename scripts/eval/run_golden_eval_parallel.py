@@ -1,23 +1,38 @@
-"""Parallel golden eval — 8 queries at a time, 3 LLM calls per query.
+"""Rotating-brand golden evaluator for quick SuperSearch regression checks.
 
-Expected time depends on LLM model and category filter.
+Runs each golden query against one selected brand in round-robin order, using
+the same SQL, recommendation, and evaluator path as the exhaustive benchmark.
+Use this for faster iteration before running the all-brand eval.
 """
 
 import json
 import os
 import re
+import sys
 import time
 import math
+from pathlib import Path
 from datetime import datetime
 from concurrent.futures import ThreadPoolExecutor, as_completed
+
+ROOT_DIR = Path(__file__).resolve().parents[2]
+if str(ROOT_DIR) not in sys.path:
+    sys.path.insert(0, str(ROOT_DIR))
+
 from knowledge_graph import KnowledgeGraph
 from db_query import query_products
 from prompts import RECOMMENDATION_SYSTEM, RECOMMENDATION_USER
-from config import KG_PATH, LLM_TIMEOUT
+from config import (
+    KG_PATH,
+    LLM_TIMEOUT,
+    GOLDEN_EVAL_PATH,
+    EVAL_RESULTS_DIR,
+    BRAND_DB_PATHS,
+)
 from llm_client import call_llm
 
 BRANDS = ["masaba", "kalki", "aza"]
-DB_CHECK = {b: f"{b}_products.db" for b in BRANDS}
+DB_CHECK = {b: BRAND_DB_PATHS[b] for b in BRANDS}
 WORKERS = 8
 
 BATCH_SCORER_SYSTEM = """You are a fashion recommendation evaluator. Score ALL products at once.
@@ -33,7 +48,7 @@ Consider: product type match, color/material/pattern alignment, cultural constra
 Return ONLY a JSON array: [{"product_index": 1, "score": <0-3>, "reason": "<one sentence>"}, ...]"""
 
 
-def call_claude(prompt, system):
+def call_llm_or_none(prompt, system):
     try:
         return call_llm(prompt, system_prompt=system, timeout=max(180, LLM_TIMEOUT))
     except Exception:
@@ -130,7 +145,7 @@ def process_single_query(qi, entry, kg, brand):
         brand_name=brand, products_json=json.dumps(products_for_llm),
     )
 
-    raw = call_claude(rec_prompt, rec_system)
+    raw = call_llm_or_none(rec_prompt, rec_system)
     recs = []
     if raw:
         match = re.search(r'\[.*\]', raw, re.DOTALL)
@@ -186,7 +201,7 @@ def process_single_query(qi, entry, kg, brand):
 
 Score every product. Return a JSON array."""
 
-    raw_scores = call_claude(scorer_prompt, BATCH_SCORER_SYSTEM)
+    raw_scores = call_llm_or_none(scorer_prompt, BATCH_SCORER_SYSTEM)
     batch_scores = []
     if raw_scores:
         match = re.search(r'\[.*\]', raw_scores, re.DOTALL)
@@ -239,7 +254,7 @@ def run_eval(category_filter=None):
     print(f"  PARALLEL GOLDEN EVAL ({WORKERS} workers)")
     print("=" * 70)
 
-    with open("golden_eval_set.json") as f:
+    with open(GOLDEN_EVAL_PATH) as f:
         golden = json.load(f)
 
     if category_filter:
@@ -252,6 +267,8 @@ def run_eval(category_filter=None):
 
     kg = KnowledgeGraph(KG_PATH)
     available_brands = [b for b in BRANDS if os.path.exists(DB_CHECK[b])]
+    if not available_brands:
+        raise FileNotFoundError("No brand DBs found. Run scripts/data/build_db.py first.")
     print(f"Brands: {available_brands}")
     print(f"Workers: {WORKERS}")
     print()
@@ -339,9 +356,9 @@ def run_eval(category_filter=None):
         print(f"    [{r['brand'].upper()}] NDCG={r['ndcg5']:.3f} | {r['query'][:55]}")
 
     # Save
-    os.makedirs("eval_results", exist_ok=True)
+    os.makedirs(EVAL_RESULTS_DIR, exist_ok=True)
     ts = datetime.now().strftime("%Y%m%d_%H%M%S")
-    output_path = f"eval_results/golden_eval_{ts}.json"
+    output_path = os.path.join(EVAL_RESULTS_DIR, f"golden_eval_{ts}.json")
     with open(output_path, "w") as f:
         json.dump({
             "summary": {

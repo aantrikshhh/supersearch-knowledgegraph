@@ -1,4 +1,9 @@
-"""Color coordination across outfit items using complementary color graph."""
+"""Color-palette helper for assembled SuperSearch outfits.
+
+Outfit workflows use this module after primary product retrieval to check
+whether selected items form a coherent palette and to suggest complementary
+colors from the assistant graph data.
+"""
 
 from complementary_graphs import ComplementaryGraphs
 

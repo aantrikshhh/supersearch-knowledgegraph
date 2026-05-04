@@ -1,13 +1,27 @@
-"""Main eval pipeline: Query → Intents → KG Lookup → Product Match → Recommendation."""
+"""Legacy spreadsheet-based eval pipeline for the first KG prototype.
+
+The maintained benchmark uses JSON golden cases plus SQL retrieval in
+`scripts/eval/`. This module remains as historical reference for the earlier
+flow that read `data/raw/Brand_Queries.xlsx` and scored raw catalog products
+with `legacy/product_matcher.py`.
+"""
 
 import json
 import time
 import os
 import re
-import subprocess
+import sys
 import openpyxl
+from pathlib import Path
 from datetime import datetime
 from tqdm import tqdm
+
+ROOT_DIR = Path(__file__).resolve().parents[1]
+LEGACY_DIR = Path(__file__).resolve().parent
+if str(ROOT_DIR) not in sys.path:
+    sys.path.insert(0, str(ROOT_DIR))
+if str(LEGACY_DIR) not in sys.path:
+    sys.path.insert(0, str(LEGACY_DIR))
 
 from knowledge_graph import KnowledgeGraph
 from brand_adapters import load_catalog
@@ -16,6 +30,8 @@ from prompts import (
     INTENT_EXTRACTION_SYSTEM, INTENT_EXTRACTION_USER,
     RECOMMENDATION_SYSTEM, RECOMMENDATION_USER,
 )
+from config import KG_PATH
+from llm_client import call_llm
 
 
 CATALOG_PATHS = {
@@ -48,27 +64,18 @@ def parse_preextracted_intents(intent_str):
     return intents
 
 
-def call_claude(prompt, system_prompt=None):
-    """Call Claude via the CLI subprocess."""
-    cmd = ["claude", "-p", prompt, "--output-format", "text",
-           "--model", "claude-haiku-4-5-20251001"]
-    if system_prompt:
-        cmd.extend(["--system-prompt", system_prompt])
-
+def call_legacy_llm(prompt, system_prompt=None):
+    """Call the shared Codex CLI wrapper used by the maintained pipeline."""
     start = time.time()
-    result = subprocess.run(cmd, capture_output=True, text=True, timeout=180)
+    text = call_llm(prompt, system_prompt=system_prompt, timeout=180)
     elapsed = (time.time() - start) * 1000
-
-    if result.returncode != 0:
-        raise RuntimeError(f"Claude CLI error: {result.stderr[:300]}")
-
-    return result.stdout.strip(), elapsed
+    return text.strip(), elapsed
 
 
 def extract_intents_llm(query):
-    """Use Claude CLI to extract intents from a query."""
+    """Use the shared LLM wrapper to extract intents from a query."""
     prompt = INTENT_EXTRACTION_USER.format(query=query)
-    text, elapsed = call_claude(prompt, system_prompt=INTENT_EXTRACTION_SYSTEM)
+    text, elapsed = call_legacy_llm(prompt, system_prompt=INTENT_EXTRACTION_SYSTEM)
 
     json_match = re.search(r'\{[^{}]+\}', text)
     if json_match:
@@ -80,7 +87,7 @@ def extract_intents_llm(query):
 
 
 def generate_recommendation(query, intents, kg_context_str, candidates, brand_name):
-    """Use Claude CLI to generate final product recommendations."""
+    """Use the shared LLM wrapper to generate final product recommendations."""
     products_for_llm = []
     for product, score in candidates[:20]:
         products_for_llm.append({
@@ -108,7 +115,7 @@ def generate_recommendation(query, intents, kg_context_str, candidates, brand_na
         products_json=products_json,
     )
 
-    text, elapsed = call_claude(prompt, system_prompt=system)
+    text, elapsed = call_legacy_llm(prompt, system_prompt=system)
 
     json_match = re.search(r'\[.*\]', text, re.DOTALL)
     if json_match:
@@ -178,7 +185,7 @@ def run_single_query(query, intents, kg, catalog_products, brand_name,
             )
             result["recommendations"] = recs
             result["timings"]["recommendation_ms"] = round(t)
-        except subprocess.TimeoutExpired:
+        except TimeoutError:
             result["errors"].append("Recommendation LLM timed out")
             result["recommendations"] = [
                 {"product_id": p.id, "title": p.title, "score": round(s, 1),
@@ -217,20 +224,20 @@ def load_queries(xlsx_path, brand):
     return queries
 
 
-def run_eval(brand, kg_path="Master_Graph.xlsx", queries_path="Brand_Queries.xlsx",
+def run_eval(brand, kg_path=KG_PATH,
+             queries_path=str(ROOT_DIR / "data" / "raw" / "Brand_Queries.xlsx"),
              catalog_path=None, max_queries=None, use_llm_intents=False,
              use_llm_recommendation=True):
     """Run the full eval for a brand.
 
     Args:
         brand: "masaba", "kalki", or "aza"
-        kg_path: path to Master_Graph.xlsx
-        queries_path: path to Brand_Queries.xlsx
+        kg_path: path to data/graph/Master_Graph.xlsx
+        queries_path: path to data/raw/Brand_Queries.xlsx
         catalog_path: path to product catalog JSON (auto-detected if None)
         max_queries: limit number of queries to process
         use_llm_intents: whether to use LLM for intent extraction
         use_llm_recommendation: whether to use LLM for final recommendation
-        model: Claude model to use
     """
     brand_lower = brand.lower()
     if not catalog_path:
@@ -277,9 +284,9 @@ def run_eval(brand, kg_path="Master_Graph.xlsx", queries_path="Brand_Queries.xls
         results.append(result)
 
     # Save results
-    os.makedirs("eval_results", exist_ok=True)
+    os.makedirs(ROOT_DIR / "eval_results", exist_ok=True)
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-    output_path = f"eval_results/{brand_lower}_{timestamp}.json"
+    output_path = str(ROOT_DIR / "eval_results" / f"{brand_lower}_{timestamp}.json")
     with open(output_path, "w") as f:
         json.dump(results, f, indent=2, default=str)
 

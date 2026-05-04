@@ -1,13 +1,24 @@
-"""Generate an image-backed eval audit visualizer."""
+"""Build a shareable audit UI from saved SuperSearch eval results.
+
+The visualizer joins eval output back to product databases and local PDP image
+manifests so reviewers can inspect the user query, recommended products, SQL
+trace, scorer rationale, and catalog-fit evidence in one static HTML file.
+"""
 
 import argparse
 import glob
-import html
 import json
 import os
 import sqlite3
+import sys
+from pathlib import Path
 from collections import Counter, defaultdict
 
+ROOT_DIR = Path(__file__).resolve().parents[2]
+if str(ROOT_DIR) not in sys.path:
+    sys.path.insert(0, str(ROOT_DIR))
+
+from config import EVAL_RESULTS_DIR, GOLDEN_EVAL_PATH
 from knowledge_graph import PRODUCT_TYPE_ALIASES
 from router import classify
 
@@ -15,7 +26,6 @@ from router import classify
 SCRAPER_DATA_DIR = "/Users/aant/repos/scraper-infra/data"
 LOCAL_IMAGE_CATALOG_DIR = os.path.join(SCRAPER_DATA_DIR, "pdp_catalogs_with_local_images")
 LOCAL_IMAGE_ROOT = SCRAPER_DATA_DIR
-DEFAULT_EVAL = "eval_results/golden_eval_20260504_195610.json"
 
 
 EXPECTED_ALIASES = {
@@ -610,9 +620,9 @@ document.addEventListener('DOMContentLoaded', init);
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument("--eval", default=DEFAULT_EVAL)
-    parser.add_argument("--golden", default="golden_eval_set.json")
-    parser.add_argument("--out", default="eval_audit_visualizer.html")
+    parser.add_argument("--eval", required=True, help="Path to a saved eval JSON file.")
+    parser.add_argument("--golden", default=GOLDEN_EVAL_PATH)
+    parser.add_argument("--out", default=os.path.join(EVAL_RESULTS_DIR, "eval_audit_visualizer.html"))
     args = parser.parse_args()
 
     dataset = build_dataset(args.eval, args.golden)

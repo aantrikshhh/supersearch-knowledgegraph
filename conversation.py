@@ -1,4 +1,10 @@
-"""Multi-turn conversation manager — the top-level orchestrator."""
+"""Top-level multi-turn orchestrator for SuperSearch chat requests.
+
+This module connects intent extraction, session state, deterministic workflow
+routing, product retrieval, and final response formatting. It is the closest
+thing to the production assistant loop: every user message enters here before
+being dispatched to one of the workflow modules.
+"""
 
 import json
 import re

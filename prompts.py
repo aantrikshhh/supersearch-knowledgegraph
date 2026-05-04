@@ -1,4 +1,9 @@
-"""System and user prompt templates for the eval pipeline."""
+"""Prompt templates shared by SuperSearch LLM stages.
+
+The repository keeps prompt text centralized so intent extraction, SQL
+generation, recommendation selection, and response formatting can evolve
+together without hiding important behavior inside workflow code.
+"""
 
 INTENT_EXTRACTION_SYSTEM = """You are an intent extraction system for a fashion recommendation engine.
 

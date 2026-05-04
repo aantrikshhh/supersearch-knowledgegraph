@@ -1,4 +1,9 @@
-"""Workflow: gifting — relation → gender/age inference → occasion-appropriate gifts."""
+"""Gifting workflow for recipient-aware SuperSearch recommendations.
+
+Gift queries add relation, likely gender/age, and occasion constraints before
+retrieval, so recommendations feel appropriate for the recipient rather than
+only matching the buyer's surface search terms.
+"""
 
 from workflows.base import run_standard_pipeline, get_kg, get_comp_graphs
 from outfit_builder import form_outfit, OutfitResult

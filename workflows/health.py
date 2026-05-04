@@ -1,4 +1,9 @@
-"""Workflow: health — comfort and feature-based recommendations."""
+"""Health and comfort workflow for constraint-heavy fashion searches.
+
+This path handles back pain, sweating, sensitive skin, arthritis, and similar
+needs by converting health context into fit/material guidance while preserving
+secondary occasion or place signals.
+"""
 
 from workflows.base import run_standard_pipeline, get_comp_graphs
 

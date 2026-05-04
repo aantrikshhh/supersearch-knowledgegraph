@@ -1,4 +1,8 @@
-"""CLI entry point — interactive conversation or single-query mode.
+"""Command-line entry point for local SuperSearch experimentation.
+
+This file wraps `ConversationManager` for two developer workflows: one-shot
+queries with optional trace output, and interactive multi-turn sessions against
+a selected brand catalog.
 
 Usage:
     python3 main.py                              # Interactive mode (default brand: aza)

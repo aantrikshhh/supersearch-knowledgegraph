@@ -1,10 +1,9 @@
-"""Loads and queries all 3 complementary graphs + accessory taxonomies.
+"""Accessory and styling graph loader for outfit assembly.
 
-Data sources:
-- complimentary_colours_graph.xlsx (453 rows): color harmony pairings
-- complimentary_product_graph.xlsx (482 rows): outfit combo definitions
-- complimentary_features_graph.xlsx (140 rows): feature pairings
-- bag_info.csv, shoes_info.csv, jewellery_info.csv: accessory taxonomies
+The main KG finds appropriate garments for a user context; these complementary
+graphs fill in styling details such as color harmony, matching product types,
+feature pairings, bags, shoes, and jewellery. Workflows access this through the
+singleton helpers in `workflows/base.py`.
 """
 
 import csv

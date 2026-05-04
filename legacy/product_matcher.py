@@ -1,4 +1,9 @@
-"""Product matching: scores catalog products against knowledge graph context."""
+"""Legacy in-memory product matcher for the pre-SQL SuperSearch prototype.
+
+The current system retrieves candidates through SQLite in `db_query.py`. This
+module remains only because legacy tracing and visualization tools still use it
+to demonstrate the original KG-to-product scoring strategy.
+"""
 
 from knowledge_graph import PRODUCT_TYPE_ALIASES
 

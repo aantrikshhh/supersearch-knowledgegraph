@@ -1,4 +1,9 @@
-"""Workflow: event/occasion — religion-aware, outfit combos, cultural sensitivity."""
+"""Occasion workflow for event, ceremony, and festival outfit searches.
+
+This is the main path for weddings, sangeet, Diwali, Onam, Navratri, gala,
+engagement, and similar queries. It combines KG cultural rules, formality, and
+optional explicit product types before building one or more outfits.
+"""
 
 from workflows.base import run_standard_pipeline, get_kg, get_comp_graphs
 from outfit_builder import form_multiple_outfits

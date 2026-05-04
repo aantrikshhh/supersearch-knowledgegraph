@@ -1,18 +1,28 @@
-"""Detailed trace of how a query flows through the Knowledge Graph pipeline.
+"""Legacy terminal tracer for the pre-SQL SuperSearch KG prototype.
 
-Run: python3 trace.py "What to wear to a restaurant in cloudy weather?"
-Or:  python3 trace.py  (uses default example)
+The maintained audit path is `scripts/eval/eval_audit_visualizer.py`. This
+older tool is kept to explain and debug the original KG scoring path that used
+`legacy/product_matcher.py` against raw catalog JSONs.
 """
 
 import sys
 import json
+from pathlib import Path
 from collections import defaultdict
+
+ROOT_DIR = Path(__file__).resolve().parents[1]
+LEGACY_DIR = Path(__file__).resolve().parent
+if str(ROOT_DIR) not in sys.path:
+    sys.path.insert(0, str(ROOT_DIR))
+if str(LEGACY_DIR) not in sys.path:
+    sys.path.insert(0, str(LEGACY_DIR))
+
 from knowledge_graph import KnowledgeGraph, INTENT_ALIASES, PRODUCT_TYPE_ALIASES
 from brand_adapters import load_catalog
 from product_matcher import score_product, _product_type_matches
+from config import KG_PATH
 
 CATALOG_PATH = "/Users/aant/repos/scraper-infra/data/house_of_masaba_products.json"
-KG_PATH = "Master_Graph.xlsx"
 BRAND = "masaba"
 
 
@@ -265,7 +275,7 @@ def trace_query(query, intents, brand=BRAND, catalog_path=CATALOG_PATH):
     # STAGE 6: LLM RECOMMENDATION
     # =========================================================================
     print(f"\n{'─' * 80}")
-    print("  STAGE 6: LLM RECOMMENDATION (what gets sent to Claude)")
+    print("  STAGE 6: LLM RECOMMENDATION (what gets sent to Codex)")
     print(f"{'─' * 80}")
 
     kg_context_str = kg.format_context(kg_result)

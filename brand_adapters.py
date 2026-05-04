@@ -1,6 +1,9 @@
-"""Brand-specific product catalog adapters.
+"""Brand-specific catalog normalization for SuperSearch product retrieval.
 
-Normalizes different catalog schemas into a common format for matching.
+Each brand export has different JSON shape, product fields, and image/URL
+conventions. This module converts those raw scraper outputs into one
+`NormalizedProduct` schema so `scripts/data/build_db.py` can build consistent
+SQLite tables for the downstream SQL recommendation flow.
 """
 
 import json

@@ -1,4 +1,9 @@
-"""Base workflow — shared logic for all 7 flows."""
+"""Shared execution path used by most SuperSearch workflows.
+
+Domain workflows enrich intents, then this module performs KG lookup, SQL
+retrieval, outfit assembly, accessory selection, and debug trace attachment.
+It also owns singleton loading for the KG and complementary graph data.
+"""
 
 from knowledge_graph import KnowledgeGraph
 from db_query import query_products

@@ -1,11 +1,18 @@
-"""Centralized configuration — paths, model names, constants."""
+"""Centralized configuration for the SuperSearch recommendation pipeline.
+
+This module is the shared contract for paths, LLM settings, brand database
+locations, weather tables, and formality constants. Runtime modules import it
+instead of hardcoding repo-relative paths so the query flow stays consistent as
+data and scripts move around the repo.
+"""
 
 import os
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+DATA_DIR = os.path.join(BASE_DIR, "data")
 
 # Knowledge Graph
-KG_PATH = os.path.join(BASE_DIR, "Master_Graph.xlsx")
+KG_PATH = os.path.join(DATA_DIR, "graph", "Master_Graph.xlsx")
 
 # Complementary Graphs
 COMP_GRAPHS_DIR = os.path.join(BASE_DIR, "assistant", "all_graph_components")
@@ -39,7 +46,7 @@ LLM_TIMEOUT = 120
 
 # Eval
 EVAL_RESULTS_DIR = os.path.join(BASE_DIR, "eval_results")
-GOLDEN_EVAL_PATH = os.path.join(BASE_DIR, "golden_eval_set.json")
+GOLDEN_EVAL_PATH = os.path.join(DATA_DIR, "eval", "golden_eval_set.json")
 
 # Weather lookup — major Indian cities + popular destinations
 WEATHER_TABLE = {

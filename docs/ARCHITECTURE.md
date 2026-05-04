@@ -10,7 +10,7 @@
                          │
                          ▼
               ┌─────────────────────┐
-              │  intent_extractor   │  LLM Call #1 (Haiku)
+              │  intent_extractor   │  LLM Call #1
               │  Parse → JSON       │  → {occasion: sangeet,
               │  + gender inference  │     bodytype: plus size,
               │  + gift detection    │     relation: sister,
@@ -36,7 +36,8 @@
               ┌─────────────────────┐
               │  knowledge_graph.py │  In-memory lookup
               │                     │  graph[("occasion",
-              │  Master_Graph.xlsx  │    "sangeet")] →
+              │ data/graph/         │    "sangeet")] →
+              │ Master_Graph.xlsx   │
               │  3012 rows          │  18 entries:
               │                     │  product, colour,
               │  Alias resolution:  │  pattern, material,
@@ -46,7 +47,7 @@
                          │
                          ▼
               ┌─────────────────────┐
-              │    db_query.py      │  LLM Call #2 (Haiku)
+              │    db_query.py      │  LLM Call #2
               │                     │
               │  Intents + KG       │  → SQL query with:
               │  context + cultural │    WHERE product_type
@@ -93,7 +94,7 @@
                          │
                          ▼
               ┌─────────────────────┐
-              │  conversation.py    │  LLM Call #3 (Haiku)
+              │  conversation.py    │  LLM Call #3
               │  Format response    │  → Natural language
               │  + styling notes    │    with product picks,
               │  + session update   │    accessories, colors,
@@ -103,7 +104,7 @@
 
 ## Data Flow
 
-### Knowledge Graph (Master_Graph.xlsx)
+### Knowledge Graph (`data/graph/Master_Graph.xlsx`)
 
 ```
 Schema: entity | entity_value | category | tag | name | rank | gender
@@ -208,7 +209,7 @@ main.py / api.py
        ├→ router.py
        │    └→ workflows/*.py
        │         ├→ workflows/base.py
-       │         │    ├→ knowledge_graph.py ──→ Master_Graph.xlsx
+       │         │    ├→ knowledge_graph.py ──→ data/graph/Master_Graph.xlsx
        │         │    ├→ db_query.py ──→ *.db (SQLite)
        │         │    │    └→ prompts.py
        │         │    └→ outfit_builder.py
@@ -222,10 +223,10 @@ main.py / api.py
 ## Eval Architecture
 
 ```
-golden_eval_set.json (50 queries with rubrics)
+data/eval/golden_eval_set.json (55 queries with rubrics)
          │
          ▼
-run_golden_eval_parallel.py (8 ThreadPoolExecutor workers)
+scripts/eval/run_golden_eval_parallel.py (8 ThreadPoolExecutor workers)
   Per query:
     1. KG lookup (in-memory, thread-safe)
     2. SQL generation (LLM subprocess)
@@ -244,12 +245,12 @@ run_golden_eval_parallel.py (8 ThreadPoolExecutor workers)
 
 | Decision | Choice | Why |
 |---|---|---|
-| LLM provider | Claude Haiku via CLI subprocess | No API key setup needed, fast enough for Haiku |
+| LLM provider | Codex CLI via `llm_client.py` | Centralized wrapper, configurable model via `KG_LLM_MODEL` |
 | Product storage | SQLite | Simple, embedded, fast (~3ms queries), no server needed |
 | KG storage | In-memory dicts from Excel | Small enough (3012 rows), sub-ms lookups |
 | Routing | Deterministic rules, not LLM | Saves a call, faster, predictable, no hallucination |
 | SQL generation | LLM with few-shot examples | Flexible queries, handles arbitrary intent combinations |
 | Color enforcement | SQL WHERE clause | Cultural constraints are hard rules, not suggestions |
 | Conflict resolution | Avoid vetoes, otherwise best rank | Safety-first: if ANY context says avoid, we avoid |
-| Eval parallelism | 8 ThreadPoolExecutor workers | 37x speedup, no rate limits observed |
+| Eval parallelism | 8 ThreadPoolExecutor workers | Keeps exhaustive 55 × 3 catalog evals practical despite CLI startup overhead |
 | Outfit composition | Complementary graphs, not LLM | Deterministic, fast, consistent outfit combos |

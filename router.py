@@ -1,4 +1,9 @@
-"""Route extracted intents to the appropriate workflow."""
+"""Deterministic workflow router for extracted SuperSearch intents.
+
+The router chooses which domain workflow owns a request, such as vacation,
+occasion, health, place/profession, activity, gifting, or general. It also
+captures secondary signals so compound queries do not silently drop context.
+"""
 
 from enum import Enum
 

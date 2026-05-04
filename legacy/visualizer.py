@@ -1,22 +1,33 @@
-"""Generate an interactive HTML visualization of the Knowledge Graph pipeline.
+"""Legacy interactive KG pipeline visualizer.
 
-Run: python3 visualizer.py
-Opens the visualizer in your browser with live data from the pipeline.
+This predates the saved-eval audit visualizer and demonstrates the older
+catalog-scoring trace path. It remains useful for architecture archaeology, but
+new eval review work should use `scripts/eval/eval_audit_visualizer.py`.
 """
 
 import json
 import webbrowser
 import os
 import re
+import sys
 import time
+from pathlib import Path
 from collections import defaultdict
+
+ROOT_DIR = Path(__file__).resolve().parents[1]
+LEGACY_DIR = Path(__file__).resolve().parent
+if str(ROOT_DIR) not in sys.path:
+    sys.path.insert(0, str(ROOT_DIR))
+if str(LEGACY_DIR) not in sys.path:
+    sys.path.insert(0, str(LEGACY_DIR))
+
 from knowledge_graph import KnowledgeGraph, INTENT_ALIASES
 from brand_adapters import load_catalog, NormalizedProduct
 from product_matcher import score_product, _product_type_matches
 from prompts import RECOMMENDATION_SYSTEM, RECOMMENDATION_USER, INTENT_EXTRACTION_SYSTEM, INTENT_EXTRACTION_USER
 from llm_client import call_llm
+from config import KG_PATH
 
-KG_PATH = "Master_Graph.xlsx"
 CATALOGS = {
     "masaba": "/Users/aant/repos/scraper-infra/data/house_of_masaba_products.json",
     "kalki": "/Users/aant/repos/scraper-infra/data/kalki_fashion_products.json",

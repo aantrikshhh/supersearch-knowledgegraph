@@ -1,3 +1,10 @@
+"""Regression tests for Rufus-inspired SuperSearch query-handling gaps.
+
+These tests lock down the behavior added after auditing fashion search queries:
+budget extraction, explicit product types, cultural event aliases, negated
+product requests, follow-up detection, and deterministic SQL constraints.
+"""
+
 import unittest
 
 from conversation import ConversationManager

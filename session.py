@@ -1,4 +1,9 @@
-"""Session state management for multi-turn conversations."""
+"""Session state and intent memory for multi-turn SuperSearch conversations.
+
+Conversation turns need sticky constraints such as product type, occasion,
+gender, body type, and religion to survive follow-ups like "in red" or "make
+it cheaper". This module stores turns and merges intent state safely.
+"""
 
 import json
 import time

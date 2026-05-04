@@ -1,21 +1,29 @@
-"""Build SQLite databases from product catalogs.
+"""Build local SQLite product databases for the SuperSearch retrieval layer.
 
-Run: python3 build_db.py
-Creates: masaba_products.db, kalki_products.db, aza_products.db
+This script normalizes raw scraper catalog JSON files through brand adapters
+and writes the compact `products` tables consumed by `db_query.py`. It is a
+data-prep entry point, not part of the live request path.
+
+Run from the repo root:
+    python3 scripts/data/build_db.py
 """
 
 import sqlite3
 import json
 import os
+import sys
+from pathlib import Path
+
+ROOT_DIR = Path(__file__).resolve().parents[2]
+if str(ROOT_DIR) not in sys.path:
+    sys.path.insert(0, str(ROOT_DIR))
+
 from brand_adapters import load_catalog
+from config import BRAND_DB_PATHS, CATALOG_PATHS
 
-CATALOGS = {
-    "masaba": "/Users/aant/repos/scraper-infra/data/house_of_masaba_products.json",
-    "kalki": "/Users/aant/repos/scraper-infra/data/kalki_fashion_products.json",
-    "aza": "/Users/aant/repos/scraper-infra/data/aza_fashions_products.json",
-}
+CATALOGS = CATALOG_PATHS
 
-DB_DIR = os.path.dirname(__file__)
+DB_DIR = str(ROOT_DIR)
 
 SCHEMA = """
 CREATE TABLE IF NOT EXISTS products (
@@ -40,7 +48,7 @@ CREATE INDEX IF NOT EXISTS idx_price ON products(price);
 
 
 def build_db(brand, catalog_path, max_products=None):
-    db_path = os.path.join(DB_DIR, f"{brand}_products.db")
+    db_path = BRAND_DB_PATHS.get(brand, os.path.join(DB_DIR, f"{brand}_products.db"))
 
     if os.path.exists(db_path):
         os.remove(db_path)
