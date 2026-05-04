@@ -1,0 +1,367 @@
+"""Parallel golden eval — 8 queries at a time, 3 LLM calls per query.
+
+Expected time depends on LLM model and full eval size.
+"""
+
+import json
+import os
+import re
+import time
+import math
+from datetime import datetime
+from concurrent.futures import ThreadPoolExecutor, as_completed
+from knowledge_graph import KnowledgeGraph
+from db_query import query_products
+from prompts import RECOMMENDATION_SYSTEM, RECOMMENDATION_USER
+from config import KG_PATH, LLM_TIMEOUT
+from llm_client import call_llm
+
+BRANDS = ["masaba", "kalki", "aza"]
+DB_CHECK = {b: f"{b}_products.db" for b in BRANDS}
+WORKERS = 8
+
+BATCH_SCORER_SYSTEM = """You are a fashion recommendation evaluator. Score ALL products at once.
+
+For each product, assign a relevance score 0-3:
+- 3 = Perfect match — exactly what the user should wear
+- 2 = Good match — appropriate and would work well
+- 1 = Acceptable — not ideal but not wrong
+- 0 = Irrelevant — wrong product type, wrong context, or culturally inappropriate
+
+Consider: product type match, color/material/pattern alignment, cultural constraints.
+
+Return ONLY a JSON array: [{"product_index": 1, "score": <0-3>, "reason": "<one sentence>"}, ...]"""
+
+
+def call_claude(prompt, system):
+    try:
+        return call_llm(prompt, system_prompt=system, timeout=max(180, LLM_TIMEOUT))
+    except Exception:
+        return None
+
+
+def dcg(scores):
+    return sum(s / math.log2(i + 2) for i, s in enumerate(scores))
+
+def ndcg_at_k(scores, k=5):
+    scores = scores[:k]
+    actual = dcg(scores)
+    ideal = dcg(sorted(scores, reverse=True))
+    return actual / ideal if ideal > 0 else 0.0
+
+def mrr(scores):
+    for i, s in enumerate(scores):
+        if s >= 2:
+            return 1.0 / (i + 1)
+    return 0.0
+
+def hit_rate(scores, threshold=2):
+    return 1.0 if any(s >= threshold for s in scores) else 0.0
+
+
+def process_single_query(qi, entry, kg, brand):
+    """Process one query end-to-end. Thread-safe (no shared mutable state)."""
+    query = entry["query"]
+    intents = entry["intents"]
+    rubric = entry.get("scoring_rubric", {})
+    expected = entry.get("expected_product_types", {})
+    cultural = entry.get("cultural_constraints", "None")
+
+    result = {
+        "query_id": qi + 1, "query": query, "brand": brand,
+        "intents": intents, "db_products": 0, "recommendations": [],
+        "scores": [], "ndcg5": 0.0, "mrr": 0.0, "hit_rate": 0.0,
+    }
+
+    # Step 1: KG lookup (in-memory, thread-safe reads)
+    kg_result = kg.lookup(intents)
+    kg_context = kg.format_context(kg_result)
+
+    # Step 2: SQL generation + DB query
+    try:
+        db_result = query_products(query, intents, kg_context, brand)
+        db_products = db_result.get("products", [])
+        result["db_products"] = len(db_products)
+        result["sql"] = db_result.get("sql", "")
+        result["db_trace"] = {
+            "brand": db_result.get("brand"),
+            "db_path": db_result.get("db_path"),
+            "available_types": db_result.get("available_types", []),
+            "sql": db_result.get("sql", ""),
+            "raw_llm_sql_response": db_result.get("raw_llm_sql_response"),
+            "product_count": db_result.get("product_count", 0),
+            "timings": db_result.get("timings", {}),
+            "errors": db_result.get("errors", []),
+            "retries": db_result.get("retries", []),
+            "candidates": [
+                {
+                    "db_rank": i + 1,
+                    "product_id": p.get("id"),
+                    "title": p.get("title"),
+                    "product_type": p.get("product_type"),
+                    "colors": p.get("colors", ""),
+                    "patterns": p.get("patterns", ""),
+                    "materials": p.get("materials", ""),
+                    "price": p.get("price", 0),
+                }
+                for i, p in enumerate(db_products[:20])
+            ],
+        }
+    except Exception as e:
+        result["errors"] = [str(e)]
+        return result
+
+    if not db_products:
+        return result
+
+    # Step 3: LLM recommendation
+    products_for_llm = [{
+        "db_rank": i + 1,
+        "product_id": p["id"], "title": p["title"],
+        "product_type": p["product_type"],
+        "colors": p.get("colors", ""), "patterns": p.get("patterns", ""),
+        "materials": p.get("materials", ""), "price": p.get("price", 0),
+    } for i, p in enumerate(db_products[:20])]
+
+    rec_system = RECOMMENDATION_SYSTEM.format(brand_name=brand)
+    rec_prompt = RECOMMENDATION_USER.format(
+        query=query, intents=json.dumps(intents),
+        kg_context=kg_context, count=len(products_for_llm),
+        brand_name=brand, products_json=json.dumps(products_for_llm),
+    )
+
+    raw = call_claude(rec_prompt, rec_system)
+    recs = []
+    if raw:
+        match = re.search(r'\[.*\]', raw, re.DOTALL)
+        if match:
+            try:
+                recs = json.loads(match.group())
+            except json.JSONDecodeError:
+                pass
+
+    if not recs:
+        recs = [{"title": p["title"], "product_id": p["product_id"],
+                 "product_type": p["product_type"], "db_rank": p["db_rank"]} for p in products_for_llm[:5]]
+
+    result["recommendation_trace"] = {
+        "raw_llm_response": raw,
+        "parsed_recommendations": recs,
+    }
+
+    # Step 4: Batch score all recommendations
+    rec_products = []
+    for rec in recs[:5]:
+        title = rec.get("title", "Unknown")
+        prod = next((p for p in products_for_llm
+                     if p.get("product_id") == rec.get("product_id")
+                     or p.get("title") == title), {})
+        if prod:
+            rec_products.append({**prod, "_llm_rec": rec})
+        else:
+            rec_products.append({"title": title, "_llm_rec": rec})
+
+    products_text = ""
+    for i, p in enumerate(rec_products):
+        products_text += f"\n{i+1}. [{p.get('product_type','')}] {p.get('title','')} | colors: {p.get('colors','')} | materials: {p.get('materials','')} | price: {p.get('price','')}"
+
+    scorer_prompt = f"""## User Query
+{query}
+
+## Scoring Rubric
+- Perfect (3): {rubric.get("3_perfect", "")}
+- Good (2): {rubric.get("2_good", "")}
+- Acceptable (1): {rubric.get("1_acceptable", "")}
+- Irrelevant (0): {rubric.get("0_irrelevant", "")}
+
+## Cultural Constraints
+{cultural}
+
+## Expected Product Types
+- Ideal: {", ".join(expected.get("ideal", []))}
+- Avoid: {", ".join(expected.get("avoid", []))}
+
+## Products to Score
+{products_text}
+
+Score every product. Return a JSON array."""
+
+    raw_scores = call_claude(scorer_prompt, BATCH_SCORER_SYSTEM)
+    batch_scores = []
+    if raw_scores:
+        match = re.search(r'\[.*\]', raw_scores, re.DOTALL)
+        if match:
+            try:
+                batch_scores = json.loads(match.group())
+            except json.JSONDecodeError:
+                pass
+
+    result["scorer_trace"] = {
+        "raw_response": raw_scores,
+        "parsed_scores": batch_scores,
+    }
+
+    scores = []
+    scored_recs = []
+    for ri, rec in enumerate(recs[:5]):
+        prod = rec_products[ri] if ri < len(rec_products) else {}
+        score_entry = batch_scores[ri] if ri < len(batch_scores) else {"score": 0, "reason": "missing"}
+        s = int(score_entry.get("score", 0))
+        scores.append(s)
+        scored_recs.append({
+            "rank": ri + 1,
+            "db_rank": prod.get("db_rank"),
+            "product_id": prod.get("product_id") or rec.get("product_id", ""),
+            "title": prod.get("title") or rec.get("title", ""),
+            "product_type": prod.get("product_type") or rec.get("product_type", ""),
+            "colors": prod.get("colors", ""),
+            "patterns": prod.get("patterns", ""),
+            "materials": prod.get("materials", ""),
+            "price": prod.get("price", ""),
+            "matched_candidate": bool(prod.get("product_id")),
+            "relevance_score": s,
+            "reason": score_entry.get("reason", ""),
+        })
+
+    result["recommendations"] = scored_recs
+    result["scores"] = scores
+    result["ndcg5"] = round(ndcg_at_k(scores), 4)
+    result["mrr"] = round(mrr(scores), 4)
+    result["hit_rate"] = round(hit_rate(scores), 4)
+    result["kg_context"] = kg_context
+
+    return result
+
+
+def run_eval():
+    start_time = time.time()
+    print("=" * 70)
+    print(f"  ALL-BRANDS PARALLEL EVAL ({WORKERS} workers)")
+    print(f"  Every query × every catalog = comprehensive coverage")
+    print("=" * 70)
+
+    with open("golden_eval_set.json") as f:
+        golden = json.load(f)
+
+    kg = KnowledgeGraph(KG_PATH)
+    available_brands = [b for b in BRANDS if os.path.exists(DB_CHECK[b])]
+    total_jobs = len(golden) * len(available_brands)
+    print(f"Queries: {len(golden)} × Brands: {len(available_brands)} = {total_jobs} total jobs")
+    print(f"Workers: {WORKERS}")
+    print()
+
+    # Prepare jobs — every query × every brand
+    jobs = []
+    for qi, entry in enumerate(golden):
+        for brand in available_brands:
+            job_id = qi * len(available_brands) + available_brands.index(brand)
+            jobs.append((job_id, qi, entry, kg, brand))
+
+    # Run in parallel
+    all_results = [None] * len(jobs)
+    completed = 0
+
+    with ThreadPoolExecutor(max_workers=WORKERS) as executor:
+        futures = {
+            executor.submit(process_single_query, qi, entry, kg, brand): job_id
+            for job_id, qi, entry, kg, brand in jobs
+        }
+
+        for future in as_completed(futures):
+            job_id = futures[future]
+            try:
+                result = future.result()
+                all_results[job_id] = result
+                completed += 1
+                elapsed = time.time() - start_time
+                eta = (elapsed / completed) * (total_jobs - completed) if completed else 0
+
+                scores_str = str(result["scores"])
+                print(f"[{completed:3d}/{total_jobs}] [{result['brand'].upper():6s}] NDCG={result['ndcg5']:.3f} | {result['query'][:48]}")
+                print(f"          {scores_str} | ETA: {eta/60:.0f}m", flush=True)
+            except Exception as e:
+                completed += 1
+                print(f"[{completed:3d}/{total_jobs}] ERROR job {job_id}: {e}", flush=True)
+                all_results[job_id] = {
+                    "query_id": job_id, "query": "error",
+                    "brand": "unknown",
+                    "scores": [], "ndcg5": 0.0, "mrr": 0.0, "hit_rate": 0.0,
+                }
+
+    all_results = [r for r in all_results if r is not None]
+
+    # Summary
+    total_time = time.time() - start_time
+    avg_ndcg = sum(r["ndcg5"] for r in all_results) / len(all_results)
+    avg_mrr = sum(r["mrr"] for r in all_results) / len(all_results)
+    avg_hit = sum(r["hit_rate"] for r in all_results) / len(all_results)
+
+    print(f"\n{'='*70}")
+    print(f"  FINAL RESULTS — {len(all_results)} queries in {total_time/60:.1f} minutes")
+    print(f"{'='*70}")
+    print(f"  NDCG@5:    {avg_ndcg:.4f}")
+    print(f"  MRR:       {avg_mrr:.4f}")
+    print(f"  Hit Rate:  {avg_hit:.4f}")
+
+    for brand in available_brands:
+        br = [r for r in all_results if r["brand"] == brand]
+        if br:
+            print(f"\n  [{brand.upper()}] ({len(br)} queries)")
+            print(f"    NDCG@5: {sum(r['ndcg5'] for r in br)/len(br):.4f}")
+            print(f"    MRR:    {sum(r['mrr'] for r in br)/len(br):.4f}")
+            print(f"    Hit:    {sum(r['hit_rate'] for r in br)/len(br):.4f}")
+
+    all_scores = [s for r in all_results for s in r["scores"]]
+    if all_scores:
+        from collections import Counter
+        dist = Counter(all_scores)
+        print(f"\n  Score distribution ({len(all_scores)} recommendations):")
+        for score in [3, 2, 1, 0]:
+            pct = dist.get(score, 0) / len(all_scores) * 100
+            bar = "█" * int(pct / 2)
+            label = {3: "perfect", 2: "good", 1: "acceptable", 0: "irrelevant"}[score]
+            print(f"    {score} ({label:10s}): {dist.get(score,0):3d} ({pct:5.1f}%) {bar}")
+
+    # Per-query cross-brand comparison
+    print(f"\n  Per-query: which brand scored best?")
+    brand_wins = {b: 0 for b in available_brands}
+    for qi in range(len(golden)):
+        query_results = [r for r in all_results if r.get("query") == golden[qi]["query"]]
+        if query_results:
+            best_brand = max(query_results, key=lambda r: r["ndcg5"])
+            brand_wins[best_brand["brand"]] += 1
+    for b, wins in sorted(brand_wins.items(), key=lambda x: -x[1]):
+        print(f"    {b.upper()}: best on {wins}/{len(golden)} queries")
+
+    worst = sorted(all_results, key=lambda r: r["ndcg5"])[:5]
+    print(f"\n  Worst 5:")
+    for r in worst:
+        print(f"    [{r['brand'].upper()}] NDCG={r['ndcg5']:.3f} | {r['query'][:55]}")
+
+    best = sorted(all_results, key=lambda r: -r["ndcg5"])[:5]
+    print(f"\n  Best 5:")
+    for r in best:
+        print(f"    [{r['brand'].upper()}] NDCG={r['ndcg5']:.3f} | {r['query'][:55]}")
+
+    # Save
+    os.makedirs("eval_results", exist_ok=True)
+    ts = datetime.now().strftime("%Y%m%d_%H%M%S")
+    output_path = f"eval_results/golden_eval_{ts}.json"
+    with open(output_path, "w") as f:
+        json.dump({
+            "summary": {
+                "total_queries": len(all_results),
+                "avg_ndcg5": round(avg_ndcg, 4),
+                "avg_mrr": round(avg_mrr, 4),
+                "avg_hit_rate": round(avg_hit, 4),
+                "total_time_minutes": round(total_time / 60, 1),
+                "workers": WORKERS,
+            },
+            "results": all_results,
+        }, f, indent=2, default=str)
+    print(f"\n  Saved to: {output_path}")
+    print(f"  Total time: {total_time/60:.1f} minutes")
+
+
+if __name__ == "__main__":
+    run_eval()

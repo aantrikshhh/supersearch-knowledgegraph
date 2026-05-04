@@ -1,0 +1,4535 @@
+[
+  {
+    "id": 1,
+    "category": "occasion-based",
+    "query": "What should I wear to my cousin's sangeet night?",
+    "intents": {
+      "occasion": "sangeet",
+      "relation": "cousin",
+      "time": "night"
+    },
+    "brand_agnostic": true,
+    "expected_product_types": {
+      "ideal": [
+        "lehenga",
+        "saree",
+        "sharara set"
+      ],
+      "acceptable": [
+        "anarkali",
+        "kurta set",
+        "gown"
+      ],
+      "avoid": [
+        "shorts",
+        "t-shirt",
+        "swimwear",
+        "tracksuit"
+      ]
+    },
+    "expected_attributes": {
+      "colors": {
+        "ideal": [
+          "pink",
+          "magenta",
+          "gold",
+          "royal blue",
+          "emerald green"
+        ],
+        "avoid": [
+          "white",
+          "black",
+          "beige"
+        ]
+      },
+      "materials": {
+        "ideal": [
+          "georgette",
+          "silk",
+          "sequin"
+        ],
+        "acceptable": [
+          "chiffon",
+          "net",
+          "velvet"
+        ],
+        "avoid": [
+          "cotton",
+          "denim",
+          "linen"
+        ]
+      },
+      "patterns": {
+        "ideal": [
+          "sequined",
+          "embroidered",
+          "mirror work",
+          "embellished"
+        ],
+        "avoid": [
+          "plain",
+          "stripes",
+          "checks"
+        ]
+      }
+    },
+    "cultural_constraints": "Sangeet is a dance-focused pre-wedding celebration; outfit must allow movement while being glamorous. Bright, festive colors expected. No white (mourning) or all-black (inauspicious for weddings).",
+    "scoring_rubric": {
+      "3_perfect": "Lehenga or sharara in vibrant pink/blue/green with sequin or mirror work \u2014 designed for dancing and celebration",
+      "2_good": "Embroidered anarkali or heavy kurta set in festive colors \u2014 appropriate but may restrict movement",
+      "1_acceptable": "Plain colored ethnic dress or simple kurta \u2014 would work but underwhelming for sangeet",
+      "0_irrelevant": "Western casual wear, dark/white outfits, or any non-ethnic product type"
+    },
+    "formality_level": "semi-formal to formal",
+    "gender_hint": "female"
+  },
+  {
+    "id": 2,
+    "category": "occasion-based",
+    "query": "I need a mehendi outfit \u2014 something comfortable but festive",
+    "intents": {
+      "occasion": "mehendi"
+    },
+    "brand_agnostic": true,
+    "expected_product_types": {
+      "ideal": [
+        "sharara set",
+        "kurta set",
+        "palazzo set"
+      ],
+      "acceptable": [
+        "anarkali",
+        "co-ord set",
+        "kaftan"
+      ],
+      "avoid": [
+        "lehenga",
+        "gown",
+        "swimwear",
+        "shorts"
+      ]
+    },
+    "expected_attributes": {
+      "colors": {
+        "ideal": [
+          "yellow",
+          "green",
+          "lime",
+          "parrot green",
+          "mustard"
+        ],
+        "avoid": [
+          "white",
+          "black",
+          "red"
+        ]
+      },
+      "materials": {
+        "ideal": [
+          "cotton silk",
+          "chanderi",
+          "georgette"
+        ],
+        "acceptable": [
+          "crepe",
+          "rayon",
+          "cotton"
+        ],
+        "avoid": [
+          "heavy silk",
+          "velvet",
+          "denim"
+        ]
+      },
+      "patterns": {
+        "ideal": [
+          "floral",
+          "gota patti",
+          "bandhani",
+          "printed"
+        ],
+        "avoid": [
+          "plain dark",
+          "western prints"
+        ]
+      }
+    },
+    "cultural_constraints": "Mehendi is a daytime pre-wedding function where hands are covered in henna. Outfit must have short or pushable sleeves. Yellow/green are traditional mehendi colors. Avoid red (reserved for bride) and white/black (inauspicious).",
+    "scoring_rubric": {
+      "3_perfect": "Yellow or green sharara/palazzo set with floral or gota work \u2014 comfortable, festive, and practical for henna application",
+      "2_good": "Printed kurta set in acceptable festive colors \u2014 appropriate but not as celebratory",
+      "1_acceptable": "Any ethnic wear in non-traditional colors \u2014 works but misses the mehendi aesthetic",
+      "0_irrelevant": "Heavy lehenga, western wear, dark colors, or anything impractical for henna"
+    },
+    "formality_level": "semi-formal",
+    "gender_hint": "female"
+  },
+  {
+    "id": 3,
+    "category": "occasion-based",
+    "query": "Show me wedding guest lehengas for a Hindu wedding reception",
+    "intents": {
+      "occasion": "hindu wedding",
+      "product_type": "lehenga"
+    },
+    "brand_agnostic": true,
+    "expected_product_types": {
+      "ideal": [
+        "lehenga"
+      ],
+      "acceptable": [
+        "saree",
+        "gown"
+      ],
+      "avoid": [
+        "kurta",
+        "jeans",
+        "shorts",
+        "kaftan"
+      ]
+    },
+    "expected_attributes": {
+      "colors": {
+        "ideal": [
+          "burgundy",
+          "navy",
+          "emerald",
+          "teal",
+          "wine",
+          "maroon"
+        ],
+        "avoid": [
+          "red",
+          "white",
+          "black"
+        ]
+      },
+      "materials": {
+        "ideal": [
+          "silk",
+          "velvet",
+          "brocade"
+        ],
+        "acceptable": [
+          "georgette",
+          "net",
+          "satin"
+        ],
+        "avoid": [
+          "cotton",
+          "denim",
+          "linen"
+        ]
+      },
+      "patterns": {
+        "ideal": [
+          "embroidered",
+          "zari work",
+          "embellished",
+          "sequined"
+        ],
+        "avoid": [
+          "plain",
+          "casual prints"
+        ]
+      }
+    },
+    "cultural_constraints": "As a wedding guest, must NOT wear red (reserved for bride). White and black are inauspicious. Reception is the most formal event \u2014 heavy, richly embellished outfits expected. Must be respectful and not outshine the bride.",
+    "scoring_rubric": {
+      "3_perfect": "Heavily embroidered lehenga in jewel tones (burgundy, navy, emerald) with zari or sequin work",
+      "2_good": "Embellished saree or gown in appropriate colors \u2014 formal enough but user asked for lehenga",
+      "1_acceptable": "Light lehenga or ethnic outfit in neutral colors \u2014 works but not impactful enough for reception",
+      "0_irrelevant": "Red lehenga (bride's color), casual wear, western outfits, or white/black"
+    },
+    "formality_level": "formal",
+    "gender_hint": "female"
+  },
+  {
+    "id": 4,
+    "category": "occasion-based",
+    "query": "What should a groom wear to his haldi ceremony?",
+    "intents": {
+      "occasion": "haldi",
+      "gender": "male"
+    },
+    "brand_agnostic": true,
+    "expected_product_types": {
+      "ideal": [
+        "kurta",
+        "kurta set",
+        "kurta pajama"
+      ],
+      "acceptable": [
+        "bandi set",
+        "dhoti kurta"
+      ],
+      "avoid": [
+        "sherwani",
+        "suit",
+        "t-shirt",
+        "jeans"
+      ]
+    },
+    "expected_attributes": {
+      "colors": {
+        "ideal": [
+          "yellow",
+          "white",
+          "ivory",
+          "cream",
+          "mustard"
+        ],
+        "avoid": [
+          "black",
+          "navy",
+          "dark colors"
+        ]
+      },
+      "materials": {
+        "ideal": [
+          "cotton",
+          "linen",
+          "chanderi"
+        ],
+        "acceptable": [
+          "silk cotton",
+          "khadi"
+        ],
+        "avoid": [
+          "heavy silk",
+          "velvet",
+          "polyester"
+        ]
+      },
+      "patterns": {
+        "ideal": [
+          "plain",
+          "chikankari",
+          "lucknowi"
+        ],
+        "avoid": [
+          "heavy embroidery",
+          "sequins"
+        ]
+      }
+    },
+    "cultural_constraints": "Haldi involves turmeric paste application \u2014 outfit WILL get stained. Yellow/white/cream are traditional. Keep it simple and washable. No expensive heavy fabrics. Groom should look festive but not overdressed.",
+    "scoring_rubric": {
+      "3_perfect": "White or yellow cotton/linen kurta pajama \u2014 traditional, practical, and appropriate for turmeric staining",
+      "2_good": "Light-colored bandi set or dhoti kurta \u2014 festive but may be too much for haldi",
+      "1_acceptable": "Any light ethnic wear that could work \u2014 present but not ideal",
+      "0_irrelevant": "Dark colors, expensive fabrics, sherwani, or western wear"
+    },
+    "formality_level": "casual to semi-formal",
+    "gender_hint": "male"
+  },
+  {
+    "id": 5,
+    "category": "occasion-based",
+    "query": "Date night outfit \u2014 something chic and modern for dinner",
+    "intents": {
+      "occasion": "date night",
+      "time": "evening"
+    },
+    "brand_agnostic": true,
+    "expected_product_types": {
+      "ideal": [
+        "dress",
+        "co-ord set",
+        "saree"
+      ],
+      "acceptable": [
+        "kurta",
+        "top",
+        "skirt set"
+      ],
+      "avoid": [
+        "lehenga",
+        "tracksuit",
+        "swimwear",
+        "salwar kameez"
+      ]
+    },
+    "expected_attributes": {
+      "colors": {
+        "ideal": [
+          "black",
+          "wine",
+          "emerald",
+          "blush pink",
+          "burgundy"
+        ],
+        "avoid": [
+          "neon",
+          "orange",
+          "bright yellow"
+        ]
+      },
+      "materials": {
+        "ideal": [
+          "satin",
+          "crepe",
+          "silk"
+        ],
+        "acceptable": [
+          "georgette",
+          "chiffon",
+          "velvet"
+        ],
+        "avoid": [
+          "cotton",
+          "denim",
+          "linen"
+        ]
+      },
+      "patterns": {
+        "ideal": [
+          "solid",
+          "subtle prints",
+          "draped"
+        ],
+        "avoid": [
+          "loud prints",
+          "heavy embroidery",
+          "ethnic motifs"
+        ]
+      }
+    },
+    "cultural_constraints": "No strict cultural constraints. Focus on modern, elegant, and slightly alluring aesthetic. Should be restaurant-appropriate \u2014 not too revealing but confident. Indian fusion acceptable.",
+    "scoring_rubric": {
+      "3_perfect": "Sleek draped dress or contemporary co-ord set in dark sophisticated colors \u2014 effortlessly chic",
+      "2_good": "Elegant printed dress or fusion saree \u2014 stylish but perhaps too dressed up or too casual",
+      "1_acceptable": "Nice kurta or ethnic top \u2014 would work but not particularly date-night specific",
+      "0_irrelevant": "Traditional heavy ethnic wear, casual loungewear, or overly conservative outfits"
+    },
+    "formality_level": "smart casual to semi-formal",
+    "gender_hint": "female"
+  },
+  {
+    "id": 6,
+    "category": "occasion-based",
+    "query": "Engagement ceremony outfit for the bride's sister",
+    "intents": {
+      "occasion": "engagement",
+      "relation": "sister"
+    },
+    "brand_agnostic": true,
+    "expected_product_types": {
+      "ideal": [
+        "lehenga",
+        "saree",
+        "anarkali"
+      ],
+      "acceptable": [
+        "sharara set",
+        "gown",
+        "kurta set"
+      ],
+      "avoid": [
+        "shorts",
+        "jeans",
+        "swimwear",
+        "kaftan"
+      ]
+    },
+    "expected_attributes": {
+      "colors": {
+        "ideal": [
+          "pink",
+          "peach",
+          "lavender",
+          "mint",
+          "coral"
+        ],
+        "avoid": [
+          "red",
+          "white",
+          "black"
+        ]
+      },
+      "materials": {
+        "ideal": [
+          "organza",
+          "georgette",
+          "net"
+        ],
+        "acceptable": [
+          "silk",
+          "crepe",
+          "chiffon"
+        ],
+        "avoid": [
+          "cotton",
+          "denim",
+          "linen"
+        ]
+      },
+      "patterns": {
+        "ideal": [
+          "embroidered",
+          "sequined",
+          "floral embellished"
+        ],
+        "avoid": [
+          "plain",
+          "casual prints"
+        ]
+      }
+    },
+    "cultural_constraints": "Sister of the bride should look celebratory and coordinated with the event but must NOT outshine the bride. Avoid red (bride's color) and white/black (inauspicious). Pastel or jewel tones work best.",
+    "scoring_rubric": {
+      "3_perfect": "Embroidered lehenga or saree in pink/peach/lavender \u2014 festive, appropriate for bride's family",
+      "2_good": "Sharara set or anarkali in acceptable colors \u2014 formal enough but slightly less impactful",
+      "1_acceptable": "Simple ethnic wear in neutral tones \u2014 appropriate but underwhelming for bride's sister",
+      "0_irrelevant": "Red outfit, western casual wear, dark colors, or anything too casual"
+    },
+    "formality_level": "formal",
+    "gender_hint": "female"
+  },
+  {
+    "id": 7,
+    "category": "occasion-based",
+    "query": "What to wear to a corporate gala dinner?",
+    "intents": {
+      "occasion": "gala",
+      "formality": "formal"
+    },
+    "brand_agnostic": true,
+    "expected_product_types": {
+      "ideal": [
+        "gown",
+        "saree",
+        "dress"
+      ],
+      "acceptable": [
+        "lehenga",
+        "anarkali",
+        "co-ord set"
+      ],
+      "avoid": [
+        "kurta",
+        "kaftan",
+        "tracksuit",
+        "shorts"
+      ]
+    },
+    "expected_attributes": {
+      "colors": {
+        "ideal": [
+          "black",
+          "navy",
+          "gold",
+          "emerald",
+          "burgundy"
+        ],
+        "avoid": [
+          "neon",
+          "orange",
+          "casual pastels"
+        ]
+      },
+      "materials": {
+        "ideal": [
+          "silk",
+          "satin",
+          "velvet"
+        ],
+        "acceptable": [
+          "crepe",
+          "georgette",
+          "brocade"
+        ],
+        "avoid": [
+          "cotton",
+          "linen",
+          "denim"
+        ]
+      },
+      "patterns": {
+        "ideal": [
+          "solid with embellishment",
+          "metallic",
+          "subtle texture"
+        ],
+        "avoid": [
+          "loud prints",
+          "cartoon prints",
+          "casual florals"
+        ]
+      }
+    },
+    "cultural_constraints": "Corporate context \u2014 must be elegant and professional while being event-appropriate. Indian ethnic (like a silk saree) is perfectly acceptable and even impressive at galas. Avoid overly revealing cuts.",
+    "scoring_rubric": {
+      "3_perfect": "Elegant gown or silk saree in rich dark tones \u2014 sophisticated and gala-appropriate",
+      "2_good": "Embellished dress or contemporary ethnic outfit in formal colors",
+      "1_acceptable": "Nice outfit that's slightly too casual or too traditional for corporate gala",
+      "0_irrelevant": "Casual wear, overly ethnic festival wear, or inappropriate formality level"
+    },
+    "formality_level": "black-tie/formal",
+    "gender_hint": "female"
+  },
+  {
+    "id": 8,
+    "category": "occasion-based",
+    "query": "Suggest an outfit for my friend's bachelorette party",
+    "intents": {
+      "occasion": "bachelorette",
+      "relation": "friend"
+    },
+    "brand_agnostic": true,
+    "expected_product_types": {
+      "ideal": [
+        "dress",
+        "co-ord set",
+        "jumpsuit"
+      ],
+      "acceptable": [
+        "skirt set",
+        "top",
+        "kaftan"
+      ],
+      "avoid": [
+        "saree",
+        "lehenga",
+        "salwar kameez",
+        "tracksuit"
+      ]
+    },
+    "expected_attributes": {
+      "colors": {
+        "ideal": [
+          "pink",
+          "hot pink",
+          "red",
+          "gold",
+          "black"
+        ],
+        "avoid": [
+          "white",
+          "beige",
+          "brown"
+        ]
+      },
+      "materials": {
+        "ideal": [
+          "sequin",
+          "satin",
+          "metallic"
+        ],
+        "acceptable": [
+          "crepe",
+          "chiffon",
+          "velvet"
+        ],
+        "avoid": [
+          "cotton",
+          "linen",
+          "wool"
+        ]
+      },
+      "patterns": {
+        "ideal": [
+          "solid glamorous",
+          "metallic",
+          "sequined"
+        ],
+        "avoid": [
+          "ethnic prints",
+          "floral traditional"
+        ]
+      }
+    },
+    "cultural_constraints": "Bachelorette is a modern, fun celebration. White is reserved for the bride-to-be. Outfit should be party-ready, glamorous, and fun. Pink is the traditional bachelorette color. No somber or overly conservative looks.",
+    "scoring_rubric": {
+      "3_perfect": "Hot pink or gold sequin dress/co-ord \u2014 party-perfect and bachelorette-ready",
+      "2_good": "Stylish black dress or jumpsuit \u2014 fun but not specifically bachelorette-themed",
+      "1_acceptable": "Any presentable outfit that could work at a party \u2014 generic but not wrong",
+      "0_irrelevant": "Traditional ethnic wear, white outfits, or casual/conservative clothing"
+    },
+    "formality_level": "party/glamorous",
+    "gender_hint": "female"
+  },
+  {
+    "id": 9,
+    "category": "occasion-based",
+    "query": "What should the mother of the groom wear to the wedding?",
+    "intents": {
+      "occasion": "hindu wedding",
+      "relation": "mom",
+      "role": "mother of groom"
+    },
+    "brand_agnostic": true,
+    "expected_product_types": {
+      "ideal": [
+        "saree",
+        "lehenga"
+      ],
+      "acceptable": [
+        "anarkali",
+        "sharara set",
+        "gown"
+      ],
+      "avoid": [
+        "kurta",
+        "jeans",
+        "dress",
+        "kaftan"
+      ]
+    },
+    "expected_attributes": {
+      "colors": {
+        "ideal": [
+          "gold",
+          "purple",
+          "navy",
+          "maroon",
+          "teal",
+          "royal blue"
+        ],
+        "avoid": [
+          "red",
+          "white",
+          "black",
+          "pastel pink"
+        ]
+      },
+      "materials": {
+        "ideal": [
+          "banarasi silk",
+          "kanjeevaram",
+          "silk",
+          "brocade"
+        ],
+        "acceptable": [
+          "georgette",
+          "velvet",
+          "organza"
+        ],
+        "avoid": [
+          "cotton",
+          "linen",
+          "crepe"
+        ]
+      },
+      "patterns": {
+        "ideal": [
+          "zari work",
+          "heavy embroidery",
+          "brocade weave",
+          "gold embellishment"
+        ],
+        "avoid": [
+          "plain",
+          "casual prints",
+          "western motifs"
+        ]
+      }
+    },
+    "cultural_constraints": "Mother of groom holds a position of honor. Must look regal and distinguished. Avoid red (bride's privilege). Rich, heavy fabrics expected \u2014 Banarasi or Kanjeevaram saree is ideal. Must be age-appropriate and dignified.",
+    "scoring_rubric": {
+      "3_perfect": "Heavy Banarasi/Kanjeevaram saree or rich lehenga in purple/navy/gold with zari work",
+      "2_good": "Embellished anarkali or sharara in jewel tones \u2014 formal but less traditional",
+      "1_acceptable": "Any formal ethnic wear in appropriate colors \u2014 dignified but not special enough",
+      "0_irrelevant": "Red outfits, casual wear, western clothing, or anything too young/trendy"
+    },
+    "formality_level": "formal/regal",
+    "gender_hint": "female"
+  },
+  {
+    "id": 10,
+    "category": "occasion-based",
+    "query": "Roka ceremony outfit \u2014 something elegant but not too heavy",
+    "intents": {
+      "occasion": "roka"
+    },
+    "brand_agnostic": true,
+    "expected_product_types": {
+      "ideal": [
+        "saree",
+        "lehenga",
+        "anarkali"
+      ],
+      "acceptable": [
+        "sharara set",
+        "kurta set",
+        "gown"
+      ],
+      "avoid": [
+        "jeans",
+        "shorts",
+        "kaftan",
+        "swimwear"
+      ]
+    },
+    "expected_attributes": {
+      "colors": {
+        "ideal": [
+          "pastel pink",
+          "peach",
+          "lavender",
+          "mint",
+          "blush"
+        ],
+        "avoid": [
+          "black",
+          "white",
+          "dark navy"
+        ]
+      },
+      "materials": {
+        "ideal": [
+          "organza",
+          "georgette",
+          "chiffon"
+        ],
+        "acceptable": [
+          "crepe",
+          "silk blend",
+          "net"
+        ],
+        "avoid": [
+          "heavy silk",
+          "velvet",
+          "cotton"
+        ]
+      },
+      "patterns": {
+        "ideal": [
+          "subtle embroidery",
+          "thread work",
+          "delicate embellishment"
+        ],
+        "avoid": [
+          "heavy zari",
+          "loud prints",
+          "plain"
+        ]
+      }
+    },
+    "cultural_constraints": "Roka is a semi-formal pre-wedding ceremony marking the engagement agreement. Elegant but not as heavy as the wedding itself. Pastel and soft colors are preferred. User specifically wants something not too heavy \u2014 prioritize lighter fabrics.",
+    "scoring_rubric": {
+      "3_perfect": "Pastel organza saree or light lehenga with delicate thread work \u2014 elegant yet not overwhelming",
+      "2_good": "Nice anarkali or sharara in soft colors \u2014 appropriate but may be slightly under or overdressed",
+      "1_acceptable": "Simple ethnic wear that could work \u2014 present but not roka-specific styling",
+      "0_irrelevant": "Heavy bridal-level outfits, dark colors, casual wear, or western clothing"
+    },
+    "formality_level": "semi-formal to formal",
+    "gender_hint": "female"
+  },
+  {
+    "id": 11,
+    "category": "place-weather",
+    "query": "What to wear to a temple visit in summer?",
+    "intents": {
+      "place": "temple",
+      "weather": "summer"
+    },
+    "brand_agnostic": true,
+    "expected_product_types": {
+      "ideal": [
+        "kurta set",
+        "saree",
+        "salwar kameez"
+      ],
+      "acceptable": [
+        "palazzo set",
+        "anarkali",
+        "kurta"
+      ],
+      "avoid": [
+        "shorts",
+        "sleeveless top",
+        "mini dress",
+        "swimwear",
+        "skirt"
+      ]
+    },
+    "expected_attributes": {
+      "colors": {
+        "ideal": [
+          "yellow",
+          "orange",
+          "white",
+          "pink",
+          "cream"
+        ],
+        "avoid": [
+          "black",
+          "dark colors"
+        ]
+      },
+      "materials": {
+        "ideal": [
+          "cotton",
+          "linen",
+          "khadi"
+        ],
+        "acceptable": [
+          "chanderi",
+          "mul cotton",
+          "rayon"
+        ],
+        "avoid": [
+          "silk",
+          "velvet",
+          "polyester",
+          "synthetic"
+        ]
+      },
+      "patterns": {
+        "ideal": [
+          "simple prints",
+          "block print",
+          "plain",
+          "subtle motifs"
+        ],
+        "avoid": [
+          "heavy embellishment",
+          "sequins",
+          "western prints"
+        ]
+      }
+    },
+    "cultural_constraints": "Temple requires modest clothing \u2014 shoulders and knees must be covered. No revealing cuts. Shoes removed at entry so comfort matters. Summer heat demands breathable fabrics. Auspicious colors preferred. Black is avoided in Hindu temples.",
+    "scoring_rubric": {
+      "3_perfect": "Cotton kurta set in yellow/orange/white \u2014 modest, breathable, and temple-appropriate",
+      "2_good": "Light saree or palazzo set in appropriate colors \u2014 works but may be less practical in heat",
+      "1_acceptable": "Any modest ethnic outfit \u2014 appropriate but not optimized for summer temple visit",
+      "0_irrelevant": "Revealing clothing, dark colors, heavy fabrics, or western casual wear"
+    },
+    "formality_level": "modest/traditional",
+    "gender_hint": "female"
+  },
+  {
+    "id": 12,
+    "category": "place-weather",
+    "query": "What to wear to a beach restaurant in humid weather?",
+    "intents": {
+      "place": "restaurant",
+      "weather": "humid",
+      "location_type": "beach"
+    },
+    "brand_agnostic": true,
+    "expected_product_types": {
+      "ideal": [
+        "dress",
+        "kaftan",
+        "co-ord set"
+      ],
+      "acceptable": [
+        "kurta",
+        "top",
+        "palazzo set"
+      ],
+      "avoid": [
+        "lehenga",
+        "saree",
+        "sherwani",
+        "heavy ethnic"
+      ]
+    },
+    "expected_attributes": {
+      "colors": {
+        "ideal": [
+          "white",
+          "blue",
+          "coral",
+          "turquoise",
+          "pastel"
+        ],
+        "avoid": [
+          "black",
+          "dark heavy colors"
+        ]
+      },
+      "materials": {
+        "ideal": [
+          "linen",
+          "cotton",
+          "mul cotton"
+        ],
+        "acceptable": [
+          "rayon",
+          "georgette",
+          "chiffon"
+        ],
+        "avoid": [
+          "silk",
+          "velvet",
+          "polyester",
+          "synthetic"
+        ]
+      },
+      "patterns": {
+        "ideal": [
+          "tropical prints",
+          "floral",
+          "abstract",
+          "block print"
+        ],
+        "avoid": [
+          "heavy embroidery",
+          "sequins",
+          "ethnic motifs"
+        ]
+      }
+    },
+    "cultural_constraints": "No strict cultural constraints. Prioritize comfort in humidity \u2014 breathable, light fabrics. Beach-restaurant appropriate means slightly elevated casual. Sweat-resistance is key consideration.",
+    "scoring_rubric": {
+      "3_perfect": "Breezy linen kaftan or cotton dress in coastal colors with fun prints \u2014 humidity-proof and restaurant-ready",
+      "2_good": "Light co-ord set or printed kurta in breathable fabric \u2014 practical but less beach-specific",
+      "1_acceptable": "Any light outfit that could work \u2014 not terrible but not optimized for conditions",
+      "0_irrelevant": "Heavy ethnic wear, synthetic fabrics, dark heavy colors, or formal traditional outfits"
+    },
+    "formality_level": "casual to smart casual",
+    "gender_hint": "female"
+  },
+  {
+    "id": 13,
+    "category": "place-weather",
+    "query": "Outfit for a mountain trip in winter \u2014 need to stay warm",
+    "intents": {
+      "place": "mountains",
+      "weather": "winter",
+      "activity": "traveling"
+    },
+    "brand_agnostic": true,
+    "expected_product_types": {
+      "ideal": [
+        "jacket",
+        "kurta set",
+        "co-ord set"
+      ],
+      "acceptable": [
+        "dress",
+        "kaftan",
+        "pant set"
+      ],
+      "avoid": [
+        "saree",
+        "lehenga",
+        "swimwear",
+        "sleeveless"
+      ]
+    },
+    "expected_attributes": {
+      "colors": {
+        "ideal": [
+          "maroon",
+          "olive",
+          "rust",
+          "navy",
+          "brown",
+          "mustard"
+        ],
+        "avoid": [
+          "white",
+          "pastel",
+          "light colors"
+        ]
+      },
+      "materials": {
+        "ideal": [
+          "wool",
+          "velvet",
+          "tweed",
+          "quilted"
+        ],
+        "acceptable": [
+          "thick cotton",
+          "fleece-lined",
+          "corduroy"
+        ],
+        "avoid": [
+          "chiffon",
+          "net",
+          "thin georgette",
+          "satin"
+        ]
+      },
+      "patterns": {
+        "ideal": [
+          "solid",
+          "checks",
+          "plaid",
+          "embroidered"
+        ],
+        "avoid": [
+          "sequins",
+          "sheer",
+          "beach prints"
+        ]
+      }
+    },
+    "cultural_constraints": "No specific cultural constraints. Focus on warmth and layering. Indian mountain destinations (Himachal, Kashmir, Uttarakhand) \u2014 local wool or Pashmina would be contextually appropriate.",
+    "scoring_rubric": {
+      "3_perfect": "Warm velvet/wool kurta set or layerable jacket in earthy tones \u2014 warm, stylish, and practical for mountains",
+      "2_good": "Thick co-ord set or dress that provides some warmth \u2014 adequate but may need additional layering",
+      "1_acceptable": "Any warm-ish outfit \u2014 not mountain-specific but could work with additions",
+      "0_irrelevant": "Summer dresses, sheer fabrics, sarees, or anything impractical for cold weather"
+    },
+    "formality_level": "casual",
+    "gender_hint": "female"
+  },
+  {
+    "id": 14,
+    "category": "place-weather",
+    "query": "What to wear to a cafe in rainy weather?",
+    "intents": {
+      "place": "cafe",
+      "weather": "rainy"
+    },
+    "brand_agnostic": true,
+    "expected_product_types": {
+      "ideal": [
+        "kurta set",
+        "co-ord set",
+        "dress"
+      ],
+      "acceptable": [
+        "top",
+        "palazzo set",
+        "kaftan"
+      ],
+      "avoid": [
+        "saree",
+        "lehenga",
+        "long trail outfits"
+      ]
+    },
+    "expected_attributes": {
+      "colors": {
+        "ideal": [
+          "teal",
+          "navy",
+          "olive",
+          "burgundy",
+          "rust"
+        ],
+        "avoid": [
+          "white",
+          "cream",
+          "pastel"
+        ]
+      },
+      "materials": {
+        "ideal": [
+          "cotton",
+          "crepe",
+          "denim"
+        ],
+        "acceptable": [
+          "rayon",
+          "polyester blend",
+          "modal"
+        ],
+        "avoid": [
+          "silk",
+          "chiffon",
+          "net",
+          "velvet"
+        ]
+      },
+      "patterns": {
+        "ideal": [
+          "solid",
+          "simple prints",
+          "abstract"
+        ],
+        "avoid": [
+          "heavy embellishment",
+          "sheer"
+        ]
+      }
+    },
+    "cultural_constraints": "No cultural constraints. Practical considerations: avoid white/light colors (water splashes show), avoid long trailing fabrics (puddles), avoid delicate fabrics that water damages. Hemline should be practical.",
+    "scoring_rubric": {
+      "3_perfect": "Short/mid-length cotton or crepe kurta set in dark color \u2014 splash-proof, cafe-appropriate, and rain-practical",
+      "2_good": "Co-ord set or dress in suitable color \u2014 works but might not fully account for rain",
+      "1_acceptable": "Any reasonable outfit in non-white colors \u2014 could work with compromises",
+      "0_irrelevant": "White silk saree, long trailing lehenga, or delicate fabrics that rain would ruin"
+    },
+    "formality_level": "casual to smart casual",
+    "gender_hint": "female"
+  },
+  {
+    "id": 15,
+    "category": "place-weather",
+    "query": "Office wear for humid Mumbai summers",
+    "intents": {
+      "place": "office",
+      "weather": "humid",
+      "weather2": "summer",
+      "location": "Mumbai"
+    },
+    "brand_agnostic": true,
+    "expected_product_types": {
+      "ideal": [
+        "kurta set",
+        "co-ord set",
+        "dress"
+      ],
+      "acceptable": [
+        "palazzo set",
+        "top",
+        "pant set"
+      ],
+      "avoid": [
+        "saree",
+        "lehenga",
+        "kaftan",
+        "swimwear"
+      ]
+    },
+    "expected_attributes": {
+      "colors": {
+        "ideal": [
+          "white",
+          "blue",
+          "beige",
+          "pastel",
+          "grey"
+        ],
+        "avoid": [
+          "black",
+          "dark navy",
+          "heavy dark colors"
+        ]
+      },
+      "materials": {
+        "ideal": [
+          "cotton",
+          "linen",
+          "mul cotton"
+        ],
+        "acceptable": [
+          "rayon",
+          "modal",
+          "chambray"
+        ],
+        "avoid": [
+          "silk",
+          "velvet",
+          "polyester",
+          "synthetic"
+        ]
+      },
+      "patterns": {
+        "ideal": [
+          "solid",
+          "subtle prints",
+          "block print",
+          "stripes"
+        ],
+        "avoid": [
+          "heavy embroidery",
+          "sequins",
+          "festive patterns"
+        ]
+      }
+    },
+    "cultural_constraints": "Office-appropriate \u2014 professional and modest. Mumbai humidity is extreme \u2014 must prioritize breathable, quick-dry fabrics. Comfort in commute (local trains/auto) matters. Cotton is king in Mumbai monsoon/summer.",
+    "scoring_rubric": {
+      "3_perfect": "Cotton/linen kurta set or co-ord in light colors \u2014 breathable, professional, Mumbai-humidity-proof",
+      "2_good": "Light dress or palazzo set in breathable fabric \u2014 professional but may not be humidity-optimized",
+      "1_acceptable": "Any office-appropriate outfit \u2014 could work but fabric/color not ideal for climate",
+      "0_irrelevant": "Dark synthetic fabrics, heavy ethnic wear, or anything impractical for Mumbai humidity"
+    },
+    "formality_level": "business casual",
+    "gender_hint": "female"
+  },
+  {
+    "id": 16,
+    "category": "place-weather",
+    "query": "What to wear to a garden party in sunny weather?",
+    "intents": {
+      "place": "garden",
+      "weather": "sunny",
+      "occasion": "party"
+    },
+    "brand_agnostic": true,
+    "expected_product_types": {
+      "ideal": [
+        "dress",
+        "co-ord set",
+        "kurta set"
+      ],
+      "acceptable": [
+        "saree",
+        "palazzo set",
+        "skirt set"
+      ],
+      "avoid": [
+        "lehenga",
+        "sherwani",
+        "tracksuit"
+      ]
+    },
+    "expected_attributes": {
+      "colors": {
+        "ideal": [
+          "floral pastels",
+          "yellow",
+          "mint",
+          "coral",
+          "lavender",
+          "peach"
+        ],
+        "avoid": [
+          "black",
+          "dark navy",
+          "dark brown"
+        ]
+      },
+      "materials": {
+        "ideal": [
+          "cotton",
+          "linen",
+          "organza"
+        ],
+        "acceptable": [
+          "chiffon",
+          "georgette",
+          "crepe"
+        ],
+        "avoid": [
+          "velvet",
+          "heavy silk",
+          "synthetic"
+        ]
+      },
+      "patterns": {
+        "ideal": [
+          "floral",
+          "botanical",
+          "pastel prints",
+          "garden prints"
+        ],
+        "avoid": [
+          "heavy embroidery",
+          "dark motifs",
+          "sequins"
+        ]
+      }
+    },
+    "cultural_constraints": "No strict constraints. Garden party aesthetic is light, fresh, and nature-inspired. Sun protection through breathable fabrics. Avoid heels-unfriendly heavy outfits. Bright, happy colors preferred.",
+    "scoring_rubric": {
+      "3_perfect": "Floral cotton/linen dress or co-ord in pastel garden colors \u2014 perfectly thematic and comfortable",
+      "2_good": "Light kurta set or palazzo in appropriate colors \u2014 nice but less garden-party-specific",
+      "1_acceptable": "Any light outfit that wouldn't look out of place \u2014 acceptable but generic",
+      "0_irrelevant": "Dark heavy outfits, formal ethnic wear, or anything impractical for outdoor sunny setting"
+    },
+    "formality_level": "smart casual",
+    "gender_hint": "female"
+  },
+  {
+    "id": 17,
+    "category": "place-weather",
+    "query": "Dressing for a mosque visit \u2014 need something respectful",
+    "intents": {
+      "place": "mosque",
+      "religion": "Islam"
+    },
+    "brand_agnostic": true,
+    "expected_product_types": {
+      "ideal": [
+        "kurta set",
+        "salwar kameez",
+        "anarkali"
+      ],
+      "acceptable": [
+        "palazzo set",
+        "abaya-style dress",
+        "kaftan"
+      ],
+      "avoid": [
+        "shorts",
+        "sleeveless",
+        "mini dress",
+        "swimwear",
+        "crop top"
+      ]
+    },
+    "expected_attributes": {
+      "colors": {
+        "ideal": [
+          "white",
+          "green",
+          "blue",
+          "cream",
+          "soft pastels"
+        ],
+        "avoid": [
+          "bright red",
+          "neon",
+          "revealing black"
+        ]
+      },
+      "materials": {
+        "ideal": [
+          "cotton",
+          "georgette",
+          "chiffon"
+        ],
+        "acceptable": [
+          "crepe",
+          "rayon",
+          "linen"
+        ],
+        "avoid": [
+          "sheer",
+          "net",
+          "see-through"
+        ]
+      },
+      "patterns": {
+        "ideal": [
+          "plain",
+          "subtle prints",
+          "geometric"
+        ],
+        "avoid": [
+          "animal prints",
+          "revealing cuts",
+          "western graphics"
+        ]
+      }
+    },
+    "cultural_constraints": "STRICT modesty requirements: full arm coverage, full leg coverage, loose-fitting (not body-hugging), head covering may be needed. No sheer or see-through fabrics. Respectful, understated elegance. Shoes removed at entry.",
+    "scoring_rubric": {
+      "3_perfect": "Loose cotton/georgette kurta set covering arms and legs fully in white/green/blue \u2014 respectful and appropriate",
+      "2_good": "Modest palazzo set or salwar in appropriate colors \u2014 covers well but might need dupatta adjustment",
+      "1_acceptable": "Any fully modest outfit \u2014 works but not aesthetically aligned with mosque context",
+      "0_irrelevant": "Revealing clothing, sheer fabrics, sleeveless, above-knee hemlines, or culturally insensitive choices"
+    },
+    "formality_level": "modest/respectful",
+    "gender_hint": "female"
+  },
+  {
+    "id": 18,
+    "category": "place-weather",
+    "query": "What to wear to a club in Delhi winter nights?",
+    "intents": {
+      "place": "club",
+      "weather": "winter",
+      "time": "night",
+      "location": "Delhi"
+    },
+    "brand_agnostic": true,
+    "expected_product_types": {
+      "ideal": [
+        "dress",
+        "co-ord set",
+        "top"
+      ],
+      "acceptable": [
+        "jumpsuit",
+        "skirt set",
+        "kurta set"
+      ],
+      "avoid": [
+        "saree",
+        "lehenga",
+        "salwar kameez",
+        "tracksuit"
+      ]
+    },
+    "expected_attributes": {
+      "colors": {
+        "ideal": [
+          "black",
+          "gold",
+          "silver",
+          "wine",
+          "emerald"
+        ],
+        "avoid": [
+          "white",
+          "pastel",
+          "beige"
+        ]
+      },
+      "materials": {
+        "ideal": [
+          "velvet",
+          "sequin",
+          "satin",
+          "metallic"
+        ],
+        "acceptable": [
+          "crepe",
+          "silk blend",
+          "leather-look"
+        ],
+        "avoid": [
+          "cotton",
+          "linen",
+          "wool"
+        ]
+      },
+      "patterns": {
+        "ideal": [
+          "solid dark",
+          "metallic",
+          "sequined",
+          "shimmer"
+        ],
+        "avoid": [
+          "ethnic prints",
+          "floral",
+          "block print"
+        ]
+      }
+    },
+    "cultural_constraints": "Delhi clubs are fashion-forward. Winter nights are cold (5-10 C) \u2014 need layering potential. Inside clubs are heated/warm. Outfit should be glamorous for indoors but consider a jacket layer. Delhi crowd is fashion-conscious.",
+    "scoring_rubric": {
+      "3_perfect": "Velvet or sequin dress/co-ord in black/gold with potential for layering \u2014 glamorous and seasonally aware",
+      "2_good": "Stylish outfit in dark tones \u2014 club-appropriate but may not account for winter or may be too conservative",
+      "1_acceptable": "Any presentable party outfit \u2014 works at a club but not Delhi-winter-night specific",
+      "0_irrelevant": "Traditional ethnic wear, casual cotton outfits, or summer-only pieces"
+    },
+    "formality_level": "party/glamorous",
+    "gender_hint": "female"
+  },
+  {
+    "id": 19,
+    "category": "body-type-occasion",
+    "query": "I'm plus size \u2014 what lehenga would work for a wedding?",
+    "intents": {
+      "bodytype": "plus size",
+      "occasion": "hindu wedding",
+      "product_type": "lehenga"
+    },
+    "brand_agnostic": true,
+    "expected_product_types": {
+      "ideal": [
+        "lehenga"
+      ],
+      "acceptable": [
+        "anarkali",
+        "saree",
+        "sharara set"
+      ],
+      "avoid": [
+        "body-con dress",
+        "crop top",
+        "shorts"
+      ]
+    },
+    "expected_attributes": {
+      "colors": {
+        "ideal": [
+          "jewel tones",
+          "navy",
+          "emerald",
+          "wine",
+          "teal",
+          "deep purple"
+        ],
+        "avoid": [
+          "all white",
+          "very light pastels",
+          "neon"
+        ]
+      },
+      "materials": {
+        "ideal": [
+          "georgette",
+          "chiffon",
+          "crepe"
+        ],
+        "acceptable": [
+          "net with lining",
+          "silk"
+        ],
+        "avoid": [
+          "stiff brocade",
+          "very heavy fabric",
+          "clingy jersey"
+        ]
+      },
+      "patterns": {
+        "ideal": [
+          "vertical embroidery",
+          "scattered motifs",
+          "A-line silhouette",
+          "strategic embellishment"
+        ],
+        "avoid": [
+          "horizontal stripes",
+          "large bold prints",
+          "all-over heavy work at waist"
+        ]
+      }
+    },
+    "cultural_constraints": "Body-positive approach \u2014 the goal is finding flattering fits, not hiding the body. A-line lehengas with fitted blouse and flared skirt are most flattering. Avoid very stiff or overly voluminous fabrics that add bulk. Jewel tones are universally flattering on plus size.",
+    "scoring_rubric": {
+      "3_perfect": "A-line georgette/chiffon lehenga in jewel tones with strategic embellishment \u2014 flattering silhouette for plus size",
+      "2_good": "Any lehenga in appropriate color with flow-y fabric \u2014 wedding appropriate but silhouette may not be optimal",
+      "1_acceptable": "Non-lehenga ethnic wear that could work \u2014 user asked for lehenga specifically",
+      "0_irrelevant": "Body-hugging styles, unflattering silhouettes, casual wear, or avoided product types"
+    },
+    "formality_level": "formal",
+    "gender_hint": "female"
+  },
+  {
+    "id": 20,
+    "category": "body-type-occasion",
+    "query": "Petite frame \u2014 what to wear to a formal office event?",
+    "intents": {
+      "bodytype": "petite",
+      "place": "office",
+      "occasion": "corporate event"
+    },
+    "brand_agnostic": true,
+    "expected_product_types": {
+      "ideal": [
+        "kurta set",
+        "co-ord set",
+        "dress"
+      ],
+      "acceptable": [
+        "saree",
+        "pant set",
+        "top"
+      ],
+      "avoid": [
+        "lehenga",
+        "heavy anarkali",
+        "oversized kaftan"
+      ]
+    },
+    "expected_attributes": {
+      "colors": {
+        "ideal": [
+          "monochrome",
+          "navy",
+          "black",
+          "burgundy",
+          "forest green"
+        ],
+        "avoid": [
+          "very busy multicolor",
+          "all-over loud prints"
+        ]
+      },
+      "materials": {
+        "ideal": [
+          "crepe",
+          "silk blend",
+          "georgette"
+        ],
+        "acceptable": [
+          "cotton",
+          "linen blend",
+          "modal"
+        ],
+        "avoid": [
+          "heavy velvet",
+          "stiff brocade",
+          "bulky fabrics"
+        ]
+      },
+      "patterns": {
+        "ideal": [
+          "vertical lines",
+          "subtle prints",
+          "solid",
+          "monochromatic embroidery"
+        ],
+        "avoid": [
+          "large florals",
+          "horizontal stripes",
+          "overly busy patterns"
+        ]
+      }
+    },
+    "cultural_constraints": "No cultural constraints beyond office appropriateness. For petite frames: vertical lines elongate, monochromatic dressing adds height, avoid oversized or overly voluminous pieces that swamp the frame. Heels-friendly outfits help.",
+    "scoring_rubric": {
+      "3_perfect": "Streamlined kurta set or co-ord in monochromatic tones with vertical elements \u2014 elongating and professional",
+      "2_good": "Nice dress or pant set in appropriate color \u2014 professional but not specifically petite-flattering",
+      "1_acceptable": "Any office-appropriate outfit \u2014 works but doesn't address petite-specific styling",
+      "0_irrelevant": "Oversized silhouettes, very heavy ethnic wear, or anything too casual for corporate event"
+    },
+    "formality_level": "business formal",
+    "gender_hint": "female"
+  },
+  {
+    "id": 21,
+    "category": "body-type-occasion",
+    "query": "I have broad shoulders \u2014 suggest a festive outfit for Diwali",
+    "intents": {
+      "bodytype": "broad shoulders",
+      "event": "Diwali"
+    },
+    "brand_agnostic": true,
+    "expected_product_types": {
+      "ideal": [
+        "anarkali",
+        "saree",
+        "lehenga"
+      ],
+      "acceptable": [
+        "kurta set",
+        "sharara set",
+        "palazzo set"
+      ],
+      "avoid": [
+        "off-shoulder top",
+        "boat neck",
+        "puffed sleeves"
+      ]
+    },
+    "expected_attributes": {
+      "colors": {
+        "ideal": [
+          "gold",
+          "red",
+          "purple",
+          "orange",
+          "green"
+        ],
+        "avoid": [
+          "white",
+          "black"
+        ]
+      },
+      "materials": {
+        "ideal": [
+          "georgette",
+          "chiffon",
+          "silk"
+        ],
+        "acceptable": [
+          "crepe",
+          "cotton silk",
+          "net"
+        ],
+        "avoid": [
+          "stiff structured fabrics"
+        ]
+      },
+      "patterns": {
+        "ideal": [
+          "V-neck cuts",
+          "vertical embroidery",
+          "draped styles",
+          "off-center motifs"
+        ],
+        "avoid": [
+          "heavy shoulder embellishment",
+          "horizontal necklines",
+          "epaulette details"
+        ]
+      }
+    },
+    "cultural_constraints": "Diwali requires festive, celebratory outfits in auspicious colors (gold, red, orange, green). For broad shoulders: V-necks draw eye downward, raglan sleeves soften shoulders, flared bottoms balance proportions, avoid cap sleeves and boat necks.",
+    "scoring_rubric": {
+      "3_perfect": "V-neck anarkali or draped saree in festive colors \u2014 balances broad shoulders while being celebration-appropriate",
+      "2_good": "Festive kurta set or lehenga in appropriate colors \u2014 Diwali-ready but neckline may not optimize for broad shoulders",
+      "1_acceptable": "Any festive outfit in appropriate colors \u2014 celebratory but doesn't address body type concern",
+      "0_irrelevant": "Dark/white colors, shoulder-emphasizing cuts, or casual non-festive wear"
+    },
+    "formality_level": "festive/semi-formal",
+    "gender_hint": "female"
+  },
+  {
+    "id": 22,
+    "category": "body-type-occasion",
+    "query": "Pear shaped body \u2014 what suits me for a birthday party?",
+    "intents": {
+      "bodytype": "pear shaped",
+      "occasion": "birthday party"
+    },
+    "brand_agnostic": true,
+    "expected_product_types": {
+      "ideal": [
+        "anarkali",
+        "dress",
+        "kurta set"
+      ],
+      "acceptable": [
+        "co-ord set",
+        "saree",
+        "sharara set"
+      ],
+      "avoid": [
+        "pencil skirt",
+        "tight leggings",
+        "body-con"
+      ]
+    },
+    "expected_attributes": {
+      "colors": {
+        "ideal": [
+          "bright top/dark bottom",
+          "jewel tones",
+          "pink",
+          "coral",
+          "teal"
+        ],
+        "avoid": [
+          "light colored tight bottoms"
+        ]
+      },
+      "materials": {
+        "ideal": [
+          "flow-y georgette",
+          "chiffon",
+          "crepe"
+        ],
+        "acceptable": [
+          "cotton",
+          "silk blend",
+          "net"
+        ],
+        "avoid": [
+          "stiff denim",
+          "clingy jersey on bottom",
+          "structured bottom"
+        ]
+      },
+      "patterns": {
+        "ideal": [
+          "embellished top/plain bottom",
+          "A-line silhouette",
+          "empire waist",
+          "flared"
+        ],
+        "avoid": [
+          "attention on hips",
+          "tight at thighs",
+          "horizontal stripes at bottom"
+        ]
+      }
+    },
+    "cultural_constraints": "No cultural constraints for birthday party. Pear shape: narrower shoulders and wider hips \u2014 draw attention upward with detailed/bright tops, keep bottoms dark/flowy. A-line and empire waist universally flattering. Avoid hip-hugging cuts.",
+    "scoring_rubric": {
+      "3_perfect": "A-line anarkali or flared dress with embellished bodice \u2014 draws eye up and flows over hips elegantly",
+      "2_good": "Kurta set with flared palazzo or saree \u2014 flattering but less party-specific",
+      "1_acceptable": "Any party outfit that doesn't actively highlight wider hips \u2014 acceptable but not optimized",
+      "0_irrelevant": "Hip-hugging styles, tight bottom wear, or anything that draws attention to lower body"
+    },
+    "formality_level": "smart casual to semi-formal",
+    "gender_hint": "female"
+  },
+  {
+    "id": 23,
+    "category": "body-type-occasion",
+    "query": "Apple shaped body \u2014 need something for a cousin's sangeet",
+    "intents": {
+      "bodytype": "apple shaped",
+      "occasion": "sangeet",
+      "relation": "cousin"
+    },
+    "brand_agnostic": true,
+    "expected_product_types": {
+      "ideal": [
+        "anarkali",
+        "sharara set",
+        "lehenga"
+      ],
+      "acceptable": [
+        "saree",
+        "kurta set",
+        "gown"
+      ],
+      "avoid": [
+        "body-con",
+        "crop top lehenga",
+        "tight co-ord set"
+      ]
+    },
+    "expected_attributes": {
+      "colors": {
+        "ideal": [
+          "jewel tones",
+          "deep pink",
+          "royal blue",
+          "emerald"
+        ],
+        "avoid": [
+          "all white",
+          "light pastels around midsection"
+        ]
+      },
+      "materials": {
+        "ideal": [
+          "georgette",
+          "chiffon",
+          "flowing fabrics"
+        ],
+        "acceptable": [
+          "net",
+          "crepe",
+          "silk"
+        ],
+        "avoid": [
+          "stiff brocade at waist",
+          "clingy fabrics",
+          "thick structured"
+        ]
+      },
+      "patterns": {
+        "ideal": [
+          "empire waist",
+          "long kurti with flared bottom",
+          "vertical draping",
+          "strategic embroidery below bust"
+        ],
+        "avoid": [
+          "waist belts",
+          "cinched waist details",
+          "horizontal patterns at midsection"
+        ]
+      }
+    },
+    "cultural_constraints": "Sangeet is celebratory and dance-focused. For apple shape (wider midsection): empire waists shift focus above tummy, flowing fabrics skim over midsection, avoid anything that cinches at natural waist. Must be dance-friendly.",
+    "scoring_rubric": {
+      "3_perfect": "Empire-waist anarkali or flowing sharara set in jewel tones \u2014 flattering for apple shape and dance-ready for sangeet",
+      "2_good": "Draped saree or well-cut lehenga \u2014 festive and somewhat forgiving at midsection",
+      "1_acceptable": "Any sangeet-appropriate ethnic wear \u2014 celebratory but may not specifically flatter apple shape",
+      "0_irrelevant": "Waist-defining tight cuts, casual wear, or anything that emphasizes midsection"
+    },
+    "formality_level": "semi-formal to formal",
+    "gender_hint": "female"
+  },
+  {
+    "id": 24,
+    "category": "body-type-occasion",
+    "query": "I'm tall and slim \u2014 suggest a saree draping style outfit for a reception",
+    "intents": {
+      "bodytype": "tall",
+      "bodytype2": "slim",
+      "occasion": "hindu wedding",
+      "product_type": "saree"
+    },
+    "brand_agnostic": true,
+    "expected_product_types": {
+      "ideal": [
+        "saree"
+      ],
+      "acceptable": [
+        "pre-draped saree",
+        "saree gown",
+        "lehenga"
+      ],
+      "avoid": [
+        "kurta",
+        "shorts",
+        "kaftan"
+      ]
+    },
+    "expected_attributes": {
+      "colors": {
+        "ideal": [
+          "gold",
+          "deep red",
+          "emerald",
+          "navy",
+          "wine"
+        ],
+        "avoid": [
+          "washed out pastels",
+          "very light neutrals"
+        ]
+      },
+      "materials": {
+        "ideal": [
+          "silk",
+          "banarasi",
+          "kanjeevaram",
+          "tissue"
+        ],
+        "acceptable": [
+          "georgette",
+          "organza",
+          "crepe"
+        ],
+        "avoid": [
+          "stiff cotton",
+          "denim"
+        ]
+      },
+      "patterns": {
+        "ideal": [
+          "rich borders",
+          "all-over embroidery",
+          "heavy pallu",
+          "zari work"
+        ],
+        "avoid": [
+          "vertical stripes",
+          "very long vertical motifs"
+        ]
+      }
+    },
+    "cultural_constraints": "Reception is the most formal wedding event. Tall and slim bodies can carry heavy sarees beautifully \u2014 rich fabrics and wide borders add visual weight. Can experiment with broader pallus and heavier work. Avoid vertical-only patterns that over-elongate.",
+    "scoring_rubric": {
+      "3_perfect": "Heavy silk or banarasi saree with rich border work in festive colors \u2014 perfect for tall frame at reception",
+      "2_good": "Georgette saree with good embellishment \u2014 reception-ready but doesn't maximize the tall frame advantage",
+      "1_acceptable": "Any saree in appropriate color \u2014 would work but generic recommendation",
+      "0_irrelevant": "Non-saree products, casual sarees, or light daily-wear sarees"
+    },
+    "formality_level": "formal",
+    "gender_hint": "female"
+  },
+  {
+    "id": 25,
+    "category": "cultural-religious",
+    "query": "What should I wear to a Sikh wedding as a guest?",
+    "intents": {
+      "occasion": "sikh wedding",
+      "religion": "Sikhism"
+    },
+    "brand_agnostic": true,
+    "expected_product_types": {
+      "ideal": [
+        "salwar kameez",
+        "saree",
+        "lehenga",
+        "anarkali"
+      ],
+      "acceptable": [
+        "sharara set",
+        "kurta set",
+        "palazzo set"
+      ],
+      "avoid": [
+        "shorts",
+        "mini dress",
+        "sleeveless top",
+        "bikini"
+      ]
+    },
+    "expected_attributes": {
+      "colors": {
+        "ideal": [
+          "red",
+          "pink",
+          "gold",
+          "orange",
+          "royal blue",
+          "turquoise"
+        ],
+        "avoid": [
+          "white",
+          "black"
+        ]
+      },
+      "materials": {
+        "ideal": [
+          "silk",
+          "georgette",
+          "brocade"
+        ],
+        "acceptable": [
+          "chiffon",
+          "crepe",
+          "velvet"
+        ],
+        "avoid": [
+          "denim",
+          "leather",
+          "sheer"
+        ]
+      },
+      "patterns": {
+        "ideal": [
+          "embroidered",
+          "phulkari",
+          "sequined",
+          "zari work"
+        ],
+        "avoid": [
+          "plain casual",
+          "western prints"
+        ]
+      }
+    },
+    "cultural_constraints": "Sikh wedding (Anand Karaj) takes place in Gurudwara \u2014 HEAD MUST BE COVERED at all times. Modest clothing required (shoulders covered). Bright celebratory colors expected. White is for mourning. Black considered inauspicious. Phulkari patterns are culturally resonant.",
+    "scoring_rubric": {
+      "3_perfect": "Embroidered salwar kameez or saree in red/pink/orange with dupatta for head covering \u2014 culturally perfect",
+      "2_good": "Festive lehenga or anarkali in bright colors with dupatta \u2014 celebratory and can cover head",
+      "1_acceptable": "Any modest ethnic wear in appropriate colors \u2014 works but may lack dupatta/head-cover element",
+      "0_irrelevant": "Revealing outfits, dark/white colors, or anything without potential head covering"
+    },
+    "formality_level": "formal/modest",
+    "gender_hint": "female"
+  },
+  {
+    "id": 26,
+    "category": "cultural-religious",
+    "query": "Outfit for Eid celebration \u2014 want something elegant",
+    "intents": {
+      "event": "Eid",
+      "religion": "Islam"
+    },
+    "brand_agnostic": true,
+    "expected_product_types": {
+      "ideal": [
+        "anarkali",
+        "sharara set",
+        "salwar kameez"
+      ],
+      "acceptable": [
+        "kurta set",
+        "palazzo set",
+        "kaftan"
+      ],
+      "avoid": [
+        "shorts",
+        "sleeveless",
+        "mini dress",
+        "crop top"
+      ]
+    },
+    "expected_attributes": {
+      "colors": {
+        "ideal": [
+          "white",
+          "green",
+          "gold",
+          "pastel blue",
+          "ivory",
+          "mint"
+        ],
+        "avoid": [
+          "bright red",
+          "neon",
+          "black"
+        ]
+      },
+      "materials": {
+        "ideal": [
+          "chiffon",
+          "georgette",
+          "silk"
+        ],
+        "acceptable": [
+          "crepe",
+          "cotton silk",
+          "net"
+        ],
+        "avoid": [
+          "denim",
+          "leather",
+          "sheer without lining"
+        ]
+      },
+      "patterns": {
+        "ideal": [
+          "delicate embroidery",
+          "thread work",
+          "sequin border",
+          "chikankari"
+        ],
+        "avoid": [
+          "Hindu religious motifs",
+          "very heavy embellishment"
+        ]
+      }
+    },
+    "cultural_constraints": "STRICT modesty required \u2014 arms covered, legs fully covered, loose fitting, no body-hugging silhouettes. Dupatta/hijab-friendly necklines. White and green are traditional Eid colors. Elegant but modest. Chikankari (Lucknowi embroidery) is quintessential Eid aesthetic.",
+    "scoring_rubric": {
+      "3_perfect": "White/green chikankari anarkali or sharara set \u2014 elegant, modest, and Eid-appropriate",
+      "2_good": "Embroidered salwar kameez or palazzo set in appropriate colors \u2014 festive and modest",
+      "1_acceptable": "Any modest ethnic wear in soft colors \u2014 works but not specifically Eid-aesthetic",
+      "0_irrelevant": "Revealing outfits, Hindu-specific designs, dark colors, or immodest cuts"
+    },
+    "formality_level": "semi-formal/modest",
+    "gender_hint": "female"
+  },
+  {
+    "id": 27,
+    "category": "cultural-religious",
+    "query": "What to wear to a Christian wedding in a church?",
+    "intents": {
+      "occasion": "christian wedding",
+      "place": "church",
+      "religion": "Christianity"
+    },
+    "brand_agnostic": true,
+    "expected_product_types": {
+      "ideal": [
+        "dress",
+        "saree",
+        "gown"
+      ],
+      "acceptable": [
+        "kurta set",
+        "co-ord set",
+        "skirt set"
+      ],
+      "avoid": [
+        "lehenga",
+        "shorts",
+        "crop top",
+        "swimwear"
+      ]
+    },
+    "expected_attributes": {
+      "colors": {
+        "ideal": [
+          "pastel blue",
+          "navy",
+          "sage green",
+          "mauve",
+          "peach"
+        ],
+        "avoid": [
+          "white",
+          "ivory",
+          "black"
+        ]
+      },
+      "materials": {
+        "ideal": [
+          "chiffon",
+          "georgette",
+          "crepe",
+          "lace"
+        ],
+        "acceptable": [
+          "silk",
+          "cotton blend",
+          "satin"
+        ],
+        "avoid": [
+          "denim",
+          "leather",
+          "sheer"
+        ]
+      },
+      "patterns": {
+        "ideal": [
+          "subtle lace",
+          "solid elegant",
+          "delicate embroidery"
+        ],
+        "avoid": [
+          "heavy Indian embroidery",
+          "sequin overload",
+          "ethnic prints"
+        ]
+      }
+    },
+    "cultural_constraints": "Church wedding requires modesty \u2014 shoulders preferably covered, knee-length or longer. White/ivory reserved for bride. Black considered too somber for weddings. Understated elegance preferred over heavy embellishment. Cross-cultural \u2014 Indian ethnic is fine but keep it refined.",
+    "scoring_rubric": {
+      "3_perfect": "Elegant pastel dress or light saree in muted tones with subtle embellishment \u2014 church-appropriate and wedding-celebratory",
+      "2_good": "Nice kurta set or co-ord in appropriate colors \u2014 modest and suitable but less wedding-specific",
+      "1_acceptable": "Any modest outfit in non-white/non-black colors \u2014 would work but generic",
+      "0_irrelevant": "White/ivory (bride's color), black, revealing outfits, or heavy traditional Indian ethnic"
+    },
+    "formality_level": "semi-formal to formal",
+    "gender_hint": "female"
+  },
+  {
+    "id": 28,
+    "category": "cultural-religious",
+    "query": "Navratri garba outfit \u2014 need something I can dance in for 9 nights",
+    "intents": {
+      "event": "Navratri",
+      "activity": "dancing"
+    },
+    "brand_agnostic": true,
+    "expected_product_types": {
+      "ideal": [
+        "chaniya choli",
+        "lehenga",
+        "ghagra choli"
+      ],
+      "acceptable": [
+        "kurta set",
+        "anarkali",
+        "sharara set"
+      ],
+      "avoid": [
+        "saree",
+        "gown",
+        "tight dress",
+        "jeans"
+      ]
+    },
+    "expected_attributes": {
+      "colors": {
+        "ideal": [
+          "multi-color",
+          "red",
+          "orange",
+          "green",
+          "yellow",
+          "pink"
+        ],
+        "avoid": [
+          "black",
+          "white",
+          "beige"
+        ]
+      },
+      "materials": {
+        "ideal": [
+          "cotton",
+          "cotton silk",
+          "georgette"
+        ],
+        "acceptable": [
+          "crepe",
+          "rayon",
+          "modal"
+        ],
+        "avoid": [
+          "heavy silk",
+          "velvet",
+          "stiff brocade"
+        ]
+      },
+      "patterns": {
+        "ideal": [
+          "mirror work",
+          "bandhani",
+          "tie-dye",
+          "kutchi embroidery",
+          "gharchola"
+        ],
+        "avoid": [
+          "plain",
+          "western prints",
+          "formal embroidery"
+        ]
+      }
+    },
+    "cultural_constraints": "Navratri garba is INTENSE cardio dancing for hours. Outfit MUST allow free movement \u2014 flared skirts that twirl. Traditional Gujarati chaniya choli is ideal. Mirror work and bandhani are quintessential Navratri aesthetics. Each night has a designated color. Breathable is essential.",
+    "scoring_rubric": {
+      "3_perfect": "Mirror work chaniya choli or flared lehenga in vibrant colors \u2014 dance-ready, breathable, and Navratri-authentic",
+      "2_good": "Colorful anarkali or sharara set \u2014 festive and allows some movement but not as dance-optimized",
+      "1_acceptable": "Any bright ethnic outfit \u2014 festive spirit but may restrict garba dancing",
+      "0_irrelevant": "Tight/restrictive outfits, dark somber colors, western wear, or non-dance-friendly heavy pieces"
+    },
+    "formality_level": "festive/active",
+    "gender_hint": "female"
+  },
+  {
+    "id": 29,
+    "category": "cultural-religious",
+    "query": "What's appropriate to wear to a Muslim nikah ceremony?",
+    "intents": {
+      "occasion": "muslim wedding",
+      "religion": "Islam"
+    },
+    "brand_agnostic": true,
+    "expected_product_types": {
+      "ideal": [
+        "sharara set",
+        "anarkali",
+        "salwar kameez"
+      ],
+      "acceptable": [
+        "kurta set",
+        "palazzo set",
+        "lehenga"
+      ],
+      "avoid": [
+        "shorts",
+        "sleeveless dress",
+        "mini skirt",
+        "crop top"
+      ]
+    },
+    "expected_attributes": {
+      "colors": {
+        "ideal": [
+          "pastel pink",
+          "mint",
+          "gold",
+          "peach",
+          "soft blue",
+          "ivory"
+        ],
+        "avoid": [
+          "bright red",
+          "neon",
+          "all black"
+        ]
+      },
+      "materials": {
+        "ideal": [
+          "georgette",
+          "chiffon",
+          "silk"
+        ],
+        "acceptable": [
+          "crepe",
+          "net with lining",
+          "velvet"
+        ],
+        "avoid": [
+          "sheer",
+          "denim",
+          "leather"
+        ]
+      },
+      "patterns": {
+        "ideal": [
+          "zardosi",
+          "thread work",
+          "delicate embroidery",
+          "pearl work"
+        ],
+        "avoid": [
+          "very heavy work",
+          "Hindu motifs",
+          "casual prints"
+        ]
+      }
+    },
+    "cultural_constraints": "Nikah is a solemn and sacred Islamic ceremony. STRICT modesty: full arm and leg coverage, loose silhouette, dupatta essential (can be used as head cover). Elegance over flash. No body-revealing or tight clothes. Understated luxury \u2014 think refined embroidery over heavy sequins.",
+    "scoring_rubric": {
+      "3_perfect": "Elegant pastel sharara/anarkali with delicate zardosi/thread work and matching dupatta \u2014 modest, refined, nikah-worthy",
+      "2_good": "Well-embroidered salwar kameez or kurta set in soft colors \u2014 modest and appropriate but less special",
+      "1_acceptable": "Any fully modest ethnic outfit \u2014 respectful but doesn't capture nikah elegance",
+      "0_irrelevant": "Revealing clothing, loud colors, immodest cuts, or culturally insensitive designs"
+    },
+    "formality_level": "formal/modest",
+    "gender_hint": "female"
+  },
+  {
+    "id": 30,
+    "category": "cultural-religious",
+    "query": "Outfit for Ganesh Chaturthi puja at home",
+    "intents": {
+      "event": "Ganesh Chaturthi",
+      "place": "home",
+      "activity": "puja"
+    },
+    "brand_agnostic": true,
+    "expected_product_types": {
+      "ideal": [
+        "kurta set",
+        "saree",
+        "salwar kameez"
+      ],
+      "acceptable": [
+        "palazzo set",
+        "anarkali",
+        "dress"
+      ],
+      "avoid": [
+        "shorts",
+        "swimwear",
+        "western casuals",
+        "crop top"
+      ]
+    },
+    "expected_attributes": {
+      "colors": {
+        "ideal": [
+          "yellow",
+          "red",
+          "orange",
+          "green",
+          "gold"
+        ],
+        "avoid": [
+          "black",
+          "dark blue",
+          "grey"
+        ]
+      },
+      "materials": {
+        "ideal": [
+          "silk",
+          "cotton silk",
+          "chanderi"
+        ],
+        "acceptable": [
+          "cotton",
+          "georgette",
+          "crepe"
+        ],
+        "avoid": [
+          "denim",
+          "leather",
+          "synthetic"
+        ]
+      },
+      "patterns": {
+        "ideal": [
+          "traditional prints",
+          "temple border",
+          "simple embroidery",
+          "block print"
+        ],
+        "avoid": [
+          "western prints",
+          "dark patterns",
+          "animal print"
+        ]
+      }
+    },
+    "cultural_constraints": "Hindu religious occasion \u2014 auspicious colors mandatory (yellow for prosperity, red for celebration, green for auspiciousness). Black is strictly avoided during puja. Modest traditional wear expected. Home setting means comfort matters but must be respectful for prayer.",
+    "scoring_rubric": {
+      "3_perfect": "Yellow/red silk or cotton silk kurta set with traditional motifs \u2014 puja-perfect, auspicious, and comfortable for home",
+      "2_good": "Simple saree or palazzo set in festive colors \u2014 appropriate for puja but may be over/underdressed for home",
+      "1_acceptable": "Any ethnic outfit in non-dark colors \u2014 respectful but not specifically puja-dressed",
+      "0_irrelevant": "Black clothing, western casual, revealing outfits, or anything disrespectful for religious occasion"
+    },
+    "formality_level": "traditional/comfortable",
+    "gender_hint": "female"
+  },
+  {
+    "id": 31,
+    "category": "activity-health",
+    "query": "I have knee pain \u2014 suggest comfortable ethnic wear for a wedding",
+    "intents": {
+      "health": "knee pain",
+      "occasion": "hindu wedding"
+    },
+    "brand_agnostic": true,
+    "expected_product_types": {
+      "ideal": [
+        "palazzo set",
+        "sharara set",
+        "anarkali"
+      ],
+      "acceptable": [
+        "kurta set",
+        "kaftan",
+        "pre-draped saree"
+      ],
+      "avoid": [
+        "saree",
+        "tight lehenga",
+        "pencil skirt",
+        "high-heeled outfit"
+      ]
+    },
+    "expected_attributes": {
+      "colors": {
+        "ideal": [
+          "festive colors",
+          "gold",
+          "maroon",
+          "teal",
+          "purple"
+        ],
+        "avoid": [
+          "white",
+          "black"
+        ]
+      },
+      "materials": {
+        "ideal": [
+          "soft georgette",
+          "crepe",
+          "flowing fabrics"
+        ],
+        "acceptable": [
+          "cotton silk",
+          "chiffon",
+          "modal"
+        ],
+        "avoid": [
+          "stiff brocade",
+          "heavy silk",
+          "tight stretch"
+        ]
+      },
+      "patterns": {
+        "ideal": [
+          "embroidered",
+          "embellished",
+          "festive prints"
+        ],
+        "avoid": [
+          "plain casual"
+        ]
+      }
+    },
+    "cultural_constraints": "Wedding formality required but knee pain is primary constraint. Avoid: tight leggings (pressure on knees), heavy sarees (weight), anything requiring constant standing/adjustment. Need flat-friendly outfits \u2014 palazzo/sharara hide flat footwear. Wide-leg comfort is key.",
+    "scoring_rubric": {
+      "3_perfect": "Embellished palazzo or sharara set in festive colors \u2014 hides flat footwear, no knee pressure, wedding-appropriate",
+      "2_good": "Flowing anarkali or pre-draped saree \u2014 comfortable but may still require some careful movement",
+      "1_acceptable": "Any wedding-appropriate outfit that isn't actively painful \u2014 works with compromises",
+      "0_irrelevant": "Tight bottoms, heavy sarees requiring constant pleating, or casual non-wedding wear"
+    },
+    "formality_level": "formal",
+    "gender_hint": "female"
+  },
+  {
+    "id": 32,
+    "category": "activity-health",
+    "query": "I have sensitive skin \u2014 what fabrics for a summer party?",
+    "intents": {
+      "health": "sensitive skin",
+      "weather": "summer",
+      "occasion": "party"
+    },
+    "brand_agnostic": true,
+    "expected_product_types": {
+      "ideal": [
+        "kurta set",
+        "dress",
+        "co-ord set"
+      ],
+      "acceptable": [
+        "palazzo set",
+        "kaftan",
+        "top"
+      ],
+      "avoid": [
+        "heavy lehenga",
+        "synthetic-heavy outfits"
+      ]
+    },
+    "expected_attributes": {
+      "colors": {
+        "ideal": [
+          "pastels",
+          "white",
+          "light blue",
+          "soft pink",
+          "cream"
+        ],
+        "avoid": [
+          "dark colors in summer"
+        ]
+      },
+      "materials": {
+        "ideal": [
+          "pure cotton",
+          "mul cotton",
+          "linen",
+          "bamboo fabric"
+        ],
+        "acceptable": [
+          "silk",
+          "modal",
+          "tencel"
+        ],
+        "avoid": [
+          "polyester",
+          "nylon",
+          "synthetic blends",
+          "rough wool",
+          "heavily dyed"
+        ]
+      },
+      "patterns": {
+        "ideal": [
+          "natural dyes",
+          "block print",
+          "simple embroidery"
+        ],
+        "avoid": [
+          "heavy chemical prints",
+          "sequins against skin",
+          "metal embellishments against skin"
+        ]
+      }
+    },
+    "cultural_constraints": "No cultural constraints. Health-first approach: natural fibers only (cotton, linen, silk). Avoid synthetic fabrics that trap heat and cause irritation. Avoid heavy embellishments that rub against skin. Loose fits prevent friction. Organic/naturally-dyed preferred.",
+    "scoring_rubric": {
+      "3_perfect": "Pure cotton or linen dress/kurta in light colors with minimal skin-contact embellishment \u2014 skin-safe and party-appropriate",
+      "2_good": "Modal or silk outfit that's gentle on skin \u2014 party-ready but may cause mild reactions",
+      "1_acceptable": "Any party outfit in natural fabric \u2014 attends to either skin or party but not both perfectly",
+      "0_irrelevant": "Polyester/synthetic fabrics, heavy embellishments against skin, or non-party casual wear"
+    },
+    "formality_level": "smart casual",
+    "gender_hint": "female"
+  },
+  {
+    "id": 33,
+    "category": "activity-health",
+    "query": "Comfortable yoga-friendly outfit that I can also wear to brunch after",
+    "intents": {
+      "activity": "yoga",
+      "occasion": "brunch"
+    },
+    "brand_agnostic": true,
+    "expected_product_types": {
+      "ideal": [
+        "co-ord set",
+        "kurta set",
+        "palazzo set"
+      ],
+      "acceptable": [
+        "kaftan",
+        "dress",
+        "top"
+      ],
+      "avoid": [
+        "saree",
+        "lehenga",
+        "formal gown",
+        "sharara set"
+      ]
+    },
+    "expected_attributes": {
+      "colors": {
+        "ideal": [
+          "earth tones",
+          "olive",
+          "terracotta",
+          "sage",
+          "dusty pink"
+        ],
+        "avoid": [
+          "neon",
+          "very dark"
+        ]
+      },
+      "materials": {
+        "ideal": [
+          "cotton jersey",
+          "modal",
+          "bamboo fabric",
+          "stretch cotton"
+        ],
+        "acceptable": [
+          "linen",
+          "soft cotton",
+          "viscose"
+        ],
+        "avoid": [
+          "silk",
+          "satin",
+          "stiff fabrics",
+          "heavy embroidery"
+        ]
+      },
+      "patterns": {
+        "ideal": [
+          "solid",
+          "tie-dye",
+          "subtle abstract",
+          "minimal"
+        ],
+        "avoid": [
+          "heavy prints",
+          "embellishment",
+          "formal patterns"
+        ]
+      }
+    },
+    "cultural_constraints": "No cultural constraints. Dual-purpose outfit: must allow full range of movement (stretches, bends, inversions) while looking polished enough for a social brunch setting. Think athleisure meets ethnic fusion.",
+    "scoring_rubric": {
+      "3_perfect": "Stretch cotton co-ord or modal kurta set in earth tones \u2014 yoga-flexible and brunch-presentable",
+      "2_good": "Comfortable palazzo set or kaftan \u2014 works for brunch but yoga capability questionable",
+      "1_acceptable": "Any comfortable outfit that could serve one purpose well \u2014 either yoga OR brunch but not both",
+      "0_irrelevant": "Formal ethnic wear, stiff/restrictive clothing, or anything requiring constant adjustment"
+    },
+    "formality_level": "casual to smart casual",
+    "gender_hint": "female"
+  },
+  {
+    "id": 34,
+    "category": "activity-health",
+    "query": "I sweat a lot \u2014 what to wear to a summer wedding?",
+    "intents": {
+      "health": "sweating",
+      "weather": "summer",
+      "occasion": "hindu wedding"
+    },
+    "brand_agnostic": true,
+    "expected_product_types": {
+      "ideal": [
+        "kurta set",
+        "palazzo set",
+        "light lehenga"
+      ],
+      "acceptable": [
+        "saree",
+        "anarkali",
+        "sharara set"
+      ],
+      "avoid": [
+        "heavy velvet lehenga",
+        "layered gown",
+        "body-con"
+      ]
+    },
+    "expected_attributes": {
+      "colors": {
+        "ideal": [
+          "dark jewel tones",
+          "navy",
+          "teal",
+          "burgundy",
+          "emerald"
+        ],
+        "avoid": [
+          "grey",
+          "light blue",
+          "light pink"
+        ]
+      },
+      "materials": {
+        "ideal": [
+          "cotton silk",
+          "mul cotton",
+          "linen blend",
+          "breathable georgette"
+        ],
+        "acceptable": [
+          "thin silk",
+          "chiffon",
+          "modal"
+        ],
+        "avoid": [
+          "velvet",
+          "heavy silk",
+          "polyester",
+          "satin"
+        ]
+      },
+      "patterns": {
+        "ideal": [
+          "prints that hide sweat marks",
+          "dark embroidery",
+          "busy patterns"
+        ],
+        "avoid": [
+          "solid light colors",
+          "clingy plain fabric"
+        ]
+      }
+    },
+    "cultural_constraints": "Wedding formality required but sweating is a real constraint. DARK colors hide sweat marks. Avoid light grey/blue/pink (shows stains). Breathable fabrics prevent excess sweating. Loose silhouettes allow air circulation. Printed/embroidered fabrics are more forgiving than solid plains.",
+    "scoring_rubric": {
+      "3_perfect": "Dark-colored breathable cotton silk or georgette outfit with busy prints/embroidery \u2014 hides sweat, prevents excess sweating, and is wedding-appropriate",
+      "2_good": "Printed chiffon saree or anarkali in dark tones \u2014 sweat-conscious and festive but may not be maximally breathable",
+      "1_acceptable": "Any wedding outfit in non-problematic color \u2014 appropriate but doesn't specifically address sweating",
+      "0_irrelevant": "Light solid colors that show sweat, heavy non-breathable fabrics, or casual non-wedding wear"
+    },
+    "formality_level": "formal",
+    "gender_hint": "female"
+  },
+  {
+    "id": 35,
+    "category": "activity-health",
+    "query": "Back pain \u2014 need supportive yet stylish office wear",
+    "intents": {
+      "health": "back pain",
+      "place": "office"
+    },
+    "brand_agnostic": true,
+    "expected_product_types": {
+      "ideal": [
+        "kurta set",
+        "co-ord set",
+        "pant set"
+      ],
+      "acceptable": [
+        "dress",
+        "palazzo set",
+        "top"
+      ],
+      "avoid": [
+        "saree",
+        "heavy lehenga",
+        "corseted outfits"
+      ]
+    },
+    "expected_attributes": {
+      "colors": {
+        "ideal": [
+          "professional neutrals",
+          "navy",
+          "grey",
+          "beige",
+          "olive"
+        ],
+        "avoid": [
+          "no color restrictions for health"
+        ]
+      },
+      "materials": {
+        "ideal": [
+          "soft cotton",
+          "modal",
+          "jersey",
+          "stretch blends"
+        ],
+        "acceptable": [
+          "linen",
+          "crepe",
+          "rayon"
+        ],
+        "avoid": [
+          "stiff brocade",
+          "heavy silk",
+          "non-stretch structured"
+        ]
+      },
+      "patterns": {
+        "ideal": [
+          "solid",
+          "subtle prints",
+          "professional patterns"
+        ],
+        "avoid": [
+          "heavy embellishment that adds weight"
+        ]
+      }
+    },
+    "cultural_constraints": "No cultural constraints. Back pain priorities: lightweight fabrics (no heavy draping), no tight waistbands (avoid cinched styles), no need for constant adjustment (avoid sarees), structured but soft support. Flat-shoe-friendly silhouettes important.",
+    "scoring_rubric": {
+      "3_perfect": "Soft cotton/modal kurta set or co-ord with relaxed fit and no heavy elements \u2014 supportive, comfortable, and professional",
+      "2_good": "Stretch dress or palazzo set \u2014 office-appropriate and comfortable but may need adjustment through the day",
+      "1_acceptable": "Any office-appropriate outfit that isn't actively aggravating \u2014 works with compromises",
+      "0_irrelevant": "Heavy sarees, tight structured outfits, or anything requiring constant posture adjustment"
+    },
+    "formality_level": "business casual",
+    "gender_hint": "female"
+  },
+  {
+    "id": 36,
+    "category": "budget",
+    "query": "Budget-friendly festive kurta set under 5000 for Diwali",
+    "intents": {
+      "budget": "budget-friendly",
+      "event": "Diwali",
+      "product_type": "kurta set"
+    },
+    "brand_agnostic": true,
+    "expected_product_types": {
+      "ideal": [
+        "kurta set"
+      ],
+      "acceptable": [
+        "kurta",
+        "palazzo set",
+        "co-ord set"
+      ],
+      "avoid": [
+        "lehenga",
+        "saree",
+        "gown"
+      ]
+    },
+    "expected_attributes": {
+      "colors": {
+        "ideal": [
+          "gold",
+          "red",
+          "orange",
+          "yellow",
+          "green",
+          "pink"
+        ],
+        "avoid": [
+          "black",
+          "white",
+          "grey"
+        ]
+      },
+      "materials": {
+        "ideal": [
+          "cotton silk",
+          "chanderi",
+          "rayon"
+        ],
+        "acceptable": [
+          "cotton",
+          "crepe",
+          "polyester blend"
+        ],
+        "avoid": [
+          "pure silk",
+          "velvet",
+          "organza"
+        ]
+      },
+      "patterns": {
+        "ideal": [
+          "block print",
+          "screen print",
+          "simple embroidery",
+          "mirror work"
+        ],
+        "avoid": [
+          "heavy hand embroidery",
+          "zardosi",
+          "expensive sequin work"
+        ]
+      }
+    },
+    "cultural_constraints": "Diwali requires festive, auspicious colors. Budget constraint means: printed over embroidered, cotton silk over pure silk, machine work over hand work. Must still look celebratory \u2014 prints and colors can compensate for simpler construction.",
+    "scoring_rubric": {
+      "3_perfect": "Festive printed/block-print kurta set in Diwali colors in affordable fabric \u2014 celebratory without breaking bank",
+      "2_good": "Simple embroidered kurta in festive color \u2014 slightly above budget or slightly plain but works",
+      "1_acceptable": "Any kurta in appropriate color \u2014 Diwali-wearable but not specifically festive or not budget-aligned",
+      "0_irrelevant": "Expensive heavy pieces, non-kurta products, dark/white colors, or casual non-festive options"
+    },
+    "formality_level": "festive/semi-formal",
+    "gender_hint": "female"
+  },
+  {
+    "id": 37,
+    "category": "budget",
+    "query": "Affordable wedding guest outfit \u2014 don't want to spend too much",
+    "intents": {
+      "budget": "affordable",
+      "occasion": "hindu wedding"
+    },
+    "brand_agnostic": true,
+    "expected_product_types": {
+      "ideal": [
+        "kurta set",
+        "saree",
+        "anarkali"
+      ],
+      "acceptable": [
+        "palazzo set",
+        "sharara set",
+        "dress"
+      ],
+      "avoid": [
+        "heavy lehenga",
+        "designer gown"
+      ]
+    },
+    "expected_attributes": {
+      "colors": {
+        "ideal": [
+          "jewel tones",
+          "pink",
+          "green",
+          "blue",
+          "wine"
+        ],
+        "avoid": [
+          "red",
+          "white",
+          "black"
+        ]
+      },
+      "materials": {
+        "ideal": [
+          "georgette",
+          "crepe",
+          "cotton silk"
+        ],
+        "acceptable": [
+          "net with lining",
+          "rayon",
+          "polyester blend"
+        ],
+        "avoid": [
+          "pure silk",
+          "velvet",
+          "brocade"
+        ]
+      },
+      "patterns": {
+        "ideal": [
+          "prints",
+          "machine embroidery",
+          "embellished borders",
+          "foil print"
+        ],
+        "avoid": [
+          "heavy hand embroidery",
+          "zardosi",
+          "real stone work"
+        ]
+      }
+    },
+    "cultural_constraints": "Wedding appropriateness required (festive colors, modest) but budget is a real constraint. Smart options: printed sarees look rich, machine embroidery mimics hand work, foil prints give shimmer affordably. Avoid red (bride's) and white/black (inauspicious).",
+    "scoring_rubric": {
+      "3_perfect": "Printed georgette saree or machine-embroidered kurta set in festive colors \u2014 looks expensive but isn't",
+      "2_good": "Nice anarkali or palazzo set that's wedding-appropriate \u2014 works but may look obviously budget",
+      "1_acceptable": "Any decent ethnic outfit in non-offensive colors \u2014 could attend a wedding in it",
+      "0_irrelevant": "Obviously casual wear, luxury-only pieces, red/white/black, or inappropriate formality"
+    },
+    "formality_level": "semi-formal to formal",
+    "gender_hint": "female"
+  },
+  {
+    "id": 38,
+    "category": "budget",
+    "query": "Premium luxury saree for my anniversary dinner \u2014 money is no object",
+    "intents": {
+      "budget": "luxury",
+      "occasion": "anniversary",
+      "product_type": "saree"
+    },
+    "brand_agnostic": true,
+    "expected_product_types": {
+      "ideal": [
+        "saree"
+      ],
+      "acceptable": [
+        "pre-draped saree",
+        "saree gown"
+      ],
+      "avoid": [
+        "kurta",
+        "co-ord set",
+        "casual dress"
+      ]
+    },
+    "expected_attributes": {
+      "colors": {
+        "ideal": [
+          "gold",
+          "deep red",
+          "emerald",
+          "black",
+          "royal purple",
+          "champagne"
+        ],
+        "avoid": [
+          "casual bright neon"
+        ]
+      },
+      "materials": {
+        "ideal": [
+          "pure silk",
+          "banarasi",
+          "kanjeevaram",
+          "organza",
+          "tissue silk"
+        ],
+        "acceptable": [
+          "handloom",
+          "chanderi silk",
+          "tussar"
+        ],
+        "avoid": [
+          "polyester",
+          "rayon",
+          "synthetic"
+        ]
+      },
+      "patterns": {
+        "ideal": [
+          "hand embroidered",
+          "zardosi",
+          "real gold zari",
+          "Swarovski",
+          "hand-woven"
+        ],
+        "avoid": [
+          "machine print",
+          "screen print",
+          "basic"
+        ]
+      }
+    },
+    "cultural_constraints": "No cultural constraints \u2014 anniversary is personal celebration. Luxury positioning means: finest handloom or hand-embroidered, premium materials, designer-level craftsmanship. Should feel special and exclusive. Romantic colors (gold, red, deep jewel tones) enhance anniversary mood.",
+    "scoring_rubric": {
+      "3_perfect": "Hand-woven Banarasi or zardosi-embroidered pure silk saree in romantic colors \u2014 luxury, special, and anniversary-worthy",
+      "2_good": "High-quality georgette saree with beautiful embroidery \u2014 premium but not the most luxurious category",
+      "1_acceptable": "Any nice saree \u2014 appropriate for anniversary but not particularly premium/special",
+      "0_irrelevant": "Budget options, non-saree products, casual/daily wear sarees, or synthetic materials"
+    },
+    "formality_level": "luxurious/formal",
+    "gender_hint": "female"
+  },
+  {
+    "id": 39,
+    "category": "budget",
+    "query": "Mid-range Diwali outfit for a college student",
+    "intents": {
+      "budget": "mid-range",
+      "event": "Diwali",
+      "agegroup": "young adult",
+      "profession": "student"
+    },
+    "brand_agnostic": true,
+    "expected_product_types": {
+      "ideal": [
+        "kurta set",
+        "co-ord set",
+        "dress"
+      ],
+      "acceptable": [
+        "palazzo set",
+        "skirt set",
+        "sharara set"
+      ],
+      "avoid": [
+        "heavy lehenga",
+        "expensive saree",
+        "gown"
+      ]
+    },
+    "expected_attributes": {
+      "colors": {
+        "ideal": [
+          "gold",
+          "pink",
+          "orange",
+          "turquoise",
+          "purple"
+        ],
+        "avoid": [
+          "black",
+          "white",
+          "dull grey"
+        ]
+      },
+      "materials": {
+        "ideal": [
+          "cotton silk",
+          "georgette",
+          "crepe"
+        ],
+        "acceptable": [
+          "rayon",
+          "modal",
+          "blend fabrics"
+        ],
+        "avoid": [
+          "pure silk",
+          "velvet",
+          "expensive handloom"
+        ]
+      },
+      "patterns": {
+        "ideal": [
+          "printed",
+          "foil print",
+          "sequin border",
+          "contemporary ethnic prints"
+        ],
+        "avoid": [
+          "heavy traditional embroidery",
+          "very plain"
+        ]
+      }
+    },
+    "cultural_constraints": "Diwali celebration \u2014 festive colors required. College student context: youthful, trendy, fusion-friendly. Mid-range budget means: quality without premium pricing. Contemporary interpretations of ethnic wear (fusion, indo-western) work well for this demographic.",
+    "scoring_rubric": {
+      "3_perfect": "Trendy printed kurta set or fusion co-ord in festive colors \u2014 youthful, affordable, and Diwali-appropriate",
+      "2_good": "Nice palazzo set or dress in celebratory colors \u2014 festive but maybe slightly too traditional or too casual",
+      "1_acceptable": "Any Diwali-appropriate outfit \u2014 would work but doesn't capture the young, trendy, budget-conscious brief",
+      "0_irrelevant": "Expensive luxury pieces, very traditional heavy outfits, or dark/non-festive options"
+    },
+    "formality_level": "smart casual/festive",
+    "gender_hint": "female"
+  },
+  {
+    "id": 40,
+    "category": "budget",
+    "query": "Economical yet elegant outfit for a housewarming ceremony",
+    "intents": {
+      "budget": "economical",
+      "occasion": "housewarming"
+    },
+    "brand_agnostic": true,
+    "expected_product_types": {
+      "ideal": [
+        "kurta set",
+        "saree",
+        "palazzo set"
+      ],
+      "acceptable": [
+        "anarkali",
+        "salwar kameez",
+        "co-ord set"
+      ],
+      "avoid": [
+        "lehenga",
+        "gown",
+        "designer pieces"
+      ]
+    },
+    "expected_attributes": {
+      "colors": {
+        "ideal": [
+          "yellow",
+          "orange",
+          "green",
+          "red",
+          "pink"
+        ],
+        "avoid": [
+          "black",
+          "white"
+        ]
+      },
+      "materials": {
+        "ideal": [
+          "cotton",
+          "cotton silk",
+          "chanderi"
+        ],
+        "acceptable": [
+          "crepe",
+          "rayon",
+          "georgette"
+        ],
+        "avoid": [
+          "pure silk",
+          "velvet",
+          "expensive fabrics"
+        ]
+      },
+      "patterns": {
+        "ideal": [
+          "block print",
+          "simple border work",
+          "printed",
+          "subtle embroidery"
+        ],
+        "avoid": [
+          "heavy hand embroidery",
+          "zardosi"
+        ]
+      }
+    },
+    "cultural_constraints": "Housewarming (Griha Pravesh) is an auspicious Hindu ceremony \u2014 bright, positive colors expected. Yellow and green are particularly auspicious for new beginnings. Black and white avoided. Modest traditional dress expected. Economical means value-for-money, not cheap-looking.",
+    "scoring_rubric": {
+      "3_perfect": "Yellow/green cotton or chanderi kurta set with simple print/border \u2014 auspicious, elegant, and budget-friendly",
+      "2_good": "Printed saree or palazzo set in festive colors \u2014 appropriate and affordable but less specific",
+      "1_acceptable": "Any modest ethnic outfit in bright colors \u2014 works for housewarming on a budget",
+      "0_irrelevant": "Dark colors, expensive luxury pieces, western casual, or inauspicious color choices"
+    },
+    "formality_level": "traditional/semi-formal",
+    "gender_hint": "female"
+  },
+  {
+    "id": 41,
+    "category": "event-festival",
+    "query": "What to wear for Holi celebrations?",
+    "intents": {
+      "event": "Holi"
+    },
+    "brand_agnostic": true,
+    "expected_product_types": {
+      "ideal": [
+        "kurta set",
+        "co-ord set",
+        "kurta"
+      ],
+      "acceptable": [
+        "dress",
+        "top",
+        "kaftan"
+      ],
+      "avoid": [
+        "saree",
+        "lehenga",
+        "expensive ethnic wear",
+        "silk anything"
+      ]
+    },
+    "expected_attributes": {
+      "colors": {
+        "ideal": [
+          "white",
+          "cream",
+          "light colors"
+        ],
+        "avoid": [
+          "expensive colors",
+          "dark that hides stains"
+        ]
+      },
+      "materials": {
+        "ideal": [
+          "cotton",
+          "old cotton",
+          "cheap cotton"
+        ],
+        "acceptable": [
+          "rayon",
+          "linen"
+        ],
+        "avoid": [
+          "silk",
+          "georgette",
+          "velvet",
+          "expensive anything"
+        ]
+      },
+      "patterns": {
+        "ideal": [
+          "plain white",
+          "simple",
+          "disposable-ready"
+        ],
+        "avoid": [
+          "heavy embroidery",
+          "embellishment",
+          "expensive prints"
+        ]
+      }
+    },
+    "cultural_constraints": "Holi involves throwing colored powder and water \u2014 OUTFIT WILL BE PERMANENTLY STAINED. White is traditional (shows colors beautifully). Must be something you don't mind ruining. Comfort and washability are paramount. No expensive fabrics. Cotton is best as colors wash out partially.",
+    "scoring_rubric": {
+      "3_perfect": "Simple white cotton kurta or co-ord \u2014 traditional Holi aesthetic, stain-friendly, and expendable",
+      "2_good": "Light-colored cotton outfit \u2014 practical for Holi but not the classic white aesthetic",
+      "1_acceptable": "Any inexpensive comfortable outfit \u2014 could play Holi in it without regret",
+      "0_irrelevant": "Expensive outfits, silk/designer pieces, or anything you'd mourn getting stained"
+    },
+    "formality_level": "very casual/disposable",
+    "gender_hint": "female"
+  },
+  {
+    "id": 42,
+    "category": "event-festival",
+    "query": "Outfit for Karwa Chauth \u2014 first one after marriage",
+    "intents": {
+      "event": "Karwa Chauth",
+      "occasion": "religious festival"
+    },
+    "brand_agnostic": true,
+    "expected_product_types": {
+      "ideal": [
+        "saree",
+        "lehenga",
+        "anarkali"
+      ],
+      "acceptable": [
+        "sharara set",
+        "salwar kameez",
+        "kurta set"
+      ],
+      "avoid": [
+        "western dress",
+        "jeans",
+        "casual wear",
+        "kaftan"
+      ]
+    },
+    "expected_attributes": {
+      "colors": {
+        "ideal": [
+          "red",
+          "maroon",
+          "pink",
+          "orange",
+          "gold"
+        ],
+        "avoid": [
+          "white",
+          "black",
+          "blue",
+          "green"
+        ]
+      },
+      "materials": {
+        "ideal": [
+          "silk",
+          "georgette",
+          "brocade"
+        ],
+        "acceptable": [
+          "chiffon",
+          "velvet",
+          "net"
+        ],
+        "avoid": [
+          "cotton",
+          "denim",
+          "linen"
+        ]
+      },
+      "patterns": {
+        "ideal": [
+          "traditional embroidery",
+          "zari work",
+          "bridal-esque embellishment",
+          "heavy border"
+        ],
+        "avoid": [
+          "plain",
+          "casual prints",
+          "western motifs"
+        ]
+      }
+    },
+    "cultural_constraints": "Karwa Chauth is BRIDE-specific \u2014 married women dress as brides. RED is the primary expected color. First Karwa Chauth after marriage is especially important \u2014 must be elaborate like wedding-day dressing. Full solah-shringar (16 adornments) expected. Very traditional and auspicious.",
+    "scoring_rubric": {
+      "3_perfect": "Red/maroon silk saree or lehenga with heavy traditional embellishment \u2014 bridal-level dressing for first Karwa Chauth",
+      "2_good": "Pink or orange ethnic outfit with good embroidery \u2014 festive and bridal-adjacent but not red",
+      "1_acceptable": "Any traditional ethnic wear in warm colors \u2014 appropriate but not Karwa Chauth-specific",
+      "0_irrelevant": "Non-red/non-warm colors, western wear, casual clothing, or anything non-bridal"
+    },
+    "formality_level": "bridal/very formal",
+    "gender_hint": "female"
+  },
+  {
+    "id": 43,
+    "category": "event-festival",
+    "query": "Christmas party outfit \u2014 want something fun and sparkly",
+    "intents": {
+      "event": "Christmas",
+      "occasion": "party"
+    },
+    "brand_agnostic": true,
+    "expected_product_types": {
+      "ideal": [
+        "dress",
+        "co-ord set",
+        "gown"
+      ],
+      "acceptable": [
+        "skirt set",
+        "kurta set",
+        "jumpsuit"
+      ],
+      "avoid": [
+        "saree",
+        "lehenga",
+        "salwar kameez"
+      ]
+    },
+    "expected_attributes": {
+      "colors": {
+        "ideal": [
+          "red",
+          "green",
+          "gold",
+          "silver",
+          "white"
+        ],
+        "avoid": [
+          "black alone",
+          "dull earth tones"
+        ]
+      },
+      "materials": {
+        "ideal": [
+          "sequin",
+          "velvet",
+          "metallic",
+          "satin"
+        ],
+        "acceptable": [
+          "crepe",
+          "georgette",
+          "silk"
+        ],
+        "avoid": [
+          "cotton",
+          "linen",
+          "denim"
+        ]
+      },
+      "patterns": {
+        "ideal": [
+          "sequined",
+          "metallic",
+          "shimmer",
+          "sparkle"
+        ],
+        "avoid": [
+          "ethnic prints",
+          "block print",
+          "traditional motifs"
+        ]
+      }
+    },
+    "cultural_constraints": "Christmas party is a western-influenced celebration in India. Red and green are thematic. User wants sparkle/fun \u2014 party-forward styling. In Indian designer context, fusion sequin outfits work perfectly. Contemporary over traditional.",
+    "scoring_rubric": {
+      "3_perfect": "Red or green sequin dress or sparkly co-ord \u2014 Christmas-thematic, fun, and party-ready",
+      "2_good": "Gold/silver metallic outfit or velvet dress \u2014 sparkly and festive but not Christmas-colored",
+      "1_acceptable": "Any party outfit with some shine \u2014 fun but not specifically Christmas-themed",
+      "0_irrelevant": "Traditional Indian ethnic, plain cotton, or non-party casual wear"
+    },
+    "formality_level": "party/glamorous",
+    "gender_hint": "female"
+  },
+  {
+    "id": 44,
+    "category": "event-festival",
+    "query": "Lohri celebration outfit \u2014 Punjabi vibes",
+    "intents": {
+      "event": "Lohri",
+      "location": "Punjab"
+    },
+    "brand_agnostic": true,
+    "expected_product_types": {
+      "ideal": [
+        "salwar kameez",
+        "sharara set",
+        "patiala suit"
+      ],
+      "acceptable": [
+        "kurta set",
+        "anarkali",
+        "lehenga"
+      ],
+      "avoid": [
+        "western dress",
+        "shorts",
+        "swimwear"
+      ]
+    },
+    "expected_attributes": {
+      "colors": {
+        "ideal": [
+          "red",
+          "orange",
+          "yellow",
+          "hot pink",
+          "green"
+        ],
+        "avoid": [
+          "black",
+          "white",
+          "grey"
+        ]
+      },
+      "materials": {
+        "ideal": [
+          "silk",
+          "velvet",
+          "phulkari dupatta fabric"
+        ],
+        "acceptable": [
+          "georgette",
+          "cotton silk",
+          "brocade"
+        ],
+        "avoid": [
+          "thin cotton",
+          "chiffon"
+        ]
+      },
+      "patterns": {
+        "ideal": [
+          "phulkari",
+          "mirror work",
+          "Punjabi embroidery",
+          "heavy dupatta work"
+        ],
+        "avoid": [
+          "plain",
+          "western prints",
+          "minimal"
+        ]
+      }
+    },
+    "cultural_constraints": "Lohri is a Punjabi winter harvest festival \u2014 celebrated around bonfire. Warm fabrics needed (January festival). Punjabi aesthetic: bright colors, phulkari embroidery, heavy dupattas. Very celebratory and vibrant. Traditional Punjabi silhouettes preferred.",
+    "scoring_rubric": {
+      "3_perfect": "Phulkari-embroidered Punjabi suit in red/orange with heavy dupatta \u2014 culturally authentic and Lohri-perfect",
+      "2_good": "Bright sharara or salwar in festive colors with Punjabi elements \u2014 appropriate but less specifically Lohri",
+      "1_acceptable": "Any warm bright ethnic outfit \u2014 festive but missing the Punjabi cultural specificity",
+      "0_irrelevant": "Summer clothing, western wear, dark somber colors, or thin fabrics inappropriate for January"
+    },
+    "formality_level": "festive/traditional",
+    "gender_hint": "female"
+  },
+  {
+    "id": 45,
+    "category": "event-festival",
+    "query": "Onam sadhya outfit \u2014 something traditional Kerala style",
+    "intents": {
+      "event": "Onam",
+      "location": "Kerala"
+    },
+    "brand_agnostic": true,
+    "expected_product_types": {
+      "ideal": [
+        "saree",
+        "set mundu"
+      ],
+      "acceptable": [
+        "kurta set",
+        "salwar kameez",
+        "dress"
+      ],
+      "avoid": [
+        "lehenga",
+        "sharara",
+        "western shorts"
+      ]
+    },
+    "expected_attributes": {
+      "colors": {
+        "ideal": [
+          "white",
+          "cream",
+          "gold border",
+          "off-white",
+          "kasavu gold"
+        ],
+        "avoid": [
+          "black",
+          "dark colors",
+          "neon"
+        ]
+      },
+      "materials": {
+        "ideal": [
+          "cotton",
+          "kasavu cotton",
+          "handloom"
+        ],
+        "acceptable": [
+          "silk cotton",
+          "Kerala handloom",
+          "tissue"
+        ],
+        "avoid": [
+          "synthetic",
+          "velvet",
+          "heavy fabrics"
+        ]
+      },
+      "patterns": {
+        "ideal": [
+          "gold kasavu border",
+          "simple gold zari",
+          "plain with gold edge",
+          "temple border"
+        ],
+        "avoid": [
+          "heavy embroidery",
+          "sequins",
+          "multicolor prints"
+        ]
+      }
+    },
+    "cultural_constraints": "Onam is Kerala's harvest festival. VERY SPECIFIC aesthetic: white/cream cotton saree with gold (kasavu) border is THE traditional outfit. This is non-negotiable for traditional Onam. Simple elegance over heavy embellishment. Kerala mundu style is distinctly different from North Indian ethnic.",
+    "scoring_rubric": {
+      "3_perfect": "White/cream cotton saree with gold kasavu border \u2014 quintessential Onam aesthetic, culturally perfect",
+      "2_good": "Off-white kurta set or simple saree with gold elements \u2014 Onam-appropriate but not the iconic kasavu look",
+      "1_acceptable": "Any light-colored modest ethnic outfit \u2014 respectful but not Kerala-specific",
+      "0_irrelevant": "Colorful North Indian ethnic, dark outfits, western wear, or heavy embellished pieces"
+    },
+    "formality_level": "traditional/elegant simplicity",
+    "gender_hint": "female"
+  },
+  {
+    "id": 46,
+    "category": "multi-intent-complex",
+    "query": "I'm a plus-size teacher attending my niece's sangeet in Jaipur in December \u2014 need something warm but festive that flatters my figure",
+    "intents": {
+      "bodytype": "plus size",
+      "profession": "teacher",
+      "relation": "niece",
+      "occasion": "sangeet",
+      "location": "Jaipur",
+      "month": "December",
+      "weather": "winter"
+    },
+    "brand_agnostic": true,
+    "expected_product_types": {
+      "ideal": [
+        "velvet lehenga",
+        "sharara set",
+        "anarkali with jacket"
+      ],
+      "acceptable": [
+        "kurta set with jacket",
+        "saree with blouse jacket",
+        "palazzo set"
+      ],
+      "avoid": [
+        "thin summer dress",
+        "crop top",
+        "body-con",
+        "swimwear"
+      ]
+    },
+    "expected_attributes": {
+      "colors": {
+        "ideal": [
+          "jewel tones",
+          "deep pink",
+          "teal",
+          "wine",
+          "royal purple",
+          "emerald"
+        ],
+        "avoid": [
+          "white",
+          "black",
+          "pastel (too light for winter + plus size)"
+        ]
+      },
+      "materials": {
+        "ideal": [
+          "velvet",
+          "brocade",
+          "heavy georgette"
+        ],
+        "acceptable": [
+          "silk",
+          "thick crepe",
+          "jacquard"
+        ],
+        "avoid": [
+          "thin chiffon",
+          "cotton",
+          "net only"
+        ]
+      },
+      "patterns": {
+        "ideal": [
+          "A-line with strategic embroidery",
+          "vertical draping",
+          "heavy borders not at waist"
+        ],
+        "avoid": [
+          "horizontal at midsection",
+          "all-over heavy work",
+          "clingy plain"
+        ]
+      }
+    },
+    "cultural_constraints": "Multi-layered needs: (1) Sangeet = festive/celebratory/dance-friendly, (2) Jaipur December = cold (5-12 C), (3) Plus size = A-line flattering silhouettes, (4) Comfortable = not too restrictive. Velvet is PERFECT \u2014 warm, festive, and drapes well on plus-size bodies. Jaipur context adds Rajasthani aesthetic possibility.",
+    "scoring_rubric": {
+      "3_perfect": "Velvet A-line sharara/lehenga in jewel tones \u2014 warm, festive, flattering for plus-size, dance-possible, and winter-appropriate",
+      "2_good": "Heavy georgette anarkali with jacket layer \u2014 addresses most needs but may not be as dance-friendly",
+      "1_acceptable": "Any festive ethnic outfit that addresses 2 of 4 needs \u2014 partial solution",
+      "0_irrelevant": "Summer/thin fabrics, unflattering silhouettes, non-festive colors, or non-ethnic casuals"
+    },
+    "formality_level": "semi-formal to formal",
+    "gender_hint": "female"
+  },
+  {
+    "id": 47,
+    "category": "multi-intent-complex",
+    "query": "I'm pear shaped with sensitive skin, attending a beach wedding in Goa in May \u2014 need modest but not too heavy",
+    "intents": {
+      "bodytype": "pear shaped",
+      "health": "sensitive skin",
+      "place": "beach",
+      "occasion": "hindu wedding",
+      "location": "Goa",
+      "month": "May",
+      "weather": "humid"
+    },
+    "brand_agnostic": true,
+    "expected_product_types": {
+      "ideal": [
+        "anarkali",
+        "kurta set",
+        "palazzo set"
+      ],
+      "acceptable": [
+        "pre-draped saree",
+        "dress",
+        "sharara set"
+      ],
+      "avoid": [
+        "heavy lehenga",
+        "velvet anything",
+        "body-con"
+      ]
+    },
+    "expected_attributes": {
+      "colors": {
+        "ideal": [
+          "coral",
+          "turquoise",
+          "sea green",
+          "peach",
+          "gold"
+        ],
+        "avoid": [
+          "white",
+          "black",
+          "very dark colors"
+        ]
+      },
+      "materials": {
+        "ideal": [
+          "organic cotton",
+          "mul cotton",
+          "linen",
+          "natural silk"
+        ],
+        "acceptable": [
+          "soft georgette",
+          "modal",
+          "bamboo"
+        ],
+        "avoid": [
+          "polyester",
+          "synthetic",
+          "rough embroidery against skin",
+          "velvet",
+          "heavy silk"
+        ]
+      },
+      "patterns": {
+        "ideal": [
+          "flowy A-line",
+          "embellished bodice with plain bottom",
+          "soft prints",
+          "gentle embroidery"
+        ],
+        "avoid": [
+          "tight at hips",
+          "hip-emphasizing details",
+          "heavy all-over work",
+          "sequins against skin"
+        ]
+      }
+    },
+    "cultural_constraints": "Complex intersection: (1) Beach wedding = semi-outdoor, sandy, humid, (2) May in Goa = extremely hot/humid, (3) Pear shaped = flowy bottom, detailed top, (4) Sensitive skin = natural fibers only, no rough embellishment against skin, (5) Modest = covered. Light natural fabrics that flow over hips without clinging, with embellishment only on lined/layered areas.",
+    "scoring_rubric": {
+      "3_perfect": "Organic cotton/linen A-line anarkali in coral/turquoise with lined embroidered bodice \u2014 addresses ALL constraints beautifully",
+      "2_good": "Soft georgette palazzo set in beach-friendly colors \u2014 addresses most needs but may not be fully skin-safe",
+      "1_acceptable": "Any light modest ethnic outfit \u2014 wedding-appropriate but misses multiple specific constraints",
+      "0_irrelevant": "Heavy/synthetic fabrics, tight hip-area, rough embellishment, or non-wedding casual"
+    },
+    "formality_level": "semi-formal (beach context)",
+    "gender_hint": "female"
+  },
+  {
+    "id": 48,
+    "category": "multi-intent-complex",
+    "query": "Young adult on a budget going to Coachella-style music festival in Mumbai \u2014 want something bold and Instagram-worthy but still culturally appropriate",
+    "intents": {
+      "agegroup": "young adult",
+      "budget": "affordable",
+      "event": "music festival",
+      "location": "Mumbai",
+      "weather": "humid"
+    },
+    "brand_agnostic": true,
+    "expected_product_types": {
+      "ideal": [
+        "co-ord set",
+        "crop top set",
+        "kaftan",
+        "skirt set"
+      ],
+      "acceptable": [
+        "dress",
+        "kurta set",
+        "jumpsuit"
+      ],
+      "avoid": [
+        "saree",
+        "lehenga",
+        "salwar kameez",
+        "formal gown"
+      ]
+    },
+    "expected_attributes": {
+      "colors": {
+        "ideal": [
+          "neon",
+          "tie-dye",
+          "multi-color",
+          "bold prints",
+          "electric blue",
+          "hot pink"
+        ],
+        "avoid": [
+          "beige",
+          "grey",
+          "dull neutrals"
+        ]
+      },
+      "materials": {
+        "ideal": [
+          "cotton",
+          "denim",
+          "crochet",
+          "light breathable"
+        ],
+        "acceptable": [
+          "rayon",
+          "modal",
+          "sequin pieces"
+        ],
+        "avoid": [
+          "silk",
+          "velvet",
+          "heavy fabrics"
+        ]
+      },
+      "patterns": {
+        "ideal": [
+          "bold prints",
+          "tie-dye",
+          "bohemian",
+          "graphic",
+          "mirror work fusion"
+        ],
+        "avoid": [
+          "traditional ethnic",
+          "formal embroidery",
+          "plain conservative"
+        ]
+      }
+    },
+    "cultural_constraints": "Multi-layered: (1) Music festival = bold, expressive, fun, (2) Budget = not expensive, (3) Mumbai humidity = breathable, (4) Instagram-worthy = visually striking, (5) Culturally appropriate = Indian context. Fusion is perfect \u2014 Indian elements (mirror work, prints) in festival-ready silhouettes. Not too revealing for Indian public context.",
+    "scoring_rubric": {
+      "3_perfect": "Bold printed co-ord or mirror-work crop set in vibrant colors \u2014 festival-perfect, budget-friendly, Mumbai-proof, and Insta-worthy",
+      "2_good": "Trendy kaftan or colorful dress \u2014 fun and breathable but may miss the festival-specific edge",
+      "1_acceptable": "Any bold affordable outfit \u2014 works for a festival but doesn't fully nail the brief",
+      "0_irrelevant": "Traditional heavy ethnic, expensive luxury, plain conservative, or sweat-inducing synthetic"
+    },
+    "formality_level": "casual/bohemian",
+    "gender_hint": "female"
+  },
+  {
+    "id": 49,
+    "category": "multi-intent-complex",
+    "query": "Middle-aged mom attending son's graduation in Delhi summer \u2014 want to look proud and put-together but comfortable in the heat",
+    "intents": {
+      "agegroup": "middle-aged",
+      "relation": "mom",
+      "occasion": "graduation",
+      "location": "Delhi",
+      "weather": "summer"
+    },
+    "brand_agnostic": true,
+    "expected_product_types": {
+      "ideal": [
+        "saree",
+        "kurta set",
+        "palazzo set"
+      ],
+      "acceptable": [
+        "salwar kameez",
+        "anarkali",
+        "co-ord set"
+      ],
+      "avoid": [
+        "lehenga",
+        "crop top",
+        "shorts",
+        "party wear"
+      ]
+    },
+    "expected_attributes": {
+      "colors": {
+        "ideal": [
+          "ivory",
+          "beige",
+          "soft gold",
+          "powder blue",
+          "mauve",
+          "sage"
+        ],
+        "avoid": [
+          "neon",
+          "very dark black",
+          "overly youthful brights"
+        ]
+      },
+      "materials": {
+        "ideal": [
+          "cotton silk",
+          "chanderi",
+          "linen blend",
+          "light silk"
+        ],
+        "acceptable": [
+          "crepe",
+          "georgette",
+          "modal"
+        ],
+        "avoid": [
+          "heavy silk",
+          "velvet",
+          "polyester",
+          "synthetic"
+        ]
+      },
+      "patterns": {
+        "ideal": [
+          "subtle embroidery",
+          "elegant prints",
+          "woven border",
+          "understated"
+        ],
+        "avoid": [
+          "heavy sequins",
+          "loud prints",
+          "very trendy/young patterns"
+        ]
+      }
+    },
+    "cultural_constraints": "Multiple considerations: (1) Graduation = proud, celebratory, photographed event, (2) Delhi summer = extreme heat (40-45 C), (3) Middle-aged mom = age-appropriate elegance, dignified, (4) Comfortable = breathable and not fussy. Sophistication over flashiness. Light fabrics that look polished without causing heat stress.",
+    "scoring_rubric": {
+      "3_perfect": "Elegant cotton silk or chanderi saree/kurta set in soft dignified colors \u2014 proud-mom appropriate, cool in Delhi heat, and photographable",
+      "2_good": "Light georgette outfit in appropriate colors \u2014 looks nice but may not be heat-optimized",
+      "1_acceptable": "Any presentable ethnic outfit \u2014 decent for graduation but misses heat or age appropriateness",
+      "0_irrelevant": "Heavy hot fabrics, overly youthful styling, casual loungewear, or anything undignified"
+    },
+    "formality_level": "semi-formal/dignified",
+    "gender_hint": "female"
+  },
+  {
+    "id": 50,
+    "category": "multi-intent-complex",
+    "query": "I practice Islam, have arthritis, and need a luxury outfit for my daughter's nikah \u2014 something regal that I can wear comfortably all day",
+    "intents": {
+      "religion": "Islam",
+      "health": "arthritis",
+      "budget": "luxury",
+      "occasion": "muslim wedding",
+      "relation": "daughter"
+    },
+    "brand_agnostic": true,
+    "expected_product_types": {
+      "ideal": [
+        "sharara set",
+        "anarkali",
+        "palazzo set"
+      ],
+      "acceptable": [
+        "kaftan gown",
+        "kurta set",
+        "pre-draped outfit"
+      ],
+      "avoid": [
+        "saree",
+        "tight lehenga",
+        "body-con",
+        "heavy draping"
+      ]
+    },
+    "expected_attributes": {
+      "colors": {
+        "ideal": [
+          "gold",
+          "ivory",
+          "champagne",
+          "dusty rose",
+          "sage green",
+          "powder blue"
+        ],
+        "avoid": [
+          "black",
+          "very dark",
+          "neon"
+        ]
+      },
+      "materials": {
+        "ideal": [
+          "silk",
+          "organza",
+          "velvet",
+          "premium georgette"
+        ],
+        "acceptable": [
+          "crepe silk",
+          "tissue",
+          "satin"
+        ],
+        "avoid": [
+          "stiff brocade",
+          "heavy zari that's hard to lift",
+          "rough fabrics"
+        ]
+      },
+      "patterns": {
+        "ideal": [
+          "delicate hand embroidery",
+          "pearl work",
+          "subtle zardosi",
+          "elegant threadwork"
+        ],
+        "avoid": [
+          "very heavy kamdani",
+          "all-over stiff work",
+          "casual prints"
+        ]
+      }
+    },
+    "cultural_constraints": "Extremely complex needs: (1) Mother of bride at nikah = most honored position, must look REGAL, (2) Islam = full modesty, arms/legs covered, loose fit, dupatta/hijab-friendly, (3) Arthritis = cannot manage saree draping, heavy jewelry, tight buttons \u2014 needs easy-wear luxury, (4) All-day comfort = lightweight despite looking rich, (5) Luxury = finest craftsmanship. Solution: pre-styled luxury sharara or anarkali that requires minimal effort to wear but looks opulent.",
+    "scoring_rubric": {
+      "3_perfect": "Luxurious pearl/zardosi embroidered sharara or anarkali in gold/ivory \u2014 regal, modest, easy to wear with arthritis, and mother-of-bride worthy",
+      "2_good": "Premium kaftan gown or palazzo set with fine embroidery \u2014 luxurious and comfortable but may not be regal enough for mother of bride",
+      "1_acceptable": "Any modest luxury ethnic outfit \u2014 hits some marks but misses the complete intersection of needs",
+      "0_irrelevant": "Sarees (hard to drape with arthritis), tight/heavy outfits, budget options, or immodest clothing"
+    },
+    "formality_level": "regal/formal",
+    "gender_hint": "female"
+  },
+  {
+    "id": 51,
+    "category": "gifting",
+    "query": "Birthday gift saree for mom 50 years traditional",
+    "intents": {
+      "relation": "mom",
+      "occasion": "birthday party",
+      "product_type": "saree",
+      "agegroup": "middle-aged"
+    },
+    "brand_agnostic": true,
+    "expected_product_types": {
+      "ideal": [
+        "saree"
+      ],
+      "acceptable": [
+        "salwar",
+        "kurta"
+      ],
+      "avoid": [
+        "dress",
+        "coord",
+        "bikini",
+        "swimsuit"
+      ]
+    },
+    "expected_attributes": {
+      "colors": {
+        "ideal": [
+          "maroon",
+          "burgundy",
+          "gold",
+          "emerald",
+          "royal blue"
+        ],
+        "avoid": [
+          "neon",
+          "bright pink"
+        ]
+      },
+      "materials": {
+        "ideal": [
+          "silk",
+          "georgette",
+          "cotton silk"
+        ],
+        "acceptable": [
+          "chiffon",
+          "crepe"
+        ],
+        "avoid": [
+          "denim",
+          "lycra"
+        ]
+      },
+      "patterns": {
+        "ideal": [
+          "ethnic",
+          "embroidered",
+          "zari",
+          "traditional"
+        ],
+        "avoid": [
+          "western prints",
+          "graphic"
+        ]
+      }
+    },
+    "cultural_constraints": "Traditional saree for a 50-year-old mother. Classic, elegant, not trendy. Rich colors and traditional patterns. Think timeless elegance.",
+    "scoring_rubric": {
+      "3_perfect": "Silk or georgette saree in rich jewel tones with traditional embroidery or zari work",
+      "2_good": "Any saree in classic colors with ethnic patterns",
+      "1_acceptable": "Traditional ethnic wear (salwar, kurta) in appropriate colors if saree not available",
+      "0_irrelevant": "Western wear, trendy/modern styles, bright neon colors, casual wear"
+    },
+    "formality_level": "semi_formal",
+    "gender_hint": "female"
+  },
+  {
+    "id": 52,
+    "category": "gifting",
+    "query": "Baby shower gift dress women",
+    "intents": {
+      "occasion": "baby shower",
+      "product_type": "dress"
+    },
+    "brand_agnostic": true,
+    "expected_product_types": {
+      "ideal": [
+        "dress"
+      ],
+      "acceptable": [
+        "coord",
+        "kurta",
+        "kaftan"
+      ],
+      "avoid": [
+        "lehenga",
+        "sherwani",
+        "swimsuit"
+      ]
+    },
+    "expected_attributes": {
+      "colors": {
+        "ideal": [
+          "pastel",
+          "yellow",
+          "pink",
+          "mint",
+          "lavender"
+        ],
+        "avoid": [
+          "black",
+          "dark"
+        ]
+      },
+      "materials": {
+        "ideal": [
+          "cotton",
+          "georgette",
+          "chiffon"
+        ],
+        "acceptable": [
+          "crepe",
+          "linen"
+        ],
+        "avoid": [
+          "heavy silk",
+          "velvet"
+        ]
+      },
+      "patterns": {
+        "ideal": [
+          "floral",
+          "printed",
+          "light embroidery"
+        ],
+        "avoid": [
+          "heavy embellishment",
+          "sequin"
+        ]
+      }
+    },
+    "cultural_constraints": "Baby shower is a happy, light celebration. Pastel and cheerful colors. Comfortable, not overly formal. Gift should be wearable and versatile.",
+    "scoring_rubric": {
+      "3_perfect": "Comfortable dress in pastel or cheerful colors with light floral pattern",
+      "2_good": "Any dress or coord set in appropriate light colors",
+      "1_acceptable": "Kurta or kaftan in cheerful colors \u2014 comfortable and gift-appropriate",
+      "0_irrelevant": "Heavy formal wear, dark colors, impractical styles"
+    },
+    "formality_level": "casual",
+    "gender_hint": "female"
+  },
+  {
+    "id": 53,
+    "category": "gifting",
+    "query": "Anniversary gift dress for wife elegant",
+    "intents": {
+      "relation": "wife",
+      "occasion": "anniversary",
+      "product_type": "dress",
+      "style_goals": "classic"
+    },
+    "brand_agnostic": true,
+    "expected_product_types": {
+      "ideal": [
+        "dress",
+        "saree"
+      ],
+      "acceptable": [
+        "coord",
+        "lehenga"
+      ],
+      "avoid": [
+        "tracksuit",
+        "swimsuit",
+        "shorts"
+      ]
+    },
+    "expected_attributes": {
+      "colors": {
+        "ideal": [
+          "burgundy",
+          "emerald",
+          "navy",
+          "gold",
+          "blush"
+        ],
+        "avoid": [
+          "neon",
+          "white"
+        ]
+      },
+      "materials": {
+        "ideal": [
+          "silk",
+          "satin",
+          "georgette",
+          "velvet"
+        ],
+        "acceptable": [
+          "chiffon",
+          "crepe"
+        ],
+        "avoid": [
+          "cotton",
+          "denim"
+        ]
+      },
+      "patterns": {
+        "ideal": [
+          "embellished",
+          "embroidered",
+          "solid",
+          "sequin"
+        ],
+        "avoid": [
+          "casual prints",
+          "graphic"
+        ]
+      }
+    },
+    "cultural_constraints": "Anniversary gift for wife \u2014 elegant, romantic, luxurious feel. Should feel special and gift-worthy, not everyday wear.",
+    "scoring_rubric": {
+      "3_perfect": "Elegant dress or saree in rich colors with sophisticated embellishment",
+      "2_good": "Any dressy outfit in romantic colors with quality fabric",
+      "1_acceptable": "Decent ethnic or western outfit that could work for a special dinner",
+      "0_irrelevant": "Casual everyday wear, sporty clothes, dark/gloomy styles"
+    },
+    "formality_level": "semi_formal",
+    "gender_hint": "female"
+  },
+  {
+    "id": 54,
+    "category": "gifting",
+    "query": "Diwali gift kurta set teenage girl",
+    "intents": {
+      "relation": "niece",
+      "event": "Diwali",
+      "product_type": "kurta",
+      "agegroup": "teenager"
+    },
+    "brand_agnostic": true,
+    "expected_product_types": {
+      "ideal": [
+        "kurta"
+      ],
+      "acceptable": [
+        "coord",
+        "dress",
+        "salwar"
+      ],
+      "avoid": [
+        "saree",
+        "lehenga",
+        "sherwani"
+      ]
+    },
+    "expected_attributes": {
+      "colors": {
+        "ideal": [
+          "pink",
+          "yellow",
+          "blue",
+          "coral",
+          "mint"
+        ],
+        "avoid": [
+          "white",
+          "black",
+          "dull"
+        ]
+      },
+      "materials": {
+        "ideal": [
+          "cotton",
+          "rayon",
+          "chanderi"
+        ],
+        "acceptable": [
+          "georgette",
+          "crepe"
+        ],
+        "avoid": [
+          "heavy silk",
+          "velvet"
+        ]
+      },
+      "patterns": {
+        "ideal": [
+          "printed",
+          "floral",
+          "ethnic",
+          "embroidered"
+        ],
+        "avoid": [
+          "plain dark",
+          "heavy embellishment"
+        ]
+      }
+    },
+    "cultural_constraints": "Diwali gift for a teenager \u2014 festive but age-appropriate. Trendy yet traditional. Bright, fun colors. Not too heavy or formal.",
+    "scoring_rubric": {
+      "3_perfect": "Trendy printed or embroidered kurta set in bright festive colors suitable for a teenager",
+      "2_good": "Any kurta or coord in cheerful Diwali-appropriate colors",
+      "1_acceptable": "Ethnic wear that a teenager might wear, even if not perfectly festive",
+      "0_irrelevant": "Heavy traditional wear (saree/lehenga), adult formal styles, dark colors"
+    },
+    "formality_level": "festive",
+    "gender_hint": "female"
+  },
+  {
+    "id": 55,
+    "category": "gifting",
+    "query": "Retirement gift shawl women colleague",
+    "intents": {
+      "relation": "colleague",
+      "occasion": "retirement party"
+    },
+    "brand_agnostic": true,
+    "expected_product_types": {
+      "ideal": [
+        "saree",
+        "salwar"
+      ],
+      "acceptable": [
+        "kurta",
+        "dress"
+      ],
+      "avoid": [
+        "bikini",
+        "swimsuit",
+        "shorts",
+        "tracksuit"
+      ]
+    },
+    "expected_attributes": {
+      "colors": {
+        "ideal": [
+          "maroon",
+          "navy",
+          "emerald",
+          "cream",
+          "beige"
+        ],
+        "avoid": [
+          "neon",
+          "bright pink"
+        ]
+      },
+      "materials": {
+        "ideal": [
+          "silk",
+          "pashmina",
+          "wool",
+          "georgette"
+        ],
+        "acceptable": [
+          "cotton silk",
+          "chiffon"
+        ],
+        "avoid": [
+          "denim",
+          "lycra"
+        ]
+      },
+      "patterns": {
+        "ideal": [
+          "traditional",
+          "embroidered",
+          "ethnic",
+          "paisley"
+        ],
+        "avoid": [
+          "graphic",
+          "bold prints"
+        ]
+      }
+    },
+    "cultural_constraints": "Retirement gift for a woman colleague \u2014 dignified, professional-yet-warm. Classic style, not trendy. Since query mentions shawl but our catalog may not have shawls, suggest elegant saree or salwar as gift alternative.",
+    "scoring_rubric": {
+      "3_perfect": "Elegant silk saree or embroidered salwar in dignified colors \u2014 classic and gift-worthy",
+      "2_good": "Any traditional ethnic wear in muted, sophisticated colors",
+      "1_acceptable": "Professional-looking outfit that could serve as a thoughtful gift",
+      "0_irrelevant": "Casual wear, trendy young styles, sporty clothes"
+    },
+    "formality_level": "semi_formal",
+    "gender_hint": "female"
+  }
+]

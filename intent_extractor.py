@@ -1,0 +1,331 @@
+"""LLM-based intent extraction from user queries."""
+
+import json
+import re
+import time
+from config import LLM_TIMEOUT
+from llm_client import call_llm
+from prompts import INTENT_EXTRACTION_SYSTEM, INTENT_EXTRACTION_USER
+
+
+def extract(query, session_context=None):
+    """Extract structured intents from a natural language query.
+
+    Args:
+        query: user's raw query text
+        session_context: optional dict with prior turn intents for context
+
+    Returns:
+        tuple of (intents_dict, elapsed_ms)
+    """
+    prompt = INTENT_EXTRACTION_USER.format(query=query)
+
+    if session_context:
+        prompt += f"\n\nPrevious context from conversation: {json.dumps(session_context)}"
+        prompt += "\nMerge relevant prior context with new intents from this message."
+
+    start = time.time()
+    try:
+        raw = call_llm(prompt, system_prompt=INTENT_EXTRACTION_SYSTEM, timeout=LLM_TIMEOUT)
+    except Exception:
+        elapsed = (time.time() - start) * 1000
+        return _enrich_intents({}, query), elapsed
+    elapsed = (time.time() - start) * 1000
+    match = re.search(r'\{[^{}]*\}', raw)
+    if match:
+        try:
+            intents = json.loads(match.group())
+            intents = _enrich_intents(intents, query)
+            return intents, elapsed
+        except json.JSONDecodeError:
+            pass
+
+    return _enrich_intents({}, query), elapsed
+
+
+FUNCTIONAL_KEYWORDS = {
+    "breathable": "breathable", "dance-friendly": "dance-friendly", "dance friendly": "dance-friendly",
+    "haldi-proof": "haldi-proof", "haldi proof": "haldi-proof", "stain-resistant": "stain-resistant",
+    "stain resistant": "stain-resistant", "wrinkle-free": "wrinkle-free", "wrinkle free": "wrinkle-free",
+    "sweat-proof": "sweat-proof", "sweat proof": "sweat-proof", "waterproof": "waterproof",
+    "water proof": "waterproof", "lightweight": "lightweight", "light weight": "lightweight",
+    "quick-dry": "quick-dry", "quick dry": "quick-dry", "stretchable": "stretchable",
+    "iron-free": "iron-free", "iron free": "iron-free", "machine-washable": "machine-washable",
+    "machine washable": "machine-washable", "travel-friendly": "travel-friendly",
+    "travel friendly": "travel-friendly", "warm": "warm", "layerable": "layerable",
+}
+
+STYLE_KEYWORDS = {
+    "slimming": "slimming", "flattering": "flattering", "elongating": "elongating",
+    "modest": "modest", "trendy": "trendy", "minimalist": "minimalist",
+    "bold": "bold", "classic": "classic", "statement": "statement-piece",
+    "instagram-worthy": "instagram-worthy", "instagram worthy": "instagram-worthy",
+}
+
+
+EVENT_KEYWORDS = {
+    "diwali": "Diwali",
+    "holi": "Holi",
+    "onam": "Onam",
+    "navratri": "Navratri",
+    "garba": "Navratri",
+    "christmas": "Christmas",
+    "eid": "Eid",
+    "pongal": "Pongal",
+    "bihu": "Bihu",
+    "lohri": "Lohri",
+    "baisakhi": "Baisakhi",
+    "durga puja": "Durga Puja",
+    "ganesh chaturthi": "Ganesh Chaturthi",
+}
+
+OCCASION_KEYWORDS = {
+    "sangeet": "sangeet",
+    "mehendi": "mehendi",
+    "haldi": "haldi",
+    "engagement": "engagement",
+    "wedding": "hindu wedding",
+    "gala": "gala",
+    "bachelorette": "bachelorette",
+    "farewell": "farewell party",
+    "date": "date night",
+    "brunch": "date night",
+    "birthday": "birthday party",
+    "baby shower": "baby shower",
+    "anniversary": "anniversary",
+    "retirement": "retirement party",
+    "interview": "interview",
+    "office party": "office party",
+    "funeral": "funeral",
+}
+
+PLACE_KEYWORDS = {
+    "office": "office",
+    "temple": "temple",
+    "airport": "airport",
+    "museum": "museum",
+    "beach": "beach",
+    "rooftop bar": "restaurant",
+    "bar": "restaurant",
+    "restaurant": "restaurant",
+    "cafe": "cafe",
+    "college": "office",
+    "school": "office",
+    "mountain": "mountains",
+}
+
+ACTIVITY_KEYWORDS = {
+    "long flight": "traveling",
+    "flight": "traveling",
+    "travel": "traveling",
+    "yoga": "yoga",
+    "hiking": "hiking",
+    "hike": "hiking",
+    "swim": "swimming",
+    "cycling": "cycling",
+    "cycle": "cycling",
+    "dance": "dancing",
+    "clubbing": "dancing",
+}
+
+BODYTYPE_KEYWORDS = {
+    "plus size": "plus size",
+    "plus-size": "plus size",
+    "petite": "petite",
+    "broad shoulders": "broad shoulders",
+}
+
+HEALTH_KEYWORDS = {
+    "back pain": "back pain",
+    "sensitive skin": "sensitive skin",
+    "hypoallergenic": "sensitive skin",
+    "sweat": "sweating",
+    "sweating": "sweating",
+}
+
+COLOR_KEYWORDS = [
+    "white", "cream", "off white", "ivory", "gold", "red", "pink", "blue",
+    "green", "yellow", "orange", "black", "maroon", "purple", "silver",
+]
+
+
+def _has_phrase(text, phrase):
+    pattern = r"(?<![a-z0-9])" + re.escape(phrase).replace(r"\ ", r"\s+") + r"(?![a-z0-9])"
+    return re.search(pattern, text) is not None
+
+
+def _enrich_intents(intents, query):
+    """Add inferred fields the LLM might have missed."""
+    query_lower = query.lower()
+
+    # Deterministic keyword fallback, guided by the Rufus query set.
+    if "event" not in intents:
+        for keyword, value in EVENT_KEYWORDS.items():
+            if _has_phrase(query_lower, keyword):
+                intents["event"] = value
+                break
+
+    if "occasion" not in intents and "event" not in intents:
+        for keyword, value in OCCASION_KEYWORDS.items():
+            if _has_phrase(query_lower, keyword):
+                intents["occasion"] = value
+                break
+
+    if "place" not in intents:
+        for keyword, value in PLACE_KEYWORDS.items():
+            if _has_phrase(query_lower, keyword):
+                intents["place"] = value
+                break
+
+    if "activity" not in intents:
+        for keyword, value in ACTIVITY_KEYWORDS.items():
+            if _has_phrase(query_lower, keyword):
+                intents["activity"] = value
+                break
+
+    if "bodytype" not in intents:
+        for keyword, value in BODYTYPE_KEYWORDS.items():
+            if _has_phrase(query_lower, keyword):
+                intents["bodytype"] = value
+                break
+
+    if "health" not in intents:
+        for keyword, value in HEALTH_KEYWORDS.items():
+            if _has_phrase(query_lower, keyword):
+                intents["health"] = value
+                break
+
+    if "weather" not in intents:
+        if any(_has_phrase(query_lower, w) for w in ("hot weather", "indian summer", "summer", "sunny")):
+            intents["weather"] = "summer"
+        elif any(_has_phrase(query_lower, w) for w in ("cold", "winter", "warm outfit")):
+            intents["weather"] = "winter"
+        elif any(_has_phrase(query_lower, w) for w in ("rain", "rainy", "waterproof")):
+            intents["weather"] = "rainy"
+
+    if "budget" not in intents:
+        if any(w in query_lower for w in ("cheap", "budget", "affordable", "economical")):
+            intents["budget"] = "affordable"
+        elif any(w in query_lower for w in ("luxury", "premium", "designer")):
+            intents["budget"] = "premium"
+
+    if "month" not in intents:
+        for month in ("january", "february", "march", "april", "may", "june",
+                      "july", "august", "september", "october", "november", "december"):
+            if month in query_lower:
+                intents["month"] = month.title()
+                break
+
+    if "location" not in intents:
+        for location in ("goa", "mumbai", "rajasthan", "sri lanka", "europe", "kerala"):
+            if location in query_lower:
+                intents["location"] = location.title()
+                break
+
+    if "agegroup" not in intents:
+        if "teenage" in query_lower or "teenager" in query_lower:
+            intents["agegroup"] = "teenager"
+        elif re.search(r'\b30\s*(?:year|yr)', query_lower):
+            intents["agegroup"] = "adult"
+
+    if "colour" not in intents:
+        colors = [c for c in COLOR_KEYWORDS if _has_phrase(query_lower, c)]
+        if colors:
+            intents["colour"] = ",".join(colors)
+
+    # Infer gender from relation
+    relation = intents.get("relation", "")
+    if relation and "gender" not in intents:
+        female_relations = {"mom", "sister", "niece", "aunt", "grandmother", "wife", "daughter"}
+        male_relations = {"dad", "brother", "nephew", "uncle", "grandfather", "husband", "son"}
+        if relation in female_relations:
+            intents["gender"] = "female"
+        elif relation in male_relations:
+            intents["gender"] = "male"
+
+    if "gender" not in intents:
+        if re.search(r"\b(women|woman|female|girl|girls|wife|mother|mom)\b", query_lower):
+            intents["gender"] = "female"
+        elif re.search(r"\b(men|man|male|boy|boys|husband|father|dad)\b", query_lower):
+            intents["gender"] = "male"
+
+    # Infer gender from product mentions in query
+    if "gender" not in intents:
+        female_products = ["saree", "lehenga", "anarkali", "salwar", "blouse", "dupatta",
+                           "chaniya choli", "ghagra choli", "kurti", "churidar"]
+        male_products = ["sherwani", "kurta pajama", "jodhpuri", "bandhgala"]
+        if any(p in query_lower for p in female_products):
+            intents["gender"] = "female"
+        elif any(p in query_lower for p in male_products):
+            intents["gender"] = "male"
+
+    # Detect gifting intent
+    gift_signals = ["for my", "gift for", "buy for", "present for", "get for"]
+    if any(s in query_lower for s in gift_signals) and "relation" in intents:
+        intents["_is_gift"] = True
+
+    # Detect vacation/packing intent
+    pack_signals = ["pack", "packing", "trip", "vacation", "travel for", "days in",
+                    "week in", "wardrobe set", "capsule wardrobe"]
+    if any(s in query_lower for s in pack_signals):
+        intents["_is_vacation"] = True
+
+    # Extract duration if mentioned
+    duration_match = re.search(r'(\d+)[\s-]*(?:day|days|night|nights)', query_lower)
+    if duration_match:
+        intents["duration"] = int(duration_match.group(1))
+
+    # Extract numeric budget constraints
+    if "price_max" not in intents:
+        price_max_match = re.search(
+            r'(?:under|below|within|less than|upto|up to|budget)\s*(?:rs\.?|inr|₹|rupees?)?\s*(\d[\d,]*)',
+            query_lower)
+        if price_max_match:
+            intents["price_max"] = int(price_max_match.group(1).replace(",", ""))
+
+    if "price_min" not in intents:
+        price_min_match = re.search(
+            r'(?:above|over|more than|starting|starting from|upwards of)\s*(?:rs\.?|inr|₹|rupees?)?\s*(\d[\d,]*)',
+            query_lower)
+        if price_min_match:
+            intents["price_min"] = int(price_min_match.group(1).replace(",", ""))
+
+    # Detect product_type from query if LLM missed it
+    # Skip if negation words precede the product mention ("not a saree", "no lehenga")
+    negation_patterns = [r"\bnot\s+(?:a\s+)?{}\b", r"\bno\s+{}\b",
+                         r"\banything\s+but\s+(?:a\s+)?{}\b",
+                         r"\bavoid\s+{}\b", r"\bwithout\s+(?:a\s+)?{}\b",
+                         r"\binstead\s+of\s+(?:a\s+)?{}\b",
+                         r"\bexcept\s+{}\b", r"\bother\s+than\s+(?:a\s+)?{}\b"]
+    avoided_types = []
+    from knowledge_graph import PRODUCT_TYPE_ALIASES
+    for canonical, aliases in PRODUCT_TYPE_ALIASES.items():
+        terms = [canonical] + aliases
+        matched_term = next((t for t in terms if _has_phrase(query_lower, t)), None)
+        if not matched_term:
+            continue
+        # Check if a negation word precedes this product mention
+        is_negated = any(
+            re.search(pat.format(re.escape(matched_term)), query_lower)
+            for pat in negation_patterns
+        )
+        if is_negated:
+            avoided_types.append(canonical)
+        elif "product_type" not in intents:
+            intents["product_type"] = canonical
+    if avoided_types and "avoid_product_type" not in intents:
+        intents["avoid_product_type"] = ",".join(sorted(set(avoided_types)))
+
+    # Detect functional needs
+    if "functional_needs" not in intents:
+        found = [v for k, v in FUNCTIONAL_KEYWORDS.items() if k in query_lower]
+        if found:
+            intents["functional_needs"] = ",".join(sorted(set(found)))
+
+    # Detect style goals
+    if "style_goals" not in intents:
+        found = [v for k, v in STYLE_KEYWORDS.items() if k in query_lower]
+        if found:
+            intents["style_goals"] = ",".join(sorted(set(found)))
+
+    return intents

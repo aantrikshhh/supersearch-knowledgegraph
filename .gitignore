@@ -1,0 +1,17 @@
+__pycache__/
+*.py[cod]
+*$py.class
+
+.DS_Store
+.claude/
+
+# Generated/runtime artifacts
+eval_results/
+pipeline_visualizer.html
+*.db
+
+# Local virtual environments
+.venv/
+venv/
+env/
+
