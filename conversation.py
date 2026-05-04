@@ -13,6 +13,7 @@ from intent_extractor import extract as extract_intents
 from router import classify, classify_with_context, get_workflow
 from config import LLM_TIMEOUT
 from llm_client import call_llm
+from outfit_builder import OutfitResult
 
 
 FOLLOWUP_SIGNALS = [
@@ -52,7 +53,7 @@ FOLLOWUP_PATTERNS = [
     r"^(no|nah|nope),?\s+",
 ]
 
-# Suggested follow-ups per workflow — returned alongside results (like Rufus buttons).
+# Suggested follow-ups per workflow — returned alongside results as refinement actions.
 # Each rule checks what intents are MISSING and suggests refinement actions.
 SUGGESTED_FOLLOWUPS = {
     "occasion": [
@@ -122,6 +123,25 @@ class ConversationManager:
             self.session.active_intents = intents
 
         workflow_type, secondary = classify_with_context(intents, user_message)
+        clarifying_questions = self._get_clarifying_questions(
+            user_message, intents, workflow_type
+        )
+        if clarifying_questions:
+            self.session.active_workflow = workflow_type.value
+            self.session.add_turn(user_message, intents, workflow_type.value)
+            response_text = " ".join(clarifying_questions)
+            return {
+                "workflow": workflow_type.value,
+                "intents": intents,
+                "outfit": OutfitResult(query=user_message, occasion=intents.get("occasion", "")),
+                "response_text": response_text,
+                "is_followup": is_followup,
+                "session_id": self.session.session_id,
+                "suggested_followups": [],
+                "needs_clarification": True,
+                "clarifying_questions": clarifying_questions,
+            }
+
         workflow = get_workflow(workflow_type)
         outfit = workflow.run(
             user_message, intents, self.session.brand,
@@ -144,6 +164,8 @@ class ConversationManager:
             "is_followup": is_followup,
             "session_id": self.session.session_id,
             "suggested_followups": followups,
+            "needs_clarification": False,
+            "clarifying_questions": [],
         }
 
     def _is_followup(self, message):
@@ -184,8 +206,8 @@ class ConversationManager:
     def _get_suggested_followups(self, intents, workflow_type):
         """Return up to 3 suggested follow-up actions based on missing intents.
 
-        Modeled after Rufus — these are refinement buttons shown alongside results,
-        not blocking questions.
+        These are refinement actions shown alongside results, not blocking
+        questions.
         """
         rules = SUGGESTED_FOLLOWUPS.get(workflow_type.value, [])
         suggestions = []
@@ -195,6 +217,54 @@ class ConversationManager:
             if len(suggestions) >= 3:
                 break
         return suggestions
+
+    def _get_clarifying_questions(self, query, intents, workflow_type):
+        """Return blocking questions for constraints that should not be guessed."""
+        questions = []
+        query_lower = query.lower()
+
+        accepted_general_wedding = "general wedding" in query_lower
+        generic_wedding = (
+            not accepted_general_wedding
+            and (
+                intents.get("_needs_religion")
+                or intents.get("occasion") == "wedding"
+                or (
+                    "wedding" in query_lower
+                    and "religion" not in intents
+                    and not any(
+                        marker in query_lower
+                        for marker in (
+                            "hindu", "muslim", "islam", "nikah", "christian",
+                            "church", "sikh", "gurudwara", "anand karaj",
+                        )
+                    )
+                )
+            )
+        )
+        if workflow_type.value == "occasion" and generic_wedding:
+            questions.append(
+                "Which wedding context should I use: Hindu, Muslim, Christian, Sikh, or general wedding guest?"
+            )
+
+        if "gender" not in intents and self._gender_is_material(query, intents):
+            questions.append(
+                "Who is this for: women, men, or kids?"
+            )
+
+        return questions[:2]
+
+    def _gender_is_material(self, query, intents):
+        """Decide whether retrieval would be too broad without a recipient/gender."""
+        if intents.get("relation"):
+            return False
+        if intents.get("product_type") in {
+            "saree", "lehenga", "salwar", "sherwani", "swimsuit",
+        }:
+            return False
+        if any(term in query.lower() for term in ("women", "woman", "men", "man", "girl", "boy", "kids", "child")):
+            return False
+        return True
 
     def _format_response(self, outfit, query, intents, workflow_type,
                          suggested_followups=None):
@@ -208,6 +278,19 @@ class ConversationManager:
                 "price": p.get("price", 0),
             })
 
+        avoid_colours = self._avoid_colours_for_response(query, outfit, intents)
+        palette = [
+            c for c in outfit.color_palette.get('palette', [])
+            if c.lower() not in avoid_colours
+        ]
+        guardrail = ""
+        if avoid_colours:
+            guardrail = (
+                "\nAvoided colours: "
+                + ", ".join(sorted(avoid_colours))
+                + ". Do not recommend, praise, or suggest these as garment, accessory, or accent colours."
+            )
+
         prompt = f"""Format this fashion recommendation as a friendly, helpful response.
 
 User asked: "{query}"
@@ -216,9 +299,10 @@ Recommendations:
 {json.dumps(products_summary, indent=2)}
 
 Accessories: shoes={outfit.shoes}, bags={outfit.bags}, jewellery={outfit.jewellery}
-Color palette: {json.dumps(outfit.color_palette.get('palette', []))}
+Color palette: {json.dumps(palette)}
 Styling notes: {outfit.styling_notes}
 Formality: {outfit.formality}
+{guardrail}
 
 Write a conversational response (3-5 sentences) that presents the top picks naturally,
 mentions why they fit the occasion, and suggests accessories. No markdown, keep it warm and helpful."""
@@ -236,3 +320,20 @@ mentions why they fit the occasion, and suggests accessories. No markdown, keep 
 
         titles = [p.get("title", "") for p in outfit.primary_products[:3]]
         return f"Here are my top picks: {', '.join(titles)}. {' '.join(outfit.styling_notes[:2])}"
+
+    def _avoid_colours_for_response(self, query, outfit, intents):
+        """Collect colors that the final formatter must not recommend."""
+        avoid = {
+            c.lower()
+            for c in outfit.kg_context.get("colour", {}).get("avoid", [])
+            if c and c.lower() != "all"
+        }
+        query_lower = query.lower()
+        wedding_context = "wedding" in query_lower or intents.get("occasion") in {
+            "wedding", "hindu wedding", "muslim wedding", "christian wedding",
+        }
+        if wedding_context and "guest" in query_lower:
+            avoid.update({"red", "white", "ivory"})
+        if wedding_context and "mother of" in query_lower:
+            avoid.add("red")
+        return avoid

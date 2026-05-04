@@ -19,7 +19,8 @@ if str(ROOT_DIR) not in sys.path:
     sys.path.insert(0, str(ROOT_DIR))
 
 from config import EVAL_RESULTS_DIR, GOLDEN_EVAL_PATH
-from knowledge_graph import PRODUCT_TYPE_ALIASES
+from taxonomy import PRODUCT_TYPE_ALIASES
+from intent_extractor import normalize_intents
 from router import classify
 
 
@@ -336,7 +337,14 @@ def build_dataset(eval_path, golden_path):
             "top_types": list(brand_products["type_counts"].items())[:12],
         }
 
-        workflow = classify(result.get("intents", {}), result.get("query", "")).value
+        normalized_intents = normalize_intents(
+            result.get("query", ""),
+            result.get("intents", {}),
+            preserve_existing=True,
+        )
+        workflow = result.get("workflow") or classify(
+            normalized_intents, result.get("query", "")
+        ).value
         item = {
             "query_id": result["query_id"],
             "row_key": f"{result['query_id']}:{brand}",
@@ -344,7 +352,7 @@ def build_dataset(eval_path, golden_path):
             "brand": brand,
             "category": golden.get("category", "unknown"),
             "workflow": workflow,
-            "intents": result.get("intents", {}),
+            "intents": normalized_intents,
             "expected": expected,
             "attributes": expected_attributes,
             "rubric": golden.get("scoring_rubric", {}),

@@ -8,39 +8,7 @@ used by workflows and SQL generation.
 
 import openpyxl
 from collections import defaultdict
-
-
-INTENT_ALIASES = {
-    "occasion": {
-        "Indian wedding": "hindu wedding",
-        "indian wedding": "hindu wedding",
-        "griha pravesh": "housewarming",
-        "rice ceremony": "baby shower",
-        "college fest": "festival",
-        "reception": "hindu wedding",
-    },
-    "event": {
-        "Puja": "Lakshmi Puja",
-        "Disneyland": "Coachella",
-    }
-}
-
-PRODUCT_TYPE_ALIASES = {
-    "salwar": ["salwar kameez", "salwar suit", "churidar", "anarkali"],
-    "coord": ["co ord set", "co-ord set", "coordinate set", "co ord", "coord set"],
-    "kurta": ["kurta set", "kurta sets", "kurti", "kurtas & tunics"],
-    "pant": ["palazzo", "palazzo set", "pallazo set", "bottoms", "trousers"],
-    "dress": ["dresses", "gown", "maxi dress", "midi dress"],
-    "top": ["tops & shirts", "shirt", "blouse"],
-    "lehenga": ["lehengas", "lehenga set", "lehenga sets", "chaniya choli", "ghagra choli", "choli"],
-    "jacket": ["jackets", "bandi", "bandi set", "bandi sets"],
-    "skirt": ["skirt set", "skirts"],
-    "swimsuit": ["swimwear"],
-    "saree": ["sarees", "sari"],
-    "sherwani": ["sherwani sets", "raja koti set"],
-    "kaftan": ["kaftans"],
-    "tracksuit": ["trackees", "trackee"],
-}
+from taxonomy import GENERIC_ENTITY_EXPANSIONS, INTENT_ALIASES
 
 
 class KnowledgeGraph:
@@ -88,6 +56,8 @@ class KnowledgeGraph:
         all_items = defaultdict(lambda: defaultdict(list))
 
         for entity, value in intents.items():
+            if str(entity).startswith("_"):
+                continue
             if entity in ("location", "month", "budget", "time",
                          "price_max", "price_min", "product_type",
                          "avoid_product_type", "functional_needs", "style_goals",
@@ -95,8 +65,15 @@ class KnowledgeGraph:
                 continue
 
             resolved = self._resolve_alias(entity, value)
-            key = (entity, resolved)
-            entries = self.graph.get(key, [])
+            lookup_values = [resolved]
+            expansion = GENERIC_ENTITY_EXPANSIONS.get((entity, resolved))
+            if expansion:
+                lookup_values = expansion
+
+            entries = []
+            for lookup_value in lookup_values:
+                key = (entity, lookup_value)
+                entries.extend(self.graph.get(key, []))
 
             for entry in entries:
                 if gender and entry["gender"] and entry["gender"] not in (gender, "both"):

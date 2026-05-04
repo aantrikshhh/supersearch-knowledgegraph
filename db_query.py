@@ -12,7 +12,7 @@ import os
 import re
 import time
 from llm_client import call_llm
-from config import LLM_TIMEOUT
+from config import SQL_LLM_TIMEOUT
 
 DB_DIR = os.path.dirname(__file__)
 
@@ -54,25 +54,27 @@ CREATE TABLE products (
 - "elegant" / "festive" → search in title column with LIKE
 
 ## CRITICAL Rules
-1. product_type is mandatory in WHERE — use KG recommended + acceptable product types
-2. Color, pattern, and material go in ORDER BY as ranking signals, NOT in WHERE (many are NULL)
-3. Use CASE statements in ORDER BY to prioritize recommended types, then colors, then patterns/materials
-4. Always add LIMIT 20
-5. Return ONLY the raw SQL — no markdown, no backticks, no explanation
-6. Must be valid SQLite
-7. When KG says "all" for colours, skip color ranking
-8. Apply gender filter in WHERE only when the query clearly implies a gender
-9. Also search the title column with LIKE for color/pattern matching as fallback
-10. Never filter on occasions column — it is almost always NULL
-11. If intents include "product_type", it MUST be the first/primary product_type in WHERE clause — the user explicitly asked for this type
-12. If intents include "price_max", add WHERE price <= N as a HARD constraint (not just ORDER BY)
-13. If intents include "price_min", add WHERE price >= N as a HARD constraint
+1. product_type is mandatory in WHERE — use only exact values from "Available product_type values"
+2. If intents include product_type, it is a hard user constraint; resolve it to exact available DB values and keep it first in WHERE
+3. If the user did not request a product_type, use KG recommended + acceptable product types after resolving them to exact available DB values
+4. Color, pattern, material, style, and KG recommended attributes normally belong in ORDER BY, not WHERE, because these columns are often NULL
+5. Use CASE statements in ORDER BY to prioritize product type, then explicit user preferences, then KG recommended colors/patterns/materials, then price
+6. Always add LIMIT 20
+7. Return ONLY the raw SQL — no markdown, no backticks, no explanation
+8. Must be valid SQLite
+9. When KG says "all" for colours, skip color ranking
+10. Apply gender filter only when intents.gender is exactly "female" or "male"; do not infer or default gender
+11. Also search the title column with LIKE for color/pattern matching as fallback
+12. Never filter on occasions column — it is almost always NULL
+13. Never invent religion/culture, brand defaults, product types, colors, or gender not present in intents/KG context
+14. If intents include "price_max", add WHERE price <= N as a HARD constraint (not just ORDER BY)
+15. If intents include "price_min", add WHERE price >= N as a HARD constraint
+16. Do not use comments, CTEs, multiple statements, INSERT, UPDATE, DELETE, DROP, ALTER, or PRAGMA
 
 ## COLOR ENFORCEMENT (important for cultural contexts)
 When the KG "Avoid colours" list includes specific colors, ADD a WHERE clause to EXCLUDE them:
   AND NOT (',' || COALESCE(colors,'') || ',' LIKE '%,white,%' OR ',' || COALESCE(colors,'') || ',' LIKE '%,ivory,%')
-When the KG "Recommended colours" has specific colors (not "all"), BOOST them heavily in ORDER BY and ALSO add a WHERE preference:
-  AND (',' || COALESCE(colors,'') || ',' LIKE '%,red,%' OR ',' || COALESCE(colors,'') || ',' LIKE '%,pink,%' OR title LIKE '%red%' OR title LIKE '%pink%' OR colors IS NULL)
+When the KG "Recommended colours" has specific colors (not "all"), BOOST them in ORDER BY. Do not filter to recommended colors in WHERE unless the user explicitly requested a color or the cultural notes say a color is mandatory.
 
 ## PRICE / BUDGET HANDLING
 - If user says "luxury", "premium", "expensive", "money is no object" → add ORDER BY price DESC
@@ -81,6 +83,7 @@ When the KG "Recommended colours" has specific colors (not "all"), BOOST them he
 
 ## HARD CONSTRAINTS VS RANKING
 - Hard exclusions from the KG "Avoid" list can be used in WHERE.
+- Explicit user filters are hard constraints; KG recommendations are ranking guidance.
 - Recommended colors, patterns, materials, and style goals should normally be ORDER BY ranking signals.
 - Festival-specific colors and products come from the Knowledge Graph context; do not invent extra festival rules.
 - Role-specific constraints in Cultural/Regional Notes can be hard exclusions, e.g. wedding guest avoiding bridal red.
@@ -99,8 +102,8 @@ ORDER BY
 LIMIT 20
 ```
 
-### Example 2: Occasion + Religion query
-Intents: {"occasion": "hindu wedding", "religion": "Hinduism"}
+### Example 2: Occasion + Religion + Gender query
+Intents: {"occasion": "hindu wedding", "religion": "Hinduism", "gender": "female"}
 KG Context: Recommended products: saree, lehenga, salwar, kurta. Recommended colours: red, yellow. Avoid: shorts, bikini. Recommended patterns: ethnic, embellished.
 ```
 SELECT * FROM products
@@ -261,13 +264,22 @@ SQL_GENERATION_USER = """## User Query
 ## Budget Signal
 {budget_signal}
 
-## Cultural/Regional Notes
+## Additional SQL Guardrails
 {cultural_notes}
 
 ## Available product_type values in this database
 {available_types}
 
-Generate a SQLite SELECT query to find the best matching products. Return ONLY the SQL query."""
+Generate a SQLite SELECT query to find the best matching products.
+
+Before returning, silently verify:
+- The query is one SELECT statement over products
+- Every product_type literal appears in the available product_type list
+- Hard constraints from explicit user intents are preserved
+- Optional KG/style/color/material signals are ranking signals unless explicitly marked mandatory
+- LIMIT 20 is present
+
+Return ONLY the SQL query."""
 
 SQL_RETRY_USER = """The previous SQL query returned 0 results. Here is the failed query:
 
@@ -281,8 +293,9 @@ Please generate a LESS RESTRICTIVE query:
 1. Keep product_type and explicit numeric price constraints in WHERE
 2. Use more product_type values from the available list only when the user did not request a specific product_type
 3. Move color, pattern, material, and style filters to ORDER BY
-4. Remove any gender filter if present
+4. Remove a gender filter only when gender was not explicitly present in intents
 5. Make sure product_type values match EXACTLY what's available in the database
+6. Do not assume a specific wedding culture when intents contain "_needs_religion": true
 
 Return ONLY the corrected SQL query."""
 
@@ -296,17 +309,6 @@ def get_available_types(db_path):
     conn.close()
     return types
 
-
-# Only role-based or relational constraints that the KG can't express.
-# Festival colors/patterns are handled by the KG directly — no need to repeat here.
-CULTURAL_NOTES = {
-    "sikh wedding": "Sikh wedding: Avoid white (mourning) and black (inauspicious).",
-    "hindu wedding": "Hindu wedding: Red is traditionally for the bride ONLY. Guests should avoid red.",
-    "muslim wedding": "Muslim wedding: Modest coverage preferred.",
-    "funeral": "Funeral: ONLY white or off-white.",
-    "christian wedding": "Christian wedding: Avoid white (bride's color).",
-    "bachelorette": "Bachelorette: Prefer modern/western styles (dress, coord, skirt) over traditional ethnic.",
-}
 
 BUDGET_SIGNALS = {
     "luxury": "LUXURY — sort by price DESC, prefer highest-priced items",
@@ -359,7 +361,7 @@ def _parse_kg_context(kg_context_str):
 
 
 def _product_terms(canonical):
-    from knowledge_graph import PRODUCT_TYPE_ALIASES
+    from taxonomy import PRODUCT_TYPE_ALIASES
     terms = [canonical]
     terms.extend(PRODUCT_TYPE_ALIASES.get(canonical, []))
     return [t.lower() for t in terms if t]
@@ -388,12 +390,68 @@ def _sql_string(value):
     return "'" + str(value).replace("'", "''") + "'"
 
 
+def _extract_sql_literals(list_body):
+    return [
+        value.replace("''", "'")
+        for value in re.findall(r"'((?:''|[^'])*)'", list_body)
+    ]
+
+
+def _validate_select_sql(sql, available_types):
+    """Fail closed on SQL shapes that should not be generated."""
+    stripped = sql.strip()
+    upper = stripped.upper()
+    if not upper.startswith("SELECT"):
+        raise ValueError(f"Generated query is not a SELECT: {stripped[:100]}")
+    if ";" in stripped.rstrip(";"):
+        raise ValueError("Generated query contains multiple SQL statements")
+    banned = ("INSERT", "UPDATE", "DELETE", "DROP", "ALTER", "PRAGMA", "ATTACH", "DETACH")
+    if any(re.search(rf"\b{word}\b", upper) for word in banned):
+        raise ValueError("Generated query contains a forbidden SQL operation")
+
+    available = {str(t) for t in available_types}
+    for body in re.findall(r"\bproduct_type\s+(?:NOT\s+)?IN\s*\(([^)]*)\)", stripped, flags=re.IGNORECASE):
+        unknown = [value for value in _extract_sql_literals(body) if value not in available]
+        if unknown:
+            raise ValueError(f"Generated query used unavailable product_type values: {unknown[:5]}")
+
+
 def _contains_expr(column, term):
     safe = str(term).replace("'", "''").lower()
     return (
         f"',' || COALESCE({column}, '') || ',' LIKE '%,{safe},%' "
         f"OR LOWER(title) LIKE '%{safe}%'"
     )
+
+
+def _has_specific_wedding_context(intents):
+    occasion = str(intents.get("occasion", "")).lower()
+    event = str(intents.get("event", "")).lower()
+    religion = str(intents.get("religion", "")).lower()
+    haystack = " ".join((occasion, event, religion))
+    return any(
+        marker in haystack
+        for marker in (
+            "hindu", "muslim", "islam", "christian", "sikh",
+            "nikah", "anand karaj",
+        )
+    )
+
+
+def _has_actionable_wedding_context(intents):
+    if _has_specific_wedding_context(intents):
+        return True
+    return intents.get("occasion") == "wedding" and not intents.get("_needs_religion")
+
+
+def _is_wedding_guest_query(query):
+    query_lower = query.lower()
+    return "wedding" in query_lower and "guest" in query_lower
+
+
+def _is_mother_of_wedding_query(query):
+    query_lower = query.lower()
+    return "wedding" in query_lower and "mother of" in query_lower
 
 
 def _deterministic_sql(query, intents, kg_context_str, available_types):
@@ -433,12 +491,14 @@ def _deterministic_sql(query, intents, kg_context_str, available_types):
         where.append(f"price >= {float(intents['price_min'])}")
 
     avoid_colours = [c for c in kg.get("colour", {}).get("avoid", []) if c.lower() != "all"]
-    query_lower = query.lower()
-    if "wedding" in query_lower and "guest" in query_lower:
+    wedding_context = _has_actionable_wedding_context(intents)
+    ambiguous_wedding = intents.get("_needs_religion") and intents.get("occasion") == "wedding"
+    if (wedding_context or ambiguous_wedding) and _is_wedding_guest_query(query):
         avoid_colours.extend(["red", "white", "ivory"])
-    if "wedding" in query_lower and "mother of" in query_lower:
+    if (wedding_context or ambiguous_wedding) and _is_mother_of_wedding_query(query):
         avoid_colours.append("red")
     if avoid_colours:
+        avoid_colours = list(dict.fromkeys(avoid_colours))
         where.append(
             "NOT ("
             + " OR ".join(_contains_expr("colors", c) for c in avoid_colours[:8])
@@ -446,7 +506,16 @@ def _deterministic_sql(query, intents, kg_context_str, available_types):
         )
 
     explicit_colours = _split_csv(intents.get("colour") or intents.get("color"))
-    recommended_colours = [c for c in kg.get("colour", {}).get("recommended", []) if c.lower() != "all"]
+    if ambiguous_wedding:
+        recommended_colours = []
+    else:
+        recommended_colours = [
+            c for c in kg.get("colour", {}).get("recommended", [])
+            if c.lower() != "all"
+        ]
+    if avoid_colours:
+        avoid_set = {c.lower() for c in avoid_colours}
+        recommended_colours = [c for c in recommended_colours if c.lower() not in avoid_set]
     recommended_materials = kg.get("material", {}).get("recommended", [])
     recommended_patterns = kg.get("pattern", {}).get("recommended", [])
 
@@ -512,23 +581,25 @@ def generate_sql(query, intents, kg_context_str, brand, available_types):
 
     # Determine cultural notes
     cultural = []
-    occasion = intents.get("occasion", "").lower()
-    event = intents.get("event", "").lower()
     query_lower = query.lower()
 
-    for key, note in CULTURAL_NOTES.items():
-        if key in occasion or key in event or key in query_lower:
-            cultural.append(note)
+    wedding_context = _has_actionable_wedding_context(intents)
+    ambiguous_wedding = intents.get("_needs_religion") and intents.get("occasion") == "wedding"
+    if ambiguous_wedding:
+        cultural.append(
+            "Ambiguous wedding context: do NOT infer Hindu, Muslim, Christian, or Sikh wedding. "
+            "Treat generic wedding KG colors as low-confidence styling only; do not make red a default."
+        )
 
-    if "mother of" in query_lower and "wedding" in query_lower:
+    if (wedding_context or ambiguous_wedding) and _is_mother_of_wedding_query(query):
         cultural.append("Mother of bride/groom: Must NOT wear red (bride's color). Prefer royal blue, emerald, purple, gold, maroon.")
 
-    if "guest" in query_lower and "wedding" in query_lower:
+    if (wedding_context or ambiguous_wedding) and _is_wedding_guest_query(query):
         cultural.append("Wedding guest: Should NOT wear red (bride's color) or white. Prefer jewel tones, pastels, or vibrant colors.")
 
     # Explicit product type request
     if "product_type" in intents:
-        from knowledge_graph import PRODUCT_TYPE_ALIASES
+        from taxonomy import PRODUCT_TYPE_ALIASES
         requested = intents["product_type"]
         aliases = PRODUCT_TYPE_ALIASES.get(requested, [])
         matching_db_types = [t for t in available_types
@@ -588,7 +659,7 @@ def generate_sql(query, intents, kg_context_str, brand, available_types):
     )
 
     start = time.time()
-    raw = call_llm(prompt, system_prompt=SQL_GENERATION_SYSTEM, timeout=LLM_TIMEOUT)
+    raw = call_llm(prompt, system_prompt=SQL_GENERATION_SYSTEM, timeout=SQL_LLM_TIMEOUT)
     elapsed = (time.time() - start) * 1000
 
     # Extract SQL from response — strip any markdown fences
@@ -597,13 +668,10 @@ def generate_sql(query, intents, kg_context_str, brand, available_types):
     sql = re.sub(r'\n?```$', '', sql)
     sql = sql.strip()
 
-    # Safety: ensure it's a SELECT
-    if not sql.upper().startswith("SELECT"):
-        raise ValueError(f"Generated query is not a SELECT: {sql[:100]}")
-
     # Ensure LIMIT
     if "LIMIT" not in sql.upper():
         sql += "\nLIMIT 20"
+    _validate_select_sql(sql, available_types)
 
     return sql, raw, elapsed
 
@@ -741,7 +809,7 @@ def _retry_sql_generation(failed_sql, available_types, intents=None):
         prompt += "\n\nPreserve these hard constraints: " + "; ".join(hard_constraints)
 
     start = time.time()
-    raw = call_llm(prompt, system_prompt=SQL_GENERATION_SYSTEM, timeout=LLM_TIMEOUT)
+    raw = call_llm(prompt, system_prompt=SQL_GENERATION_SYSTEM, timeout=SQL_LLM_TIMEOUT)
     elapsed = (time.time() - start) * 1000
     sql = re.sub(r'^```\w*\n?', '', raw)
     sql = re.sub(r'\n?```$', '', sql)
@@ -751,6 +819,7 @@ def _retry_sql_generation(failed_sql, available_types, intents=None):
         raise ValueError(f"Retry did not produce a SELECT: {sql[:100]}")
     if "LIMIT" not in sql.upper():
         sql += "\nLIMIT 20"
+    _validate_select_sql(sql, available_types)
 
     return sql, raw, elapsed
 

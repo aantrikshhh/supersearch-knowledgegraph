@@ -43,22 +43,36 @@ class Session:
 
     # Keys that persist from prior turns unless the new turn explicitly overrides them
     _STICKY_KEYS = frozenset({
-        "product_type", "gender", "occasion", "event",
-        "bodytype", "health", "religion",
+        "activity", "agegroup", "avoid_product_type", "bodytype", "budget",
+        "colour", "complexion", "duration", "event", "functional_needs",
+        "gender", "health", "location", "month", "occasion", "place",
+        "price_max", "price_min", "product_type", "profession", "relation",
+        "religion", "style_goals", "time", "weather",
     })
+    _CLEARABLE_FLAGS = frozenset({"_needs_religion"})
 
     def merge_intents(self, new_intents):
         """Smart merge: new values always win, sticky keys persist when not contradicted.
 
-        Internal flags (_is_gift, _is_vacation, etc.) always persist.
+        Internal flags usually persist, but clarification flags clear when the
+        new turn resolves them.
         """
         merged = {}
+        clear_flags = set()
+        if new_intents.get("_needs_religion") is False or "religion" in new_intents:
+            clear_flags.add("_needs_religion")
+
         for k, v in self.active_intents.items():
             if k.startswith("_"):
+                if k in clear_flags:
+                    continue
                 merged[k] = v
             elif k in self._STICKY_KEYS and k not in new_intents:
                 merged[k] = v
         for k, v in new_intents.items():
+            if k in self._CLEARABLE_FLAGS and v is False:
+                merged.pop(k, None)
+                continue
             merged[k] = v
         self.active_intents = merged
 

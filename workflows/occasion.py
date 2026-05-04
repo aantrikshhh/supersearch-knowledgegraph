@@ -5,7 +5,7 @@ engagement, and similar queries. It combines KG cultural rules, formality, and
 optional explicit product types before building one or more outfits.
 """
 
-from workflows.base import run_standard_pipeline, get_kg, get_comp_graphs
+from workflows.base import run_standard_pipeline, get_kg, get_comp_graphs, resolve_gender
 from outfit_builder import form_multiple_outfits
 from db_query import query_products
 from config import get_formality
@@ -22,7 +22,7 @@ def run(query, intents, brand, session=None, secondary=None):
     kg = get_kg()
     comp = get_comp_graphs()
 
-    gender = intents.get("gender", "female")
+    gender = resolve_gender(intents)
     occasion = intents.get("occasion", intents.get("event", ""))
     formality, formality_config = get_formality(
         occasion=intents.get("occasion"),

@@ -7,7 +7,7 @@ returns packing-oriented recommendations.
 
 import json
 import re
-from workflows.base import get_kg, get_comp_graphs
+from workflows.base import get_kg, get_comp_graphs, resolve_gender
 from weather_inference import infer as infer_weather
 from outfit_builder import form_outfit, OutfitResult
 from color_coordinator import check_color_variety
@@ -31,7 +31,7 @@ def run(query, intents, brand, session=None, secondary=None):
     location = intents.get("location", "destination")
     month = intents.get("month", "")
     duration = intents.get("duration", 3)
-    gender = intents.get("gender", "female")
+    gender = resolve_gender(intents)
     occasion = intents.get("occasion", intents.get("event", ""))
 
     # Step 1: Weather

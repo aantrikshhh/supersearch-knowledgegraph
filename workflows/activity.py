@@ -5,7 +5,7 @@ clubbing by preserving activity constraints while delegating retrieval and
 outfit assembly to the shared workflow base.
 """
 
-from workflows.base import run_standard_pipeline, get_comp_graphs
+from workflows.base import run_standard_pipeline, get_comp_graphs, resolve_gender
 
 
 def run(query, intents, brand, session=None, secondary=None):
@@ -14,7 +14,7 @@ def run(query, intents, brand, session=None, secondary=None):
     If activity implies a specific product (swimming→swimsuit),
     the KG already handles this via the activity entity lookup.
     """
-    gender = intents.get("gender", "female")
+    gender = resolve_gender(intents)
     outfit = run_standard_pipeline(query, intents, brand, gender)
 
     activity = intents.get("activity", "")

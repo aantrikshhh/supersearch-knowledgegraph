@@ -5,7 +5,7 @@ needs by converting health context into fit/material guidance while preserving
 secondary occasion or place signals.
 """
 
-from workflows.base import run_standard_pipeline, get_comp_graphs
+from workflows.base import run_standard_pipeline, get_comp_graphs, resolve_gender
 
 
 def run(query, intents, brand, session=None, secondary=None):
@@ -16,7 +16,7 @@ def run(query, intents, brand, session=None, secondary=None):
     Injects formality/place context from secondary signals when available.
     """
     secondary = secondary or {}
-    gender = intents.get("gender", "female")
+    gender = resolve_gender(intents)
 
     # Inject secondary formality context so KG picks appropriate product types
     formality_occasion = secondary.get("formality_context", "")

@@ -20,7 +20,9 @@ if str(ROOT_DIR) not in sys.path:
 
 from knowledge_graph import KnowledgeGraph
 from db_query import query_products
+from intent_extractor import normalize_intents
 from prompts import RECOMMENDATION_SYSTEM, RECOMMENDATION_USER
+from router import classify
 from config import KG_PATH, GOLDEN_EVAL_PATH, EVAL_RESULTS_DIR, BRAND_DB_PATHS
 from llm_client import call_llm
 
@@ -168,7 +170,9 @@ def run_eval():
 
     for qi, entry in enumerate(golden):
         query = entry["query"]
-        intents = entry["intents"]
+        intents = normalize_intents(query, entry["intents"], preserve_existing=True)
+        if entry.get("gender_hint") and "gender" not in intents:
+            intents["gender"] = entry["gender_hint"]
         rubric = entry.get("scoring_rubric", {})
         expected = entry.get("expected_product_types", {})
         cultural = entry.get("cultural_constraints", "None")
@@ -203,6 +207,7 @@ def run_eval():
                 "query_id": qi + 1, "query": query, "brand": brand,
                 "intents": intents, "db_products": 0, "recommendations": [],
                 "scores": [], "ndcg5": 0.0, "mrr": 0.0, "hit_rate": 0.0,
+                "workflow": classify(intents, query).value,
             })
             continue
 
@@ -272,6 +277,7 @@ def run_eval():
             "recommendations": scored_recs,
             "scores": scores, "ndcg5": round(n, 4), "mrr": round(m, 4),
             "hit_rate": round(h, 4),
+            "workflow": classify(intents, query).value,
         })
 
     # Final summary

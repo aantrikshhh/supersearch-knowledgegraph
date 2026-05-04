@@ -21,12 +21,13 @@ if str(ROOT_DIR) not in sys.path:
 if str(LEGACY_DIR) not in sys.path:
     sys.path.insert(0, str(LEGACY_DIR))
 
-from knowledge_graph import KnowledgeGraph, INTENT_ALIASES
+from config import KG_PATH
+from taxonomy import INTENT_ALIASES, RELATION_GENDERS
+from knowledge_graph import KnowledgeGraph
 from brand_adapters import load_catalog, NormalizedProduct
 from product_matcher import score_product, _product_type_matches
 from prompts import RECOMMENDATION_SYSTEM, RECOMMENDATION_USER, INTENT_EXTRACTION_SYSTEM, INTENT_EXTRACTION_USER
 from llm_client import call_llm
-from config import KG_PATH
 
 CATALOGS = {
     "masaba": "/Users/aant/repos/scraper-infra/data/house_of_masaba_products.json",
@@ -172,10 +173,7 @@ def build_trace_data(query, intents, brand="masaba", run_llm=False, kg=None, cat
     # Stage 5: Product scoring
     gender = None
     relation = intents.get("relation", "")
-    if relation in ("mom", "sister", "niece", "aunt", "grandmother"):
-        gender = "female"
-    elif relation in ("dad", "brother", "nephew", "uncle", "grandfather"):
-        gender = "male"
+    gender = RELATION_GENDERS.get(relation)
 
     trace["gender_filter"] = gender
 

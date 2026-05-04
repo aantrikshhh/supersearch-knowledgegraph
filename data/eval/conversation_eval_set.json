@@ -1,0 +1,144 @@
+[
+  {
+    "id": "clarify_generic_wedding_then_general_women",
+    "brand": "aza",
+    "description": "Generic wedding guest query should ask for wedding context and gender, then preserve budget after the user answers.",
+    "turns": [
+      {
+        "user": "Affordable wedding guest outfit - don't want to spend too much",
+        "expect": {
+          "workflow": "occasion",
+          "needs_clarification": true,
+          "clarifying_contains": ["wedding context", "women, men, or kids"],
+          "intent_equals": {"occasion": "wedding", "budget": "affordable"},
+          "intent_truthy": ["_needs_religion"],
+          "max_primary_products": 0
+        }
+      },
+      {
+        "user": "general wedding guest women",
+        "expect": {
+          "workflow": "occasion",
+          "needs_clarification": false,
+          "is_followup": true,
+          "intent_equals": {"occasion": "wedding", "gender": "female", "budget": "affordable"},
+          "intent_absent": ["_needs_religion"],
+          "min_db_products": 1,
+          "min_primary_products": 1,
+          "sql_contains": ["gender IN", "NOT"],
+          "sql_not_contains": ["LIKE '%,red,%' THEN 0"],
+          "response_not_contains": ["black accents", "red accents", "white accents"]
+        }
+      }
+    ]
+  },
+  {
+    "id": "clarify_gender_then_music_festival_results",
+    "brand": "aza",
+    "description": "Broad outfit query without gender should ask gender first, then keep event/location/weather after gender answer.",
+    "turns": [
+      {
+        "user": "Affordable music festival outfit for humid Mumbai",
+        "expect": {
+          "needs_clarification": true,
+          "clarifying_contains": ["women, men, or kids"],
+          "intent_equals": {"budget": "affordable", "location": "Mumbai", "weather": "humid"},
+          "max_primary_products": 0
+        }
+      },
+      {
+        "user": "women",
+        "expect": {
+          "needs_clarification": false,
+          "is_followup": true,
+          "intent_equals": {"gender": "female", "budget": "affordable", "location": "Mumbai", "weather": "humid"},
+          "min_db_products": 1,
+          "min_primary_products": 1
+        }
+      }
+    ]
+  },
+  {
+    "id": "gifting_result_then_cheaper_followup",
+    "brand": "aza",
+    "description": "Gift query should route to gifting; follow-up should preserve gift/product context and return another result set.",
+    "turns": [
+      {
+        "user": "Baby shower gift dress women",
+        "expect": {
+          "workflow": "gifting",
+          "needs_clarification": false,
+          "intent_equals": {"occasion": "baby shower", "gender": "female", "product_type": "dress"},
+          "intent_truthy": ["_is_gift"],
+          "min_db_products": 1,
+          "min_primary_products": 1,
+          "product_types_all": ["dress"]
+        }
+      },
+      {
+        "user": "show me cheaper options",
+        "expect": {
+          "workflow": "gifting",
+          "needs_clarification": false,
+          "is_followup": true,
+          "intent_equals": {"occasion": "baby shower", "gender": "female", "product_type": "dress", "budget": "affordable"},
+          "intent_truthy": ["_is_gift"],
+          "min_db_products": 1,
+          "min_primary_products": 1,
+          "product_types_all": ["dress"]
+        }
+      }
+    ]
+  },
+  {
+    "id": "diwali_kurta_result_then_red_followup",
+    "brand": "kalki",
+    "description": "Post-result color refinement should retain event, product type, price cap, and gender.",
+    "turns": [
+      {
+        "user": "Kurta set under 2000 for Diwali women",
+        "expect": {
+          "workflow": "occasion",
+          "needs_clarification": false,
+          "intent_equals": {"event": "Diwali", "product_type": "kurta", "gender": "female", "price_max": 2000},
+          "min_db_products": 1,
+          "min_primary_products": 1,
+          "product_types_all": ["kurta"],
+          "sql_contains": ["price <="]
+        }
+      },
+      {
+        "user": "in red",
+        "expect": {
+          "workflow": "occasion",
+          "needs_clarification": false,
+          "is_followup": true,
+          "intent_equals": {"event": "Diwali", "product_type": "kurta", "gender": "female", "price_max": 2000, "colour": "red"},
+          "min_db_products": 1,
+          "min_primary_products": 1,
+          "product_types_all": ["kurta"],
+          "sql_contains": ["price <=", "red"]
+        }
+      }
+    ]
+  },
+  {
+    "id": "retirement_gift_shawl_routes_to_scarf",
+    "brand": "aza",
+    "description": "Shawl gift should route to gifting and map to scarf-like catalog types.",
+    "turns": [
+      {
+        "user": "Retirement gift shawl women colleague",
+        "expect": {
+          "workflow": "gifting",
+          "needs_clarification": false,
+          "intent_equals": {"occasion": "retirement party", "relation": "colleague", "gender": "female", "product_type": "scarf"},
+          "intent_truthy": ["_is_gift"],
+          "min_db_products": 1,
+          "min_primary_products": 1,
+          "product_types_all": ["scarf"]
+        }
+      }
+    ]
+  }
+]

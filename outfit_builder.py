@@ -23,9 +23,10 @@ class OutfitResult:
     occasion: str = ""
     query: str = ""
     db_debug: dict = field(default_factory=dict)
+    kg_context: dict = field(default_factory=dict)
 
 
-def form_outfit(candidates, kg_context, intents, comp_graphs=None, gender="female", top_n=3):
+def form_outfit(candidates, kg_context, intents, comp_graphs=None, gender=None, top_n=3):
     """Build a complete outfit from DB candidates + KG context + complementary graphs.
 
     Args:
@@ -33,7 +34,7 @@ def form_outfit(candidates, kg_context, intents, comp_graphs=None, gender="femal
         kg_context: dict from KnowledgeGraph.lookup()
         intents: extracted intents dict
         comp_graphs: ComplementaryGraphs instance
-        gender: "male" or "female"
+        gender: optional "male" or "female" filter for accessory graphs
         top_n: number of primary product options to include
 
     Returns:
@@ -115,6 +116,20 @@ def form_outfit(candidates, kg_context, intents, comp_graphs=None, gender="femal
     }
     color_context = context_map.get(formality_level, "all")
     color_result = coordinate_colors(primary_colors[:3], context=color_context, comp_graphs=comp_graphs)
+    avoid_colors = {
+        c.lower()
+        for c in kg_context.get("colour", {}).get("avoid", [])
+        if c and c.lower() != "all"
+    }
+    if avoid_colors:
+        color_result["palette"] = [
+            c for c in color_result.get("palette", [])
+            if c.lower() not in avoid_colors
+        ]
+        color_result["accessory_colors"] = [
+            c for c in color_result.get("accessory_colors", [])
+            if c.lower() not in avoid_colors
+        ]
 
     # Build styling notes
     notes = []
@@ -144,11 +159,12 @@ def form_outfit(candidates, kg_context, intents, comp_graphs=None, gender="femal
         formality=formality_level,
         occasion=occasion,
         query="",
+        kg_context=kg_context,
     )
 
 
 def form_multiple_outfits(candidates, kg_context, intents, comp_graphs=None,
-                          gender="female", count=3):
+                          gender=None, count=3):
     """Build multiple distinct outfit options.
 
     Splits candidates into groups by product type to ensure variety.

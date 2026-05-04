@@ -38,6 +38,9 @@ python3 main.py -b aza
 # Run eval (55 queries × 3 brands; runtime depends on LLM model)
 python3 scripts/eval/run_golden_eval_all_brands.py
 
+# Run conversational eval for clarifications + follow-up turns
+python3 scripts/eval/run_conversation_eval.py --skip-response-llm
+
 # Generate eval audit visualizer from a saved eval result
 python3 scripts/eval/eval_audit_visualizer.py --eval eval_results/golden_eval_YYYYMMDD_HHMMSS.json
 ```
@@ -75,7 +78,7 @@ knowledge-graph/
 ├── outfit_builder.py          # Product scoring, outfits, accessories
 ├── data/
 │   ├── graph/                 # Master knowledge graph workbook
-│   ├── eval/                  # Golden eval set and rubrics
+│   ├── eval/                  # Golden + conversational eval sets
 │   └── raw/                   # Raw/reference spreadsheets
 ├── scripts/
 │   ├── data/                  # DB/query data generation scripts

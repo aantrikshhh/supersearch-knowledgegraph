@@ -42,6 +42,9 @@ python3 scripts/eval/run_golden_eval_parallel.py
 # Full: 55 queries × 3 brands
 python3 scripts/eval/run_golden_eval_all_brands.py
 
+# Runtime conversation flow: clarifications + follow-up turns
+python3 scripts/eval/run_conversation_eval.py --skip-response-llm
+
 # Results saved to eval_results/golden_eval_{timestamp}.json
 ```
 
@@ -98,7 +101,7 @@ Edit `data/graph/Master_Graph.xlsx` (sheet: "graph"). Columns:
 
 After editing, no rebuild needed — the graph loads fresh each time from Excel.
 
-To add aliases (e.g., "griha pravesh" → "housewarming"), edit `INTENT_ALIASES` in `knowledge_graph.py`.
+To add aliases (e.g., "griha pravesh" → "housewarming"), edit `INTENT_ALIASES` in `taxonomy.py`.
 
 ## Updating Complementary Graphs
 
@@ -110,8 +113,8 @@ Files are in `assistant/all_graph_components/`. Edit the Excel/CSV files directl
 |---|---|---|
 | `codex` command not found | CLI not installed | Install/authenticate Codex CLI |
 | 0 products returned | SQL too restrictive | Check db_query.py self-correction is working. Run with --trace |
-| Wrong product types | KG alias missing | Add alias to `INTENT_ALIASES` in knowledge_graph.py |
+| Wrong product types | KG alias missing | Add alias to `INTENT_ALIASES` in taxonomy.py |
 | Slow eval (~2+ hours) | Sequential processing | Use `scripts/eval/run_golden_eval_parallel.py` (8 workers) |
 | Import errors | Circular imports | Workflows use lazy imports via router.get_workflow() |
 | SQLite locked | Concurrent writes | Each thread gets its own connection (read-only) |
-| Cultural color wrong | Missing KG festival/occasion row | Add or correct rows in `data/graph/Master_Graph.xlsx`; use `CULTURAL_NOTES` only for role-based constraints |
+| Cultural color wrong | Missing KG festival/occasion row | Add or correct rows in `data/graph/Master_Graph.xlsx`; keep code-level notes limited to role-specific constraints |

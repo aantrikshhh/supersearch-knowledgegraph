@@ -5,7 +5,7 @@ module remains only because legacy tracing and visualization tools still use it
 to demonstrate the original KG-to-product scoring strategy.
 """
 
-from knowledge_graph import PRODUCT_TYPE_ALIASES
+from taxonomy import PRODUCT_TYPE_ALIASES
 
 
 def _product_type_matches(product_type, kg_product_name):

@@ -17,6 +17,9 @@ python3 scripts/eval/run_golden_eval_all_brands.py
 # Quick eval (55 queries, 1 brand each; supports --category)
 python3 scripts/eval/run_golden_eval_parallel.py
 
+# Conversational eval (clarifications + follow-up turns)
+python3 scripts/eval/run_conversation_eval.py --skip-response-llm
+
 # Generate HTML visualizer
 python3 scripts/eval/eval_audit_visualizer.py --eval eval_results/golden_eval_YYYYMMDD_HHMMSS.json
 
@@ -54,6 +57,7 @@ Queries route to: `vacation`, `place_profession`, `activity`, `occasion`, `healt
 - `*.db` — SQLite product databases (Masaba 971, Kalki 9664, Aza 50000)
 - `assistant/all_graph_components/` — Complementary graphs (colors, products, features)
 - `data/eval/golden_eval_set.json` — 55 annotated eval queries with scoring rubrics
+- `data/eval/conversation_eval_set.json` — multi-turn runtime scenarios for clarifications and follow-ups
 - `docs/specs/Workflows.docx` — Production workflow spec
 
 ## LLM Calls
@@ -68,12 +72,13 @@ All core calls use the centralized `llm_client.py` Codex CLI subprocess wrapper.
 
 - All core LLM calls go through `llm_client.py`, NOT the Anthropic SDK.
 - KG conflict resolution: avoid (-1) vetoes everything, otherwise best rank (max) wins. See knowledge_graph.py:lookup().
-- Cultural color/style rules should live in the KG when possible; `db_query.py:CULTURAL_NOTES` is only for role-based constraints the KG cannot express.
-- Product type aliases map catalog values to KG names. See knowledge_graph.py:PRODUCT_TYPE_ALIASES.
-- Intent aliases map user terms to KG entity values. See knowledge_graph.py:INTENT_ALIASES.
+- Cultural color/style rules should live in the KG; `db_query.py` only adds dynamic role-specific guardrails the KG cannot express.
+- Product type aliases map catalog values to KG names. See taxonomy.py:PRODUCT_TYPE_ALIASES.
+- Intent aliases map user terms to KG entity values. See taxonomy.py:INTENT_ALIASES.
 - Complementary graphs and KG are loaded as singletons in workflows/base.py (get_kg(), get_comp_graphs()).
 - Router uses deterministic rules, NOT LLM. See router.py:classify().
 - Eval uses ThreadPoolExecutor with 8 workers for parallelism. See `scripts/eval/run_golden_eval_parallel.py`.
+- Conversational evals use the production `ConversationManager` runtime path. See `scripts/eval/run_conversation_eval.py`.
 - Product catalog JSONs live at /Users/aant/repos/scraper-infra/data/ — paths are in config.py:CATALOG_PATHS.
 - The assistant/ directory was cloned from github.com/crystals-ai/assistant and contains complementary graph data.
 

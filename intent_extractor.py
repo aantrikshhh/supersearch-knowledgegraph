@@ -10,6 +10,17 @@ import json
 import re
 import time
 from config import LLM_TIMEOUT
+from taxonomy import (
+    AGEGROUP_TERMS,
+    GIFT_ACTION_PATTERNS,
+    GIFT_TERMS,
+    PRODUCT_TYPE_ALIASES,
+    RELATION_ALIASES,
+    RELATION_GENDERS,
+    RELIGION_KEYWORDS,
+    RELIGION_WEDDING_TERMS,
+    USER_GENDER_TERMS,
+)
 from llm_client import call_llm
 from prompts import INTENT_EXTRACTION_SYSTEM, INTENT_EXTRACTION_USER
 
@@ -90,7 +101,7 @@ OCCASION_KEYWORDS = {
     "mehendi": "mehendi",
     "haldi": "haldi",
     "engagement": "engagement",
-    "wedding": "hindu wedding",
+    "wedding": "wedding",
     "gala": "gala",
     "bachelorette": "bachelorette",
     "farewell": "farewell party",
@@ -160,11 +171,41 @@ def _has_phrase(text, phrase):
     return re.search(pattern, text) is not None
 
 
-def _enrich_intents(intents, query):
+def _has_gift_signal(query_lower):
+    if any(_has_phrase(query_lower, keyword) for keyword in GIFT_TERMS):
+        return True
+    return any(re.search(pattern, query_lower) for pattern in GIFT_ACTION_PATTERNS)
+
+
+def _infer_relation(query_lower):
+    for keyword, value in RELATION_ALIASES.items():
+        if _has_phrase(query_lower, keyword) or _has_phrase(query_lower, keyword + "'s"):
+            return value
+    return None
+
+
+def _is_generic_wedding_query(query_lower):
+    if not _has_phrase(query_lower, "wedding"):
+        return False
+    if _is_accepted_general_wedding(query_lower):
+        return False
+    return not any(_has_phrase(query_lower, term) for term in RELIGION_WEDDING_TERMS)
+
+
+def _is_accepted_general_wedding(query_lower):
+    return _has_phrase(query_lower, "general wedding") or _has_phrase(query_lower, "general wedding guest")
+
+
+def normalize_intents(query, intents=None, preserve_existing=False):
+    """Return deterministic runtime/eval intent enrichment for a query."""
+    return _enrich_intents(dict(intents or {}), query, preserve_existing=preserve_existing)
+
+
+def _enrich_intents(intents, query, preserve_existing=False):
     """Add inferred fields the LLM might have missed."""
     query_lower = query.lower()
 
-    # Deterministic keyword fallback, guided by the Rufus query set.
+    # Deterministic enrichment only handles high-confidence canonicalization.
     if "event" not in intents:
         for keyword, value in EVENT_KEYWORDS.items():
             if _has_phrase(query_lower, keyword):
@@ -182,6 +223,30 @@ def _enrich_intents(intents, query):
             if _has_phrase(query_lower, keyword):
                 intents["place"] = value
                 break
+
+    if "religion" not in intents:
+        for keyword, value in RELIGION_KEYWORDS.items():
+            if _has_phrase(query_lower, keyword):
+                intents["religion"] = value
+                break
+    if "religion" in intents:
+        intents["_needs_religion"] = False
+
+    # "general wedding" is the user's explicit answer to use a generic context.
+    # Do not let an LLM-provided _needs_religion flag survive that answer.
+    if _is_accepted_general_wedding(query_lower):
+        if not preserve_existing and intents.get("occasion") in (None, "hindu wedding"):
+            intents["occasion"] = "wedding"
+        if intents.get("occasion") == "wedding":
+            intents["_needs_religion"] = False
+
+    # Generic wedding should not silently become a specific religion/culture.
+    # We ask a clarification question later unless the user provided a cue.
+    if _is_generic_wedding_query(query_lower):
+        if not preserve_existing and intents.get("occasion") in (None, "hindu wedding"):
+            intents["occasion"] = "wedding"
+        if "religion" not in intents and intents.get("occasion") == "wedding":
+            intents["_needs_religion"] = True
 
     if "activity" not in intents:
         for keyword, value in ACTIVITY_KEYWORDS.items():
@@ -229,10 +294,17 @@ def _enrich_intents(intents, query):
                 break
 
     if "agegroup" not in intents:
-        if "teenage" in query_lower or "teenager" in query_lower:
-            intents["agegroup"] = "teenager"
-        elif re.search(r'\b30\s*(?:year|yr)', query_lower):
+        for agegroup, terms in AGEGROUP_TERMS.items():
+            if any(_has_phrase(query_lower, term) for term in terms):
+                intents["agegroup"] = agegroup
+                break
+        if "agegroup" not in intents and re.search(r'\b30\s*(?:year|yr)', query_lower):
             intents["agegroup"] = "adult"
+
+    if "relation" not in intents:
+        relation = _infer_relation(query_lower)
+        if relation:
+            intents["relation"] = relation
 
     if "colour" not in intents:
         colors = [c for c in COLOR_KEYWORDS if _has_phrase(query_lower, c)]
@@ -242,18 +314,15 @@ def _enrich_intents(intents, query):
     # Infer gender from relation
     relation = intents.get("relation", "")
     if relation and "gender" not in intents:
-        female_relations = {"mom", "sister", "niece", "aunt", "grandmother", "wife", "daughter"}
-        male_relations = {"dad", "brother", "nephew", "uncle", "grandfather", "husband", "son"}
-        if relation in female_relations:
-            intents["gender"] = "female"
-        elif relation in male_relations:
-            intents["gender"] = "male"
+        profile_gender = RELATION_GENDERS.get(relation)
+        if profile_gender:
+            intents["gender"] = profile_gender
 
     if "gender" not in intents:
-        if re.search(r"\b(women|woman|female|girl|girls|wife|mother|mom)\b", query_lower):
-            intents["gender"] = "female"
-        elif re.search(r"\b(men|man|male|boy|boys|husband|father|dad)\b", query_lower):
-            intents["gender"] = "male"
+        for gender, terms in USER_GENDER_TERMS.items():
+            if any(_has_phrase(query_lower, term) for term in terms):
+                intents["gender"] = gender
+                break
 
     # Infer gender from product mentions in query
     if "gender" not in intents:
@@ -266,8 +335,7 @@ def _enrich_intents(intents, query):
             intents["gender"] = "male"
 
     # Detect gifting intent
-    gift_signals = ["for my", "gift for", "buy for", "present for", "get for"]
-    if any(s in query_lower for s in gift_signals) and "relation" in intents:
+    if _has_gift_signal(query_lower):
         intents["_is_gift"] = True
 
     # Detect vacation/packing intent
@@ -304,7 +372,6 @@ def _enrich_intents(intents, query):
                          r"\binstead\s+of\s+(?:a\s+)?{}\b",
                          r"\bexcept\s+{}\b", r"\bother\s+than\s+(?:a\s+)?{}\b"]
     avoided_types = []
-    from knowledge_graph import PRODUCT_TYPE_ALIASES
     for canonical, aliases in PRODUCT_TYPE_ALIASES.items():
         terms = [canonical] + aliases
         matched_term = next((t for t in terms if _has_phrase(query_lower, t)), None)

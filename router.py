@@ -6,6 +6,9 @@ captures secondary signals so compound queries do not silently drop context.
 """
 
 from enum import Enum
+import re
+
+from taxonomy import GIFT_ACTION_PATTERNS, GIFT_TERMS, PRODUCT_TYPE_ALIASES
 
 
 class WorkflowType(Enum):
@@ -16,6 +19,13 @@ class WorkflowType(Enum):
     HEALTH = "health"
     GENERAL = "general"
     GIFTING = "gifting"
+
+
+def _has_gift_signal(query_lower):
+    return (
+        any(re.search(rf"\b{re.escape(term)}\b", query_lower) for term in GIFT_TERMS)
+        or any(re.search(pattern, query_lower) for pattern in GIFT_ACTION_PATTERNS)
+    )
 
 
 def classify(intents, query=""):
@@ -33,8 +43,10 @@ def classify(intents, query=""):
     if intents.get("activity") == "vacation":
         return WorkflowType.VACATION
 
-    # 2. Gifting — buying for someone else
-    if intents.get("_is_gift"):
+    # 2. Gifting — buying a present for someone else.
+    # Query text is checked too because golden/eval callers may pass raw intents
+    # that were not normalized through intent_extractor.
+    if intents.get("_is_gift") or _has_gift_signal(query_lower):
         return WorkflowType.GIFTING
 
     # 3. Occasion/Event — the most common flow
@@ -82,7 +94,6 @@ def classify_with_context(intents, query=""):
         secondary["formality_context"] = intents.get("occasion", intents.get("event", ""))
 
     # Detect multi-product requests
-    from knowledge_graph import PRODUCT_TYPE_ALIASES
     query_lower = query.lower()
     product_mentions = []
     for canonical, aliases in PRODUCT_TYPE_ALIASES.items():

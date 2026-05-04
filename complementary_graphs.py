@@ -128,12 +128,12 @@ class ComplementaryGraphs:
         pairs.sort(key=lambda x: x["rank"])
         return pairs[:top_n]
 
-    def get_outfit_combos(self, occasion_tag, gender="female"):
+    def get_outfit_combos(self, occasion_tag, gender=None):
         """Get outfit combo definitions for an occasion.
 
         Args:
             occasion_tag: e.g., "casual", "sangeet", "party", "ethnic"
-            gender: "male", "female", "both"
+            gender: optional "male" or "female"; None returns gender-neutral combos
 
         Returns:
             list of combos, each with {name, items: [{category, tag, name, rank}]}
@@ -205,7 +205,7 @@ class ComplementaryGraphs:
         cat_data = self.accessories.get(category, {})
         return cat_data.get(product_name.lower(), [])
 
-    def get_outfit_accessories(self, occasion_tag, gender="female"):
+    def get_outfit_accessories(self, occasion_tag, gender=None):
         """Get recommended accessories (shoes, bag, jewellery) for an occasion.
 
         Extracts non-clothing items from outfit combos.

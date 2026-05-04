@@ -31,6 +31,7 @@ from prompts import (
     RECOMMENDATION_SYSTEM, RECOMMENDATION_USER,
 )
 from config import KG_PATH
+from taxonomy import RELATION_GENDERS
 from llm_client import call_llm
 
 
@@ -154,10 +155,7 @@ def run_single_query(query, intents, kg, catalog_products, brand_name,
     # Infer gender from intents
     gender = None
     relation = active_intents.get("relation", "")
-    if relation in ("mom", "sister", "niece", "aunt", "grandmother"):
-        gender = "female"
-    elif relation in ("dad", "brother", "nephew", "uncle", "grandfather"):
-        gender = "male"
+    gender = RELATION_GENDERS.get(relation)
 
     # Step 2: Knowledge graph lookup
     start = time.time()

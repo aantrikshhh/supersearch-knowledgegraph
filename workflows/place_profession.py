@@ -5,7 +5,7 @@ professional roles. It enriches weather and setting context before using the
 standard recommendation pipeline.
 """
 
-from workflows.base import run_standard_pipeline
+from workflows.base import run_standard_pipeline, resolve_gender
 from weather_inference import enrich_intents_with_weather
 
 
@@ -17,7 +17,7 @@ def run(query, intents, brand, session=None, secondary=None):
     """
     secondary = secondary or {}
     enrich_intents_with_weather(intents)
-    gender = intents.get("gender", "female")
+    gender = resolve_gender(intents)
 
     activity_context = secondary.get("activity_context", "")
     if activity_context and "activity" not in intents:

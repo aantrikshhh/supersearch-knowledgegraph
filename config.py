@@ -43,10 +43,12 @@ CATALOG_PATHS = {
 # with KG_LLM_MODEL if the deployment has access to a smaller/faster model.
 LLM_MODEL = os.environ.get("KG_LLM_MODEL", "gpt-5.2")
 LLM_TIMEOUT = 120
+SQL_LLM_TIMEOUT = int(os.environ.get("KG_SQL_LLM_TIMEOUT", "45"))
 
 # Eval
 EVAL_RESULTS_DIR = os.path.join(BASE_DIR, "eval_results")
 GOLDEN_EVAL_PATH = os.path.join(DATA_DIR, "eval", "golden_eval_set.json")
+CONVERSATION_EVAL_PATH = os.path.join(DATA_DIR, "eval", "conversation_eval_set.json")
 
 # Weather lookup — major Indian cities + popular destinations
 WEATHER_TABLE = {
@@ -145,7 +147,7 @@ WEATHER_TABLE = {
 # Formality hierarchy
 FORMALITY_LEVELS = {
     "formal": {
-        "occasions": ["hindu wedding", "muslim wedding", "christian wedding", "engagement",
+        "occasions": ["wedding", "hindu wedding", "muslim wedding", "christian wedding", "engagement",
                       "roka", "sangeet", "reception", "gala", "corporate event"],
         "product_bias": ["saree", "lehenga", "salwar", "sherwani"],
         "material_bias": ["silk", "velvet", "brocade", "satin", "organza"],

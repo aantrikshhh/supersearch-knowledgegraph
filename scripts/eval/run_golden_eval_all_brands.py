@@ -22,7 +22,9 @@ if str(ROOT_DIR) not in sys.path:
 
 from knowledge_graph import KnowledgeGraph
 from db_query import query_products
+from intent_extractor import normalize_intents
 from prompts import RECOMMENDATION_SYSTEM, RECOMMENDATION_USER
+from router import classify
 from config import (
     KG_PATH,
     LLM_TIMEOUT,
@@ -78,7 +80,9 @@ def hit_rate(scores, threshold=2):
 def process_single_query(qi, entry, kg, brand):
     """Process one query end-to-end. Thread-safe (no shared mutable state)."""
     query = entry["query"]
-    intents = entry["intents"]
+    intents = normalize_intents(query, entry["intents"], preserve_existing=True)
+    if entry.get("gender_hint") and "gender" not in intents:
+        intents["gender"] = entry["gender_hint"]
     rubric = entry.get("scoring_rubric", {})
     expected = entry.get("expected_product_types", {})
     cultural = entry.get("cultural_constraints", "None")
@@ -87,6 +91,7 @@ def process_single_query(qi, entry, kg, brand):
         "query_id": qi + 1, "query": query, "brand": brand,
         "intents": intents, "db_products": 0, "recommendations": [],
         "scores": [], "ndcg5": 0.0, "mrr": 0.0, "hit_rate": 0.0,
+        "workflow": classify(intents, query).value,
     }
 
     # Step 1: KG lookup (in-memory, thread-safe reads)

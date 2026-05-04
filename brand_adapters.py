@@ -10,7 +10,7 @@ import json
 import re
 from dataclasses import dataclass, field
 from collections import Counter
-from knowledge_graph import PRODUCT_TYPE_ALIASES
+from taxonomy import PRODUCT_TYPE_ALIASES
 
 
 @dataclass

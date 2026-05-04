@@ -31,6 +31,12 @@ def get_comp_graphs():
     return _comp
 
 
+def resolve_gender(intents):
+    """Return a DB/KG gender filter only when the user supplied one."""
+    gender = intents.get("gender")
+    return gender if gender in ("female", "male") else None
+
+
 def run_standard_pipeline(query, intents, brand, gender=None):
     """The common pipeline: KG lookup → SQL → DB → outfit builder.
 
@@ -42,8 +48,7 @@ def run_standard_pipeline(query, intents, brand, gender=None):
     kg = get_kg()
     comp = get_comp_graphs()
 
-    if not gender:
-        gender = intents.get("gender", "female")
+    gender = gender if gender in ("female", "male") else resolve_gender(intents)
 
     enrich_intents_with_weather(intents)
 
@@ -58,6 +63,7 @@ def run_standard_pipeline(query, intents, brand, gender=None):
             query=query,
             occasion=intents.get("occasion", ""),
             db_debug=db_result,
+            kg_context=kg_result,
         )
 
     outfit = form_outfit(
