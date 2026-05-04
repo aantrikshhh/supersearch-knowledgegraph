@@ -386,6 +386,85 @@ def _resolve_db_types(canonical_types, available_types):
     return resolved
 
 
+def _resolve_broad_db_types(canonical_types, intents, available_types):
+    """Find broad catalog buckets that need title-backed product matching.
+
+    Some brand exports use coarse product_type values such as "men" or
+    "kidswear" while the actual garment appears only in the title. Keep these
+    behind explicit product requests so they do not dilute normal KG retrieval.
+    """
+    if not canonical_types:
+        return []
+
+    gender = str(intents.get("gender", "")).lower()
+    child_like = _is_child_agegroup(intents)
+
+    broad_terms = set()
+    if child_like:
+        broad_terms.update({"kid", "kids", "kidswear", "children"})
+    if gender == "male":
+        broad_terms.update({"men", "mens", "men's", "menswear"})
+
+    # Menswear in some catalogs is stored as one bucket even for specific
+    # garments like sherwani, bandhgala, jacket, or kurta.
+    male_leaning = {"sherwani", "kurta", "jacket", "pant", "top"}
+    if any(str(c).lower() in male_leaning for c in canonical_types):
+        if gender == "male":
+            broad_terms.update({"men", "mens", "men's", "menswear"})
+
+    resolved = []
+    for db_type in available_types:
+        db_lower = db_type.lower()
+        if any(non_apparel in db_lower for non_apparel in ("footwear", "jewellery", "jewelry", "bags", "accessories")):
+            continue
+        db_tokens = set(re.findall(r"[a-z]+", db_lower))
+        if any(term == db_lower or term in db_tokens for term in broad_terms):
+            if db_type not in resolved:
+                resolved.append(db_type)
+    return resolved
+
+
+def _is_child_agegroup(intents):
+    agegroup = str(intents.get("agegroup", "")).lower()
+    return agegroup in {"baby", "child", "infant", "toddler", "tween", "teenager", "youth"}
+
+
+def _resolve_apparel_fallback_types(available_types):
+    """Return likely garment product_type buckets, excluding accessories."""
+    preferred = [
+        "kurta", "dress", "ethnic dresses", "lehenga", "saree", "salwar",
+        "coord", "ethnic co-ord sets", "pant sets", "topwear", "top",
+        "fusion set", "kaftan", "skirt", "jacket", "jackets and sets",
+        "ethnic jackets", "sherwanis", "bandhgalas", "men", "mens",
+        "kidswear", "kids", "bridal", "indo western", "suits and tuxedos",
+        "blazers & sets", "bottomwear", "swimwear",
+    ]
+    available_by_lower = {t.lower(): t for t in available_types if t}
+    resolved = []
+    for wanted in preferred:
+        if wanted in available_by_lower and available_by_lower[wanted] not in resolved:
+            resolved.append(available_by_lower[wanted])
+    if resolved:
+        return resolved
+
+    blocked = ("footwear", "jewellery", "jewelry", "bags", "accessories", "earrings", "necklace", "bracelet")
+    return [t for t in available_types if t and not any(b in t.lower() for b in blocked)]
+
+
+def _title_match_clause(canonical_types):
+    terms = []
+    for canonical in canonical_types:
+        terms.extend(_product_terms(canonical))
+    terms = list(dict.fromkeys(t for t in terms if len(t) >= 3))
+    if not terms:
+        return ""
+    clauses = []
+    for term in terms[:10]:
+        safe = str(term).replace("'", "''").lower()
+        clauses.append(f"LOWER(title) LIKE '%{safe}%'")
+    return "(" + " OR ".join(clauses) + ")"
+
+
 def _sql_string(value):
     return "'" + str(value).replace("'", "''") + "'"
 
@@ -463,9 +542,24 @@ def _deterministic_sql(query, intents, kg_context_str, available_types):
     kg = _parse_kg_context(kg_context_str)
 
     requested_types = _split_csv(intents.get("product_type"))
+    title_backed_types = []
     if requested_types:
-        allowed_types = _resolve_db_types(requested_types, available_types)
+        exact_types = _resolve_db_types(requested_types, available_types)
+        broad_types = [
+            t for t in _resolve_broad_db_types(requested_types, intents, available_types)
+            if t not in exact_types
+        ]
+        if _is_child_agegroup(intents):
+            allowed_types = broad_types + exact_types
+        else:
+            allowed_types = exact_types + broad_types
+        title_backed_types = broad_types
+        if not allowed_types:
+            allowed_types = _resolve_apparel_fallback_types(available_types)
+            title_backed_types = allowed_types
     else:
+        exact_types = []
+        broad_types = []
         kg_types = kg.get("product", {})
         canonical = kg_types.get("recommended", []) + kg_types.get("acceptable", [])
         allowed_types = _resolve_db_types(canonical, available_types)
@@ -478,6 +572,17 @@ def _deterministic_sql(query, intents, kg_context_str, available_types):
     avoided_types = _resolve_db_types(avoided_canonical, available_types)
 
     where = [f"product_type IN ({', '.join(_sql_string(t) for t in allowed_types[:12])})"]
+    if requested_types and title_backed_types:
+        title_clause = _title_match_clause(requested_types)
+        if title_clause:
+            exact_clause = ""
+            if exact_types:
+                exact_clause = (
+                    "product_type IN ("
+                    + ", ".join(_sql_string(t) for t in exact_types[:12])
+                    + ") OR "
+                )
+            where.append(f"({exact_clause}{title_clause})")
     if avoided_types:
         where.append(f"product_type NOT IN ({', '.join(_sql_string(t) for t in avoided_types[:12])})")
 

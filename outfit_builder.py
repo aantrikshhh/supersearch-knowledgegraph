@@ -9,6 +9,7 @@ from dataclasses import dataclass, field
 from complementary_graphs import ComplementaryGraphs
 from color_coordinator import coordinate_colors
 from config import get_formality
+from taxonomy import PRODUCT_TYPE_ALIASES
 
 
 @dataclass
@@ -24,6 +25,31 @@ class OutfitResult:
     query: str = ""
     db_debug: dict = field(default_factory=dict)
     kg_context: dict = field(default_factory=dict)
+
+
+def _split_csv(value):
+    if not value:
+        return []
+    if isinstance(value, (list, tuple, set)):
+        return [str(v).strip() for v in value if str(v).strip()]
+    return [v.strip() for v in str(value).split(",") if v.strip()]
+
+
+def _product_matches_type(product, canonical_type):
+    canonical = str(canonical_type or "").strip().lower()
+    if not canonical:
+        return False
+    terms = [canonical] + [a.lower() for a in PRODUCT_TYPE_ALIASES.get(canonical, [])]
+    product_type = str(product.get("product_type", "")).lower()
+    title = str(product.get("title", "")).lower()
+    return any(
+        term == product_type
+        or term in product_type
+        or product_type in term
+        or product_type.rstrip("s") == term.rstrip("s")
+        or term in title
+        for term in terms
+    )
 
 
 def form_outfit(candidates, kg_context, intents, comp_graphs=None, gender=None, top_n=3):
@@ -50,20 +76,24 @@ def form_outfit(candidates, kg_context, intents, comp_graphs=None, gender=None, 
     )
 
     # Pick primary products — prefer recommended types, then diversify
-    recommended_types = set(kg_context.get("product", {}).get("recommended", []))
-    acceptable_types = set(kg_context.get("product", {}).get("acceptable", []))
-    avoid_types = set(kg_context.get("product", {}).get("avoid", []))
+    requested_types = _split_csv(intents.get("product_type"))
+    recommended_types = kg_context.get("product", {}).get("recommended", [])
+    acceptable_types = kg_context.get("product", {}).get("acceptable", [])
+    avoid_types = kg_context.get("product", {}).get("avoid", [])
+    avoided_types = set(avoid_types + _split_csv(intents.get("avoid_product_type")))
 
     scored = []
     for p in candidates:
-        ptype = p.get("product_type", "")
-        score = 0
-        if ptype in recommended_types:
-            score = 10
-        elif ptype in acceptable_types:
-            score = 5
-        elif ptype in avoid_types:
+        if any(_product_matches_type(p, t) for t in avoided_types):
             continue
+
+        score = 0
+        if requested_types and any(_product_matches_type(p, t) for t in requested_types):
+            score = 12
+        elif any(_product_matches_type(p, t) for t in recommended_types):
+            score = 10
+        elif any(_product_matches_type(p, t) for t in acceptable_types):
+            score = 5
         else:
             score = 3
 

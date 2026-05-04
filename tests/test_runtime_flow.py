@@ -121,6 +121,18 @@ class RuntimeFlowRegressionTests(unittest.TestCase):
         questions = conv._get_clarifying_questions(query, intents, classify(intents, query))
         self.assertTrue(any("women, men, or kids" in q for q in questions))
 
+    def test_neutral_gift_recipient_gets_gender_clarification(self):
+        query = "Birthday gift kurta for colleague"
+        intents = normalize_intents(query)
+        conv = ConversationManager()
+        questions = conv._get_clarifying_questions(query, intents, classify(intents, query))
+        self.assertTrue(any("women, men, or kids" in q for q in questions))
+
+    def test_traveling_activity_does_not_steal_explicit_place(self):
+        query = "Travel-friendly coord for airport women"
+        intents = normalize_intents(query)
+        self.assertEqual(classify(intents, query).value, "place_profession")
+
     def test_unknown_recipient_gift_does_not_default_female(self):
         query = "Gift dress for colleague"
         intents = normalize_intents(query)
@@ -222,6 +234,36 @@ class RuntimeFlowRegressionTests(unittest.TestCase):
         )
         self.assertIn("product_type IN ('kurta')", sql)
         self.assertIn("price <= 2000.0", sql)
+
+    def test_deterministic_sql_uses_title_backed_broad_catalog_buckets(self):
+        sql = _deterministic_sql(
+            "Hindu wedding groom sherwani men",
+            {"occasion": "wedding", "religion": "Hinduism", "gender": "male", "product_type": "sherwani"},
+            "Recommended products: sherwani, kurta\nRecommended colours: all",
+            get_available_types("kalki_products.db"),
+        )
+        self.assertIn("'men'", sql)
+        self.assertIn("LOWER(title) LIKE '%sherwani%'", sql)
+
+    def test_deterministic_sql_prioritizes_kidswear_for_child_queries(self):
+        sql = _deterministic_sql(
+            "Kids lehenga for Diwali girl",
+            {"event": "Diwali", "agegroup": "child", "gender": "female", "product_type": "lehenga"},
+            "Recommended products: lehenga, kurta\nRecommended colours: red, gold",
+            get_available_types("kalki_products.db"),
+        )
+        self.assertIn("product_type IN ('kids', 'kidswear', 'lehenga')", sql)
+        self.assertIn("LOWER(title) LIKE '%lehenga%'", sql)
+
+    def test_deterministic_sql_uses_apparel_fallback_when_type_only_in_title(self):
+        sql = _deterministic_sql(
+            "Eid gift kaftan for mom under 20000",
+            {"event": "Eid", "relation": "mom", "gender": "female", "product_type": "kaftan", "price_max": 20000},
+            "Recommended products: kaftan, kurta\nRecommended colours: gold",
+            get_available_types("aza_products.db"),
+        )
+        self.assertIn("LOWER(title) LIKE '%kaftan%'", sql)
+        self.assertNotIn("'anklets'", sql)
 
 
 if __name__ == "__main__":

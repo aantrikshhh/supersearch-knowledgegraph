@@ -29,18 +29,20 @@ def load_json(path):
         return json.load(f)
 
 
-def product_type_matches(expected, actual):
+def product_type_matches(expected, actual, title=""):
     expected = (expected or "").strip().lower()
     actual = (actual or "").strip().lower()
     if not expected or not actual:
         return False
     terms = {expected}
     terms.update(t.lower() for t in PRODUCT_TYPE_ALIASES.get(expected, []))
+    title = (title or "").strip().lower()
     return any(
         term == actual
         or term in actual
         or actual in term
         or term.rstrip("s") == actual.rstrip("s")
+        or term in title
         for term in terms
     )
 
@@ -140,6 +142,14 @@ def check_expectations(turn_summary, expect):
         actual = intents.get(key)
         if actual != expected:
             failures.append(f"intent {key}: expected {expected!r}, got {actual!r}")
+    for key, allowed in expect.get("intent_one_of", {}).items():
+        actual = intents.get(key)
+        if actual not in allowed:
+            failures.append(f"intent {key}: expected one of {allowed!r}, got {actual!r}")
+    for key, forbidden in expect.get("intent_not_equals", {}).items():
+        actual = intents.get(key)
+        if actual == forbidden:
+            failures.append(f"intent {key}: should not equal {forbidden!r}")
     for key, expected_values in expect.get("intent_contains", {}).items():
         actual = str(intents.get(key, "")).lower()
         if isinstance(expected_values, str):
@@ -180,7 +190,8 @@ def check_expectations(turn_summary, expect):
     if allowed_types and products:
         for product in products:
             actual_type = product.get("product_type", "")
-            if not any(product_type_matches(expected, actual_type) for expected in allowed_types):
+            title = product.get("title", "")
+            if not any(product_type_matches(expected, actual_type, title) for expected in allowed_types):
                 failures.append(
                     f"product type {actual_type!r} did not match allowed {allowed_types!r}"
                 )
@@ -188,7 +199,8 @@ def check_expectations(turn_summary, expect):
     if excluded_types and products:
         for product in products:
             actual_type = product.get("product_type", "")
-            if any(product_type_matches(excluded, actual_type) for excluded in excluded_types):
+            title = product.get("title", "")
+            if any(product_type_matches(excluded, actual_type, title) for excluded in excluded_types):
                 failures.append(
                     f"product type {actual_type!r} matched excluded {excluded_types!r}"
                 )
@@ -256,13 +268,17 @@ def run_scenario(scenario, skip_response_llm=False):
     }
 
 
-def run_eval(path, scenario_filter=None, skip_response_llm=False):
+def run_eval(path, scenario_filter=None, skip_response_llm=False, progress=False):
     scenarios = load_json(path)
     if scenario_filter:
         wanted = set(scenario_filter)
         scenarios = [s for s in scenarios if s["id"] in wanted]
 
-    results = [run_scenario(s, skip_response_llm=skip_response_llm) for s in scenarios]
+    results = []
+    for idx, scenario in enumerate(scenarios, 1):
+        if progress:
+            print(f"[{idx}/{len(scenarios)}] {scenario['id']}", flush=True)
+        results.append(run_scenario(scenario, skip_response_llm=skip_response_llm))
     passed = sum(1 for r in results if r["passed"])
     total_turns = sum(len(r["turns"]) for r in results)
     failed_turns = sum(1 for r in results for t in r["turns"] if not t["passed"])
@@ -289,6 +305,7 @@ def main():
         action="store_true",
         help="Use deterministic fallback response text to speed up flow checks.",
     )
+    parser.add_argument("--progress", action="store_true", help="Print scenario progress while running.")
     parser.add_argument("--out", default=None)
     args = parser.parse_args()
 
@@ -296,6 +313,7 @@ def main():
         args.eval,
         scenario_filter=args.scenario,
         skip_response_llm=args.skip_response_llm,
+        progress=args.progress,
     )
 
     os.makedirs(EVAL_RESULTS_DIR, exist_ok=True)

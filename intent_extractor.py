@@ -102,11 +102,14 @@ OCCASION_KEYWORDS = {
     "haldi": "haldi",
     "engagement": "engagement",
     "wedding": "wedding",
+    "reception": "wedding",
     "gala": "gala",
     "bachelorette": "bachelorette",
     "farewell": "farewell party",
     "date": "date night",
     "brunch": "date night",
+    "music festival": "festival",
+    "festival": "festival",
     "birthday": "birthday party",
     "baby shower": "baby shower",
     "anniversary": "anniversary",
@@ -129,6 +132,31 @@ PLACE_KEYWORDS = {
     "college": "office",
     "school": "office",
     "mountain": "mountains",
+}
+
+PROFESSION_KEYWORDS = {
+    "accountant": "accountant",
+    "actor": "actor",
+    "artist": "artist",
+    "athlete": "athlete",
+    "chef": "chef",
+    "designer": "designer",
+    "developer": "developer",
+    "doctor": "doctor",
+    "driver": "driver",
+    "engineer": "engineer",
+    "entrepreneur": "entrepreneur",
+    "homemaker": "homemaker",
+    "lawyer": "lawyer",
+    "manager": "manager",
+    "model": "model",
+    "musician": "musician",
+    "nurse": "nurse",
+    "photographer": "photographer",
+    "pilot": "pilot",
+    "student": "student",
+    "teacher": "teacher",
+    "writer": "writer",
 }
 
 ACTIVITY_KEYWORDS = {
@@ -224,6 +252,12 @@ def _enrich_intents(intents, query, preserve_existing=False):
                 intents["place"] = value
                 break
 
+    if "profession" not in intents:
+        for keyword, value in PROFESSION_KEYWORDS.items():
+            if _has_phrase(query_lower, keyword):
+                intents["profession"] = value
+                break
+
     if "religion" not in intents:
         for keyword, value in RELIGION_KEYWORDS.items():
             if _has_phrase(query_lower, keyword):
@@ -267,7 +301,9 @@ def _enrich_intents(intents, query, preserve_existing=False):
                 break
 
     if "weather" not in intents:
-        if any(_has_phrase(query_lower, w) for w in ("hot weather", "indian summer", "summer", "sunny")):
+        if _has_phrase(query_lower, "humid") or _has_phrase(query_lower, "humidity"):
+            intents["weather"] = "humid"
+        elif any(_has_phrase(query_lower, w) for w in ("hot weather", "indian summer", "summer", "sunny")):
             intents["weather"] = "summer"
         elif any(_has_phrase(query_lower, w) for w in ("cold", "winter", "warm outfit")):
             intents["weather"] = "winter"

@@ -30,6 +30,7 @@ FOLLOWUP_SIGNALS = [
     "which has", "which one", "which is", "which works",
     # Negation / replacement
     "something else", "not this", "change", "swap", "replace", "remove",
+    "make it",
     # Accessories
     "matching shoes", "matching bag", "matching jewel", "accessories for",
     "shoes for", "bag for", "jewellery for",
@@ -226,12 +227,12 @@ class ConversationManager:
         accepted_general_wedding = "general wedding" in query_lower
         generic_wedding = (
             not accepted_general_wedding
+            and "religion" not in intents
             and (
                 intents.get("_needs_religion")
                 or intents.get("occasion") == "wedding"
                 or (
                     "wedding" in query_lower
-                    and "religion" not in intents
                     and not any(
                         marker in query_lower
                         for marker in (
@@ -256,7 +257,7 @@ class ConversationManager:
 
     def _gender_is_material(self, query, intents):
         """Decide whether retrieval would be too broad without a recipient/gender."""
-        if intents.get("relation"):
+        if intents.get("relation") and intents.get("gender"):
             return False
         if intents.get("product_type") in {
             "saree", "lehenga", "salwar", "sherwani", "swimsuit",

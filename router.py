@@ -54,6 +54,8 @@ def classify(intents, query=""):
         return WorkflowType.OCCASION
 
     # 4. Activity — specific activity (not vacation)
+    if intents.get("activity") == "traveling" and ("place" in intents or "profession" in intents):
+        return WorkflowType.PLACE_PROFESSION
     if "activity" in intents:
         return WorkflowType.ACTIVITY
 

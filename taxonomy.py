@@ -25,18 +25,24 @@ GENERIC_ENTITY_EXPANSIONS = {
 }
 
 PRODUCT_TYPE_ALIASES = {
-    "salwar": ["salwar kameez", "salwar suit", "churidar", "anarkali"],
-    "coord": ["co ord set", "co-ord set", "coordinate set", "co ord", "coord set"],
+    "salwar": [
+        "salwar kameez", "salwar suit", "churidar", "anarkali",
+        "anarkali suit", "sharara", "sharara set", "gharara",
+    ],
+    "coord": [
+        "co ord set", "co-ord set", "coordinate set", "co ord",
+        "coord set", "fusion set", "fusion sets",
+    ],
     "kurta": ["kurta set", "kurta sets", "kurti", "kurtas & tunics"],
     "pant": ["palazzo", "palazzo set", "pallazo set", "bottoms", "trousers"],
-    "dress": ["dresses", "gown", "maxi dress", "midi dress"],
-    "top": ["tops & shirts", "shirt", "blouse"],
+    "dress": ["dresses", "gown", "gowns", "maxi dress", "midi dress", "jumpsuit"],
+    "top": ["tops & shirts", "shirt", "blouse", "crop top", "croptop"],
     "lehenga": ["lehengas", "lehenga set", "lehenga sets", "chaniya choli", "ghagra choli", "choli"],
     "jacket": ["jackets", "bandi", "bandi set", "bandi sets"],
     "skirt": ["skirt set", "skirts"],
     "swimsuit": ["swimwear"],
     "saree": ["sarees", "sari"],
-    "sherwani": ["sherwani sets", "raja koti set"],
+    "sherwani": ["sherwani sets", "sherwanis", "raja koti set", "bandhgala", "bandhgalas", "achkan", "jodhpuri"],
     "kaftan": ["kaftans"],
     "tracksuit": ["trackees", "trackee"],
     "scarf": ["scarves", "scarf", "shawl", "shawls", "stole", "stoles", "scarves & stoles"],
@@ -115,8 +121,14 @@ RELIGION_KEYWORDS = {
 RELIGION_WEDDING_TERMS = tuple(RELIGION_KEYWORDS.keys())
 
 USER_GENDER_TERMS = {
-    "female": ("women", "woman", "female", "girl", "girls", "wife", "mother", "mom", "lady", "ladies"),
-    "male": ("men", "man", "male", "boy", "boys", "husband", "father", "dad", "gentleman", "gentlemen"),
+    "female": (
+        "women", "woman", "female", "girl", "girls", "wife", "mother",
+        "mom", "lady", "ladies", "bride", "bridesmaid",
+    ),
+    "male": (
+        "men", "man", "male", "boy", "boys", "husband", "father",
+        "dad", "gentleman", "gentlemen", "groom", "groomsman",
+    ),
 }
 
 AGEGROUP_TERMS = {

@@ -370,7 +370,7 @@
           "needs_clarification": false,
           "is_followup": false,
           "intent_equals": {"event": "Diwali", "product_type": "kurta", "gender": "female", "price_max": 2000},
-          "intent_absent": ["occasion"],
+          "intent_not_equals": {"occasion": "sangeet"},
           "min_db_products": 1,
           "min_primary_products": 1,
           "product_types_all": ["kurta"]
@@ -424,6 +424,750 @@
           "min_primary_products": 1,
           "min_suggested_followups": 1,
           "suggested_contains": ["budget"],
+          "product_types_all": ["kurta"]
+        }
+      }
+    ]
+  },
+  {
+    "id": "masaba_beach_kaftan_one_shot",
+    "brand": "masaba",
+    "description": "Masaba has kaftans as a core category; explicit kaftan should stay locked even when beach KG suggests other products.",
+    "turns": [
+      {
+        "user": "Beach kaftan for women",
+        "expect": {
+          "workflow": "place_profession",
+          "needs_clarification": false,
+          "intent_equals": {"place": "beach", "product_type": "kaftan", "gender": "female"},
+          "min_db_products": 1,
+          "min_primary_products": 1,
+          "product_types_all": ["kaftan"]
+        }
+      }
+    ]
+  },
+  {
+    "id": "masaba_mens_diwali_kurta",
+    "brand": "masaba",
+    "description": "Masaba menswear should support men's festive kurta requests with gender preserved.",
+    "turns": [
+      {
+        "user": "Men's kurta for Diwali",
+        "expect": {
+          "workflow": "occasion",
+          "needs_clarification": false,
+          "intent_equals": {"event": "Diwali", "product_type": "kurta", "gender": "male"},
+          "min_db_products": 1,
+          "min_primary_products": 1,
+          "product_types_all": ["kurta"],
+          "sql_contains": ["gender IN"]
+        }
+      }
+    ]
+  },
+  {
+    "id": "masaba_fusion_set_maps_to_coord",
+    "brand": "masaba",
+    "description": "Masaba fusion sets are catalog-specific wording for co-ord/fusion outfits and should not fall through to generic retrieval.",
+    "turns": [
+      {
+        "user": "Fusion set for Diwali women",
+        "expect": {
+          "workflow": "occasion",
+          "needs_clarification": false,
+          "intent_equals": {"event": "Diwali", "product_type": "coord", "gender": "female"},
+          "min_db_products": 1,
+          "min_primary_products": 1,
+          "product_types_all": ["coord"]
+        }
+      }
+    ]
+  },
+  {
+    "id": "masaba_luxury_sangeet_lehenga",
+    "brand": "masaba",
+    "description": "Premium Masaba occasion query should preserve luxury sorting and explicit lehenga.",
+    "turns": [
+      {
+        "user": "Luxury lehenga for sangeet women",
+        "expect": {
+          "workflow": "occasion",
+          "needs_clarification": false,
+          "intent_equals": {"occasion": "sangeet", "product_type": "lehenga", "gender": "female", "budget": "luxury"},
+          "min_db_products": 1,
+          "min_primary_products": 1,
+          "product_types_all": ["lehenga"],
+          "sql_contains": ["price DESC"]
+        }
+      }
+    ]
+  },
+  {
+    "id": "kalki_groom_sherwani_broad_mens_bucket",
+    "brand": "kalki",
+    "description": "Kalki stores many sherwanis under a broad men bucket; retrieval should use title-backed matching instead of losing the hard product request.",
+    "turns": [
+      {
+        "user": "Hindu wedding groom sherwani men",
+        "expect": {
+          "workflow": "occasion",
+          "needs_clarification": false,
+          "intent_equals": {"religion": "Hinduism", "product_type": "sherwani", "gender": "male"},
+          "intent_one_of": {"occasion": ["wedding", "hindu wedding"]},
+          "min_db_products": 1,
+          "min_primary_products": 1,
+          "product_types_all": ["sherwani"],
+          "sql_contains": ["LOWER(title) LIKE"]
+        }
+      }
+    ]
+  },
+  {
+    "id": "kalki_anarkali_haldi_budget",
+    "brand": "kalki",
+    "description": "Anarkali should canonicalize to salwar and keep the haldi plus numeric budget constraints.",
+    "turns": [
+      {
+        "user": "Anarkali for haldi ceremony women under 500",
+        "expect": {
+          "workflow": "occasion",
+          "needs_clarification": false,
+          "intent_equals": {"occasion": "haldi", "product_type": "salwar", "gender": "female", "price_max": 500},
+          "min_db_products": 1,
+          "min_primary_products": 1,
+          "product_types_all": ["salwar"],
+          "sql_contains": ["price <="]
+        }
+      }
+    ]
+  },
+  {
+    "id": "kalki_kids_lehenga_title_backed_kidswear",
+    "brand": "kalki",
+    "description": "Kidswear is a broad Kalki bucket; child lehenga requests should prioritize kidswear with title-backed matching.",
+    "turns": [
+      {
+        "user": "Kids lehenga for Diwali girl",
+        "expect": {
+          "workflow": "occasion",
+          "needs_clarification": false,
+          "intent_equals": {"event": "Diwali", "agegroup": "child", "gender": "female", "product_type": "lehenga"},
+          "min_db_products": 1,
+          "min_primary_products": 1,
+          "product_types_all": ["lehenga"],
+          "sql_contains": ["kidswear", "LOWER(title) LIKE"]
+        }
+      }
+    ]
+  },
+  {
+    "id": "aza_plus_size_black_date_dress",
+    "brand": "aza",
+    "description": "Aza contemporary dress query should preserve body type, color, occasion, and gender.",
+    "turns": [
+      {
+        "user": "Plus size black dress for date night women",
+        "expect": {
+          "workflow": "occasion",
+          "needs_clarification": false,
+          "intent_equals": {"occasion": "date night", "bodytype": "plus size", "product_type": "dress", "gender": "female", "colour": "black"},
+          "min_db_products": 1,
+          "min_primary_products": 1,
+          "product_types_all": ["dress"],
+          "sql_contains": ["black"]
+        }
+      }
+    ]
+  },
+  {
+    "id": "aza_mens_sangeet_sherwani",
+    "brand": "aza",
+    "description": "Aza menswear should resolve sherwanis/sherwani sets for sangeet.",
+    "turns": [
+      {
+        "user": "Groom sherwani for sangeet men",
+        "expect": {
+          "workflow": "occasion",
+          "needs_clarification": false,
+          "intent_equals": {"occasion": "sangeet", "product_type": "sherwani", "gender": "male"},
+          "min_db_products": 1,
+          "min_primary_products": 1,
+          "product_types_all": ["sherwani"]
+        }
+      }
+    ]
+  },
+  {
+    "id": "aza_eid_gift_kaftan_mom_budget",
+    "brand": "aza",
+    "description": "Gift query should preserve event, relation-derived gender, explicit kaftan, and numeric price cap.",
+    "turns": [
+      {
+        "user": "Eid gift kaftan for mom under 20000",
+        "expect": {
+          "workflow": "gifting",
+          "needs_clarification": false,
+          "intent_equals": {"event": "Eid", "relation": "mom", "gender": "female", "product_type": "kaftan", "price_max": 20000},
+          "intent_truthy": ["_is_gift"],
+          "min_db_products": 1,
+          "min_primary_products": 1,
+          "product_types_all": ["kaftan"],
+          "sql_contains": ["price <="]
+        }
+      }
+    ]
+  },
+  {
+    "id": "aza_gala_gown_maps_to_dress",
+    "brand": "aza",
+    "description": "Gown should canonicalize to dress for a formal gala request.",
+    "turns": [
+      {
+        "user": "Gown for corporate gala women",
+        "expect": {
+          "workflow": "occasion",
+          "needs_clarification": false,
+          "intent_equals": {"occasion": "gala", "product_type": "dress", "gender": "female"},
+          "min_db_products": 1,
+          "min_primary_products": 1,
+          "product_types_all": ["dress"]
+        }
+      }
+    ]
+  },
+  {
+    "id": "clarify_wedding_context_then_sikh_answer",
+    "brand": "aza",
+    "description": "A short clarification answer should resolve religion without dropping the original saree wedding-guest context.",
+    "turns": [
+      {
+        "user": "Wedding guest saree",
+        "expect": {
+          "workflow": "occasion",
+          "needs_clarification": true,
+          "clarifying_contains": ["wedding context"],
+          "intent_equals": {"occasion": "wedding", "product_type": "saree"},
+          "intent_truthy": ["_needs_religion"],
+          "max_primary_products": 0
+        }
+      },
+      {
+        "user": "Sikh",
+        "expect": {
+          "workflow": "occasion",
+          "needs_clarification": false,
+          "is_followup": true,
+          "intent_equals": {"occasion": "wedding", "product_type": "saree", "religion": "Sikhism"},
+          "intent_absent": ["_needs_religion"],
+          "min_db_products": 1,
+          "min_primary_products": 1,
+          "product_types_all": ["saree"]
+        }
+      }
+    ]
+  },
+  {
+    "id": "followup_replaces_negated_product_type",
+    "brand": "kalki",
+    "description": "A user correction should replace the requested product type and carry the old one as an exclusion.",
+    "turns": [
+      {
+        "user": "Show lehengas for sangeet women",
+        "expect": {
+          "workflow": "occasion",
+          "needs_clarification": false,
+          "intent_equals": {"occasion": "sangeet", "product_type": "lehenga", "gender": "female"},
+          "min_db_products": 1,
+          "min_primary_products": 1,
+          "product_types_all": ["lehenga"]
+        }
+      },
+      {
+        "user": "no lehengas, show sarees",
+        "expect": {
+          "workflow": "occasion",
+          "needs_clarification": false,
+          "is_followup": true,
+          "intent_equals": {"occasion": "sangeet", "product_type": "saree", "gender": "female", "avoid_product_type": "lehenga"},
+          "min_db_products": 1,
+          "min_primary_products": 1,
+          "product_types_all": ["saree"],
+          "product_types_none": ["lehenga"]
+        }
+      }
+    ]
+  },
+  {
+    "id": "followup_adds_numeric_budget_cap",
+    "brand": "kalki",
+    "description": "A short budget follow-up should preserve the prior product/event/gender and add a hard price cap.",
+    "turns": [
+      {
+        "user": "Show sarees for Diwali women",
+        "expect": {
+          "workflow": "occasion",
+          "needs_clarification": false,
+          "intent_equals": {"event": "Diwali", "product_type": "saree", "gender": "female"},
+          "min_db_products": 1,
+          "min_primary_products": 1,
+          "product_types_all": ["saree"]
+        }
+      },
+      {
+        "user": "under 5000",
+        "expect": {
+          "workflow": "occasion",
+          "needs_clarification": false,
+          "is_followup": true,
+          "intent_equals": {"event": "Diwali", "product_type": "saree", "gender": "female", "price_max": 5000},
+          "min_db_products": 1,
+          "min_primary_products": 1,
+          "product_types_all": ["saree"],
+          "sql_contains": ["price <="]
+        }
+      }
+    ]
+  },
+  {
+    "id": "followup_adds_weather_context",
+    "brand": "aza",
+    "description": "A natural follow-up like 'make it for rainy weather' should merge weather into the prior place/product query.",
+    "turns": [
+      {
+        "user": "Office kurta for women",
+        "expect": {
+          "workflow": "place_profession",
+          "needs_clarification": false,
+          "intent_equals": {"place": "office", "product_type": "kurta", "gender": "female"},
+          "min_db_products": 1,
+          "min_primary_products": 1,
+          "product_types_all": ["kurta"]
+        }
+      },
+      {
+        "user": "make it for rainy weather",
+        "expect": {
+          "workflow": "place_profession",
+          "needs_clarification": false,
+          "is_followup": true,
+          "intent_equals": {"place": "office", "product_type": "kurta", "gender": "female", "weather": "rainy"},
+          "min_db_products": 1,
+          "min_primary_products": 1,
+          "product_types_all": ["kurta"]
+        }
+      }
+    ]
+  },
+  {
+    "id": "neutral_gift_recipient_clarifies_gender",
+    "brand": "aza",
+    "description": "Neutral gift recipients like colleague should ask who the product is for instead of defaulting gender.",
+    "turns": [
+      {
+        "user": "Birthday gift kurta for colleague",
+        "expect": {
+          "workflow": "gifting",
+          "needs_clarification": true,
+          "clarifying_contains": ["women, men, or kids"],
+          "intent_equals": {"occasion": "birthday party", "relation": "colleague", "product_type": "kurta"},
+          "intent_truthy": ["_is_gift"],
+          "max_primary_products": 0
+        }
+      },
+      {
+        "user": "men",
+        "expect": {
+          "workflow": "gifting",
+          "needs_clarification": false,
+          "is_followup": true,
+          "intent_equals": {"occasion": "birthday party", "relation": "colleague", "product_type": "kurta", "gender": "male"},
+          "intent_truthy": ["_is_gift"],
+          "min_db_products": 1,
+          "min_primary_products": 1,
+          "product_types_all": ["kurta"]
+        }
+      }
+    ]
+  },
+  {
+    "id": "kalki_kids_kurta_without_binary_gender",
+    "brand": "kalki",
+    "description": "Kids queries should use agegroup/kidswear without forcing a binary gender clarification.",
+    "turns": [
+      {
+        "user": "Kids kurta for Diwali",
+        "expect": {
+          "workflow": "occasion",
+          "needs_clarification": false,
+          "intent_equals": {"event": "Diwali", "agegroup": "child", "product_type": "kurta"},
+          "intent_absent": ["gender"],
+          "min_db_products": 1,
+          "min_primary_products": 1,
+          "product_types_all": ["kurta"],
+          "sql_contains": ["kidswear", "LOWER(title) LIKE"]
+        }
+      }
+    ]
+  },
+  {
+    "id": "airport_travel_friendly_place_route",
+    "brand": "aza",
+    "description": "Travel-friendly airport queries should route to place/profession, with travel-friendly kept as a functional need.",
+    "turns": [
+      {
+        "user": "Travel-friendly coord for airport women",
+        "expect": {
+          "workflow": "place_profession",
+          "needs_clarification": false,
+          "intent_equals": {"place": "airport", "activity": "traveling", "product_type": "coord", "gender": "female"},
+          "intent_contains": {"functional_needs": "travel-friendly"},
+          "min_db_products": 1,
+          "min_primary_products": 1,
+          "product_types_all": ["coord"]
+        }
+      }
+    ]
+  },
+  {
+    "id": "temple_modest_saree_place_flow",
+    "brand": "aza",
+    "description": "Temple queries should preserve place, modest style goal, explicit product type, and gender.",
+    "turns": [
+      {
+        "user": "Modest saree for temple women",
+        "expect": {
+          "workflow": "place_profession",
+          "needs_clarification": false,
+          "intent_equals": {"place": "temple", "style_goals": "modest", "product_type": "saree", "gender": "female"},
+          "min_db_products": 1,
+          "min_primary_products": 1,
+          "product_types_all": ["saree"]
+        }
+      }
+    ]
+  },
+  {
+    "id": "profession_lawyer_office_jacket",
+    "brand": "aza",
+    "description": "Profession/place query should keep explicit jacket and male gender.",
+    "turns": [
+      {
+        "user": "Jacket for lawyer office men",
+        "expect": {
+          "workflow": "place_profession",
+          "needs_clarification": false,
+          "intent_equals": {"place": "office", "profession": "lawyer", "product_type": "jacket", "gender": "male"},
+          "min_db_products": 1,
+          "min_primary_products": 1,
+          "product_types_all": ["jacket"]
+        }
+      }
+    ]
+  },
+  {
+    "id": "health_sensitive_skin_kurta",
+    "brand": "aza",
+    "description": "Health flow should preserve sensitive-skin need and explicit kurta.",
+    "turns": [
+      {
+        "user": "Cotton kurta for sensitive skin women",
+        "expect": {
+          "workflow": "health",
+          "needs_clarification": false,
+          "intent_equals": {"health": "sensitive skin", "product_type": "kurta", "gender": "female"},
+          "min_db_products": 1,
+          "min_primary_products": 1,
+          "product_types_all": ["kurta"]
+        }
+      }
+    ]
+  },
+  {
+    "id": "activity_yoga_with_health_context",
+    "brand": "aza",
+    "description": "Activity should own yoga while preserving health as a secondary constraint.",
+    "turns": [
+      {
+        "user": "Yoga outfit for back pain women",
+        "expect": {
+          "workflow": "activity",
+          "needs_clarification": false,
+          "intent_equals": {"activity": "yoga", "health": "back pain", "gender": "female"},
+          "min_db_products": 1,
+          "min_primary_products": 1
+        }
+      }
+    ]
+  },
+  {
+    "id": "premium_general_wedding_price_floor",
+    "brand": "aza",
+    "description": "General wedding answer should avoid religion clarification and preserve a hard price floor.",
+    "turns": [
+      {
+        "user": "Premium saree above 50000 for general wedding guest women",
+        "expect": {
+          "workflow": "occasion",
+          "needs_clarification": false,
+          "intent_equals": {"occasion": "wedding", "product_type": "saree", "gender": "female", "price_min": 50000, "budget": "premium"},
+          "intent_absent": ["_needs_religion"],
+          "min_db_products": 1,
+          "min_primary_products": 1,
+          "product_types_all": ["saree"],
+          "sql_contains": ["price >="]
+        }
+      }
+    ]
+  },
+  {
+    "id": "relation_without_gift_routes_occasion",
+    "brand": "aza",
+    "description": "A relation in a non-gift query should not route to gifting.",
+    "turns": [
+      {
+        "user": "Outfit for my friend's bachelorette party women",
+        "expect": {
+          "workflow": "occasion",
+          "needs_clarification": false,
+          "intent_equals": {"occasion": "bachelorette", "relation": "friend", "gender": "female"},
+          "intent_absent": ["_is_gift"],
+          "min_db_products": 1,
+          "min_primary_products": 1
+        }
+      }
+    ]
+  },
+  {
+    "id": "followup_colour_override",
+    "brand": "kalki",
+    "description": "A later color correction should replace the previous color while preserving product/event/gender.",
+    "turns": [
+      {
+        "user": "Show green sarees for Diwali women",
+        "expect": {
+          "workflow": "occasion",
+          "needs_clarification": false,
+          "intent_equals": {"event": "Diwali", "product_type": "saree", "gender": "female", "colour": "green"},
+          "min_db_products": 1,
+          "min_primary_products": 1,
+          "product_types_all": ["saree"]
+        }
+      },
+      {
+        "user": "actually blue",
+        "expect": {
+          "workflow": "occasion",
+          "needs_clarification": false,
+          "is_followup": true,
+          "intent_equals": {"event": "Diwali", "product_type": "saree", "gender": "female", "colour": "blue"},
+          "min_db_products": 1,
+          "min_primary_products": 1,
+          "product_types_all": ["saree"],
+          "sql_contains": ["blue"]
+        }
+      }
+    ]
+  },
+  {
+    "id": "rainy_mumbai_office_dress_budget",
+    "brand": "aza",
+    "description": "Place query should preserve city, rainy weather, explicit dress, gender, and hard budget cap.",
+    "turns": [
+      {
+        "user": "Rainy Mumbai office dress for women under 10000",
+        "expect": {
+          "workflow": "place_profession",
+          "needs_clarification": false,
+          "intent_equals": {"place": "office", "location": "Mumbai", "weather": "rainy", "product_type": "dress", "gender": "female", "price_max": 10000},
+          "min_db_products": 1,
+          "min_primary_products": 1,
+          "product_types_all": ["dress"],
+          "sql_contains": ["price <="]
+        }
+      }
+    ]
+  },
+  {
+    "id": "winter_airport_jacket_men",
+    "brand": "aza",
+    "description": "Winter airport query should route to place/profession and preserve warmth, jacket, and male gender.",
+    "turns": [
+      {
+        "user": "Warm jacket for winter airport men",
+        "expect": {
+          "workflow": "place_profession",
+          "needs_clarification": false,
+          "intent_equals": {"place": "airport", "weather": "winter", "product_type": "jacket", "gender": "male"},
+          "intent_contains": {"functional_needs": "warm"},
+          "min_db_products": 1,
+          "min_primary_products": 1,
+          "product_types_all": ["jacket"]
+        }
+      }
+    ]
+  },
+  {
+    "id": "onam_negated_saree_explicit_kurta",
+    "brand": "aza",
+    "description": "Onam query with explicit no-saree constraint should return kurta and exclude sarees.",
+    "turns": [
+      {
+        "user": "No sarees, show kurta for Onam women",
+        "expect": {
+          "workflow": "occasion",
+          "needs_clarification": false,
+          "intent_equals": {"event": "Onam", "product_type": "kurta", "avoid_product_type": "saree", "gender": "female"},
+          "min_db_products": 1,
+          "min_primary_products": 1,
+          "product_types_all": ["kurta"],
+          "product_types_none": ["saree"]
+        }
+      }
+    ]
+  },
+  {
+    "id": "haldi_proof_kurta_functional",
+    "brand": "aza",
+    "description": "Haldi-proof should remain a functional requirement and explicit kurta should stay locked.",
+    "turns": [
+      {
+        "user": "Haldi-proof kurta for haldi women",
+        "expect": {
+          "workflow": "occasion",
+          "needs_clarification": false,
+          "intent_equals": {"occasion": "haldi", "product_type": "kurta", "gender": "female"},
+          "intent_contains": {"functional_needs": "haldi-proof"},
+          "min_db_products": 1,
+          "min_primary_products": 1,
+          "product_types_all": ["kurta"]
+        }
+      }
+    ]
+  },
+  {
+    "id": "dance_friendly_sangeet_lehenga_budget",
+    "brand": "aza",
+    "description": "Dance-friendly sangeet query should preserve functional movement need, explicit lehenga, and price cap.",
+    "turns": [
+      {
+        "user": "Dance-friendly lehenga for sangeet women under 30000",
+        "expect": {
+          "workflow": "occasion",
+          "needs_clarification": false,
+          "intent_equals": {"occasion": "sangeet", "product_type": "lehenga", "gender": "female", "price_max": 30000},
+          "intent_contains": {"functional_needs": "dance-friendly"},
+          "min_db_products": 1,
+          "min_primary_products": 1,
+          "product_types_all": ["lehenga"],
+          "sql_contains": ["price <="]
+        }
+      }
+    ]
+  },
+  {
+    "id": "mother_of_groom_general_wedding_avoids_red",
+    "brand": "aza",
+    "description": "Mother-of-groom wedding query should avoid bridal red even for a general wedding context.",
+    "turns": [
+      {
+        "user": "Mother of groom saree for general wedding women",
+        "expect": {
+          "workflow": "occasion",
+          "needs_clarification": false,
+          "intent_equals": {"occasion": "wedding", "product_type": "saree", "gender": "female"},
+          "intent_absent": ["_needs_religion"],
+          "min_db_products": 1,
+          "min_primary_products": 1,
+          "product_types_all": ["saree"],
+          "sql_contains": ["NOT", "red"]
+        }
+      }
+    ]
+  },
+  {
+    "id": "christian_wedding_guest_dress",
+    "brand": "aza",
+    "description": "Specific Christian wedding context should avoid generic religion clarification and preserve explicit dress.",
+    "turns": [
+      {
+        "user": "Christian wedding guest dress women",
+        "expect": {
+          "workflow": "occasion",
+          "needs_clarification": false,
+          "intent_equals": {"religion": "Christianity", "product_type": "dress", "gender": "female"},
+          "intent_one_of": {"occasion": ["wedding", "christian wedding"]},
+          "intent_absent": ["_needs_religion"],
+          "min_db_products": 1,
+          "min_primary_products": 1,
+          "product_types_all": ["dress"]
+        }
+      }
+    ]
+  },
+  {
+    "id": "muslim_wedding_salwar_women",
+    "brand": "kalki",
+    "description": "Specific Muslim wedding query should preserve religion and salwar product type.",
+    "turns": [
+      {
+        "user": "Muslim wedding salwar women",
+        "expect": {
+          "workflow": "occasion",
+          "needs_clarification": false,
+          "intent_equals": {"religion": "Islam", "product_type": "salwar", "gender": "female"},
+          "intent_one_of": {"occasion": ["wedding", "muslim wedding"]},
+          "intent_absent": ["_needs_religion"],
+          "min_db_products": 1,
+          "min_primary_products": 1,
+          "product_types_all": ["salwar"]
+        }
+      }
+    ]
+  },
+  {
+    "id": "petite_engagement_lehenga",
+    "brand": "aza",
+    "description": "Body-type plus occasion query should preserve petite, engagement, explicit lehenga, and gender.",
+    "turns": [
+      {
+        "user": "Petite lehenga for engagement women",
+        "expect": {
+          "workflow": "occasion",
+          "needs_clarification": false,
+          "intent_equals": {"occasion": "engagement", "bodytype": "petite", "product_type": "lehenga", "gender": "female"},
+          "min_db_products": 1,
+          "min_primary_products": 1,
+          "product_types_all": ["lehenga"]
+        }
+      }
+    ]
+  },
+  {
+    "id": "followup_show_something_else_preserves_context",
+    "brand": "kalki",
+    "description": "A vague post-result follow-up should remain in context rather than becoming a new generic query.",
+    "turns": [
+      {
+        "user": "Show kurta for Diwali women",
+        "expect": {
+          "workflow": "occasion",
+          "needs_clarification": false,
+          "intent_equals": {"event": "Diwali", "product_type": "kurta", "gender": "female"},
+          "min_db_products": 1,
+          "min_primary_products": 1,
+          "product_types_all": ["kurta"]
+        }
+      },
+      {
+        "user": "show me something else",
+        "expect": {
+          "workflow": "occasion",
+          "needs_clarification": false,
+          "is_followup": true,
+          "intent_equals": {"event": "Diwali", "product_type": "kurta", "gender": "female"},
+          "min_db_products": 1,
+          "min_primary_products": 1,
           "product_types_all": ["kurta"]
         }
       }
