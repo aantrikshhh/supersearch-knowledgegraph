@@ -41,6 +41,9 @@ class ConversationEvalVisualizerTests(unittest.TestCase):
         parser = PayloadScriptParser()
         parser.feed(html)
 
+        self.assertIn('id="queryList"', html)
+        self.assertIn('id="chatPane"', html)
+        self.assertIn('id="tracePane"', html)
         raw_payload = "".join(parser.text)
         self.assertNotIn("&quot;", raw_payload)
         parsed = json.loads(raw_payload)

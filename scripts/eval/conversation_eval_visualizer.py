@@ -269,7 +269,7 @@ def esc_json(data):
     )
 
 
-def render_html(payload, title):
+def render_legacy_html(payload, title):
     data_json = esc_json(payload)
     return f"""<!doctype html>
 <html lang="en">
@@ -596,6 +596,736 @@ sourceLine(); cards(); initFilters(); render();
 </script>
 </body>
 </html>"""
+
+
+def render_html(payload, title):
+    data_json = esc_json(payload)
+    title_html = html.escape(title)
+    template = """<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>__TITLE__</title>
+<style>
+:root {
+  --bg:#f4f5f2;
+  --surface:#ffffff;
+  --surface-2:#fafaf8;
+  --ink:#171a1f;
+  --muted:#667085;
+  --line:#d9ded6;
+  --line-strong:#c5cdc2;
+  --accent:#0f6b5f;
+  --accent-soft:#e4f1ee;
+  --warn:#986500;
+  --warn-soft:#fff3d4;
+  --bad:#b42318;
+  --bad-soft:#fff0ee;
+  --ok:#16703a;
+  --ok-soft:#e7f5ec;
+}
+* { box-sizing:border-box }
+html,body { height:100% }
+body {
+  margin:0;
+  background:var(--bg);
+  color:var(--ink);
+  font:14px/1.45 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;
+}
+button,input,select { font:inherit }
+button { color:inherit }
+.app {
+  height:100vh;
+  display:grid;
+  grid-template-rows:auto minmax(0,1fr);
+}
+.topbar {
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:20px;
+  padding:12px 16px;
+  border-bottom:1px solid var(--line);
+  background:rgba(244,245,242,.96);
+  backdrop-filter:blur(10px);
+}
+h1 { margin:0; font-size:17px; line-height:1.2; letter-spacing:0; font-weight:760 }
+.source { margin-top:2px; color:var(--muted); font-size:12px }
+.summary-strip { display:flex; gap:8px; flex-wrap:wrap; justify-content:flex-end }
+.metric {
+  min-width:86px;
+  padding:7px 10px;
+  border:1px solid var(--line);
+  border-radius:7px;
+  background:var(--surface);
+}
+.metric b { display:block; font-size:16px; line-height:1.1 }
+.metric span { color:var(--muted); font-size:11px }
+.workspace {
+  min-height:0;
+  display:grid;
+  grid-template-columns:minmax(360px,.95fr) minmax(440px,1.05fr);
+  grid-template-rows:230px minmax(0,1fr);
+  gap:0;
+  overflow:auto;
+}
+.query-rail,.chat-pane,.trace-pane {
+  min-height:0;
+  overflow:auto;
+  border-right:1px solid var(--line);
+}
+.query-rail {
+  grid-column:1 / -1;
+  grid-row:1;
+  background:var(--surface);
+  display:grid;
+  grid-template-columns:300px minmax(0,1fr);
+  border-right:0;
+  border-bottom:1px solid var(--line);
+}
+.rail-filters {
+  min-height:0;
+  overflow:auto;
+  z-index:2;
+  display:grid;
+  gap:8px;
+  padding:12px;
+  border-right:1px solid var(--line);
+  background:var(--surface);
+}
+.filter-row { display:grid; grid-template-columns:1fr 1fr; gap:8px }
+label { display:grid; gap:4px; color:var(--muted); font-size:11px; font-weight:700 }
+input,select {
+  width:100%;
+  border:1px solid var(--line);
+  border-radius:6px;
+  background:#fff;
+  color:var(--ink);
+  padding:8px 9px;
+  min-width:0;
+}
+.rail-count {
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  color:var(--muted);
+  font-size:12px;
+}
+.reset-btn {
+  border:1px solid var(--line);
+  background:var(--surface-2);
+  border-radius:6px;
+  padding:6px 9px;
+  cursor:pointer;
+  font-weight:700;
+}
+.query-list {
+  min-height:0;
+  overflow:auto;
+  padding:10px;
+  display:grid;
+  grid-template-columns:repeat(auto-fill,minmax(280px,1fr));
+  gap:8px;
+  align-content:start;
+}
+.query-item {
+  width:100%;
+  display:grid;
+  gap:6px;
+  text-align:left;
+  border:1px solid transparent;
+  border-radius:7px;
+  background:transparent;
+  padding:10px;
+  cursor:pointer;
+}
+.query-item:hover { background:var(--surface-2); border-color:var(--line) }
+.query-item.active {
+  background:var(--accent-soft);
+  border-color:#9ecac3;
+}
+.query-title { font-weight:760; line-height:1.28 }
+.query-meta,.pill-row { display:flex; gap:5px; flex-wrap:wrap; align-items:center }
+.pill {
+  display:inline-flex;
+  align-items:center;
+  max-width:100%;
+  border-radius:999px;
+  padding:2px 7px;
+  background:#edf0ec;
+  color:#4d5967;
+  font-size:11px;
+  font-weight:760;
+  white-space:nowrap;
+}
+.pill.ok { background:var(--ok-soft); color:var(--ok) }
+.pill.warn { background:var(--warn-soft); color:var(--warn) }
+.pill.bad { background:var(--bad-soft); color:var(--bad) }
+.pill.accent { background:var(--accent-soft); color:var(--accent) }
+.chat-pane {
+  grid-column:1;
+  grid-row:2;
+  background:var(--surface-2);
+  display:grid;
+  grid-template-rows:auto minmax(0,1fr);
+}
+.pane-head {
+  position:sticky;
+  top:0;
+  z-index:2;
+  padding:13px 16px;
+  border-bottom:1px solid var(--line);
+  background:rgba(250,250,248,.97);
+  backdrop-filter:blur(10px);
+}
+.pane-title { font-weight:800; font-size:15px }
+.pane-sub { color:var(--muted); font-size:12px; margin-top:2px }
+.chat-thread {
+  min-height:0;
+  overflow:auto;
+  padding:18px 16px 24px;
+  display:grid;
+  gap:14px;
+  align-content:start;
+}
+.turn-block {
+  display:grid;
+  gap:8px;
+  padding:10px;
+  border:1px solid transparent;
+  border-radius:8px;
+  cursor:pointer;
+}
+.turn-block:hover { border-color:var(--line); background:#fff }
+.turn-block.active { border-color:#9ecac3; background:#fff }
+.bubble {
+  max-width:88%;
+  border:1px solid var(--line);
+  border-radius:8px;
+  padding:10px 12px;
+  background:#fff;
+}
+.bubble.user {
+  margin-left:auto;
+  background:#15201f;
+  color:#fff;
+  border-color:#15201f;
+}
+.bubble.assistant { margin-right:auto }
+.bubble-label {
+  margin-bottom:5px;
+  color:var(--muted);
+  font-size:11px;
+  font-weight:800;
+  text-transform:uppercase;
+  letter-spacing:.04em;
+}
+.bubble.user .bubble-label { color:#c9d6d3 }
+.bubble-text { white-space:pre-wrap; overflow-wrap:anywhere }
+.product-strip { display:grid; gap:6px; margin-top:8px }
+.mini-product {
+  display:grid;
+  grid-template-columns:minmax(0,1fr) auto;
+  gap:8px;
+  border:1px solid var(--line);
+  border-radius:6px;
+  padding:7px 8px;
+  background:#fff;
+  font-size:12px;
+}
+.mini-product b { overflow:hidden; text-overflow:ellipsis; white-space:nowrap }
+.trace-pane {
+  grid-column:2;
+  grid-row:2;
+  border-right:0;
+  border-left:1px solid var(--line);
+  background:var(--surface);
+  display:grid;
+  grid-template-rows:auto minmax(0,1fr);
+}
+.trace-scroll {
+  min-height:0;
+  overflow:auto;
+  padding:14px 16px 24px;
+  display:grid;
+  gap:12px;
+  align-content:start;
+}
+.section {
+  border:1px solid var(--line);
+  border-radius:8px;
+  background:#fff;
+  overflow:hidden;
+}
+.section h2 {
+  margin:0;
+  padding:10px 12px;
+  border-bottom:1px solid var(--line);
+  font-size:12px;
+  text-transform:uppercase;
+  letter-spacing:.04em;
+  color:#536071;
+}
+.section-body { padding:11px 12px; display:grid; gap:10px }
+.kv-grid {
+  display:grid;
+  grid-template-columns:150px minmax(0,1fr);
+  gap:7px 10px;
+  font-size:12px;
+}
+.kv-grid b { color:var(--muted); font-weight:730 }
+.kv-grid span { min-width:0; overflow-wrap:anywhere }
+.intent-grid {
+  display:flex;
+  gap:6px;
+  flex-wrap:wrap;
+}
+.intent-chip {
+  border:1px solid var(--line);
+  border-radius:999px;
+  padding:5px 8px;
+  background:var(--surface-2);
+  font-size:12px;
+}
+.intent-chip b { color:#4f5b68 }
+.kg-row {
+  display:grid;
+  grid-template-columns:86px minmax(0,1fr);
+  gap:8px;
+  align-items:start;
+  padding:7px 0;
+  border-bottom:1px solid #edf0ec;
+}
+.kg-row:last-child { border-bottom:0 }
+.kg-row b { color:var(--muted); font-size:12px }
+.chip-line { display:flex; gap:5px; flex-wrap:wrap }
+.code {
+  margin:0;
+  white-space:pre-wrap;
+  overflow-wrap:anywhere;
+  font:12px/1.45 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+  color:#222a35;
+}
+details {
+  border:1px solid var(--line);
+  border-radius:7px;
+  padding:8px 10px;
+  background:var(--surface-2);
+}
+summary { cursor:pointer; font-weight:760 }
+.product-table { display:grid; gap:6px }
+.product-row {
+  display:grid;
+  grid-template-columns:minmax(0,1.3fr) 100px 96px 82px;
+  gap:8px;
+  align-items:start;
+  padding:8px 0;
+  border-bottom:1px solid #edf0ec;
+  font-size:12px;
+}
+.product-row:last-child { border-bottom:0 }
+.product-row b { overflow:hidden; text-overflow:ellipsis; white-space:nowrap }
+.judge {
+  border-left:3px solid var(--accent);
+  background:var(--accent-soft);
+  border-radius:6px;
+  padding:9px 10px;
+}
+.judge.warn { border-color:var(--warn); background:var(--warn-soft) }
+.judge.bad { border-color:var(--bad); background:var(--bad-soft) }
+.empty {
+  padding:24px;
+  color:var(--muted);
+  border:1px dashed var(--line);
+  border-radius:8px;
+  text-align:center;
+}
+@media (max-width:1220px) {
+  .app { min-width:850px }
+  .workspace { grid-template-columns:390px 460px }
+}
+@media (max-width:760px) {
+  .filter-row,.product-row,.kv-grid { grid-template-columns:1fr }
+}
+</style>
+</head>
+<body>
+<div class="app">
+  <header class="topbar">
+    <div>
+      <h1>__TITLE__</h1>
+      <div class="source" id="sourceLine"></div>
+    </div>
+    <div class="summary-strip" id="summaryStrip"></div>
+  </header>
+  <div class="workspace">
+    <aside class="query-rail">
+      <div class="rail-filters">
+        <label>Search
+          <input id="search" placeholder="query, product, SQL, intent">
+        </label>
+        <div class="filter-row">
+          <label>Category<select id="category"><option value="">All</option></select></label>
+          <label>Workflow<select id="workflow"><option value="">All</option></select></label>
+        </div>
+        <div class="filter-row">
+          <label>Status<select id="catalog"><option value="">All</option></select></label>
+          <label>Turn<select id="turnType"><option value="">All</option><option value="followup">Follow-up</option><option value="new">New query</option><option value="clarification">Clarification</option><option value="result">Result</option></select></label>
+        </div>
+        <div class="filter-row">
+          <label>Pass<select id="pass"><option value="">All</option><option value="passed">Passed</option><option value="failed">Failed</option></select></label>
+          <label>Judge<select id="judge"><option value="">All</option><option value="has">Has judge</option><option value="non_ok">Non-ok judge</option></select></label>
+        </div>
+        <div class="rail-count"><span id="queryCount"></span><button class="reset-btn" id="reset">Reset</button></div>
+      </div>
+      <div class="query-list" id="queryList"></div>
+    </aside>
+    <main class="chat-pane">
+      <div class="pane-head">
+        <div class="pane-title" id="chatTitle">Conversation</div>
+        <div class="pane-sub" id="chatMeta"></div>
+      </div>
+      <div class="chat-thread" id="chatPane"></div>
+    </main>
+    <aside class="trace-pane">
+      <div class="pane-head">
+        <div class="pane-title" id="traceTitle">Trace</div>
+        <div class="pane-sub" id="traceMeta"></div>
+      </div>
+      <div class="trace-scroll" id="tracePane"></div>
+    </aside>
+  </div>
+</div>
+<script id="payload" type="application/json">__DATA_JSON__</script>
+<script>
+const payload = JSON.parse(document.getElementById('payload').textContent);
+const scenarios = payload.scenarios || [];
+const state = { selectedScenarioId: null, selectedTurnIndex: 1 };
+const $ = selector => document.querySelector(selector);
+const $$ = selector => Array.from(document.querySelectorAll(selector));
+const lower = value => String(value ?? '').toLowerCase();
+const esc = value => String(value ?? '').replace(/[&<>"']/g, char => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[char]));
+const countEntries = obj => Object.entries(obj || {}).sort((a,b) => b[1] - a[1]);
+
+function pill(text, cls='') {
+  return `<span class="pill ${cls}">${esc(text)}</span>`;
+}
+
+function jsonBlock(obj) {
+  return `<pre class="code">${esc(JSON.stringify(obj ?? {}, null, 2))}</pre>`;
+}
+
+function optionList(id, counts) {
+  const select = $(id);
+  countEntries(counts).forEach(([name, count]) => {
+    const option = document.createElement('option');
+    option.value = name;
+    option.textContent = `${name} (${count})`;
+    select.appendChild(option);
+  });
+}
+
+function judgeState(turn) {
+  const judges = Object.values(turn.judges || {});
+  if (!judges.length) return 'none';
+  return judges.some(judge => judge.classification && judge.classification !== 'ok') ? 'non_ok' : 'ok';
+}
+
+function turnMatches(turn, scenario) {
+  const q = lower($('#search').value);
+  const category = $('#category').value;
+  const workflow = $('#workflow').value;
+  const catalog = $('#catalog').value;
+  const turnType = $('#turnType').value;
+  const pass = $('#pass').value;
+  const judge = $('#judge').value;
+  if (category && scenario.category !== category) return false;
+  if (workflow && turn.workflow !== workflow) return false;
+  if (catalog && (turn.catalog_status?.label || 'unknown') !== catalog) return false;
+  if (turnType === 'followup' && !turn.is_followup) return false;
+  if (turnType === 'new' && turn.is_followup) return false;
+  if (turnType === 'clarification' && !turn.needs_clarification) return false;
+  if (turnType === 'result' && turn.needs_clarification) return false;
+  if (pass === 'passed' && !turn.passed) return false;
+  if (pass === 'failed' && turn.passed) return false;
+  const js = judgeState(turn);
+  if (judge === 'has' && js === 'none') return false;
+  if (judge === 'non_ok' && js !== 'non_ok') return false;
+  if (!q) return true;
+  const haystack = [
+    scenario.id, scenario.category, scenario.brand, scenario.description,
+    turn.user, turn.workflow, turn.sql, turn.response_text,
+    JSON.stringify(turn.intents), JSON.stringify(turn.catalog_status),
+    JSON.stringify(turn.primary_products), JSON.stringify(turn.kg_context),
+    JSON.stringify(turn.kg_trace), JSON.stringify(turn.judges),
+  ].join(' ');
+  return lower(haystack).includes(q);
+}
+
+function filteredScenarios() {
+  return scenarios.map(scenario => {
+    const matchedTurns = (scenario.turns || []).filter(turn => turnMatches(turn, scenario));
+    return {...scenario, matchedTurns};
+  }).filter(scenario => scenario.matchedTurns.length);
+}
+
+function selectedScenario() {
+  return scenarios.find(scenario => scenario.id === state.selectedScenarioId) || scenarios[0] || null;
+}
+
+function selectedTurn(scenario) {
+  if (!scenario) return null;
+  return (scenario.turns || []).find(turn => turn.turn_index === state.selectedTurnIndex) || (scenario.turns || [])[0] || null;
+}
+
+function scenarioSummary(scenario) {
+  const turns = scenario.turns || [];
+  const failed = turns.some(turn => !turn.passed);
+  const gapCount = turns.filter(turn => (turn.catalog_status?.label || '').includes('gap')).length;
+  const judgeFindings = turns.some(turn => judgeState(turn) === 'non_ok');
+  return [
+    pill(scenario.category || 'category'),
+    pill(`${turns.length} turn${turns.length === 1 ? '' : 's'}`),
+    failed ? pill('failed', 'bad') : pill('passed', 'ok'),
+    gapCount ? pill(`${gapCount} gap${gapCount === 1 ? '' : 's'}`, 'warn') : '',
+    judgeFindings ? pill('judge finding', 'warn') : '',
+  ].join('');
+}
+
+function turnPills(turn) {
+  const catalog = turn.catalog_status?.label || 'unknown';
+  const catalogCls = catalog === 'covered' ? 'ok' : (catalog.includes('gap') ? 'warn' : 'accent');
+  return [
+    pill(turn.workflow || 'workflow?', 'accent'),
+    pill(catalog, catalogCls),
+    turn.is_followup ? pill('follow-up') : pill('new query'),
+    turn.needs_clarification ? pill('clarification', 'warn') : pill('result', 'ok'),
+    turn.passed ? pill('passed', 'ok') : pill('failed', 'bad'),
+  ].join('');
+}
+
+function renderShell() {
+  const summary = payload.summary || {};
+  $('#sourceLine').textContent = `${summary.scenarios || scenarios.length} scenarios · ${summary.turns || 0} turns · ${summary.visualized_at || ''}`;
+  const metrics = [
+    [`${summary.passed_scenarios ?? 0}/${summary.scenarios ?? scenarios.length}`, 'scenarios'],
+    [`${summary.turns ?? 0}`, 'turns'],
+    [`${(summary.catalog_status_counts || {}).covered || 0}`, 'covered'],
+    [`${(summary.catalog_status_counts || {}).retrieval_gap || 0}`, 'retrieval gaps'],
+  ];
+  $('#summaryStrip').innerHTML = metrics.map(([value, label]) => `<div class="metric"><b>${esc(value)}</b><span>${esc(label)}</span></div>`).join('');
+  optionList('#category', summary.category_counts);
+  optionList('#workflow', summary.workflow_counts);
+  optionList('#catalog', summary.catalog_status_counts);
+}
+
+function renderQueryList() {
+  const list = filteredScenarios();
+  if (!list.some(scenario => scenario.id === state.selectedScenarioId)) {
+    state.selectedScenarioId = list[0]?.id || scenarios[0]?.id || null;
+    state.selectedTurnIndex = list[0]?.matchedTurns?.[0]?.turn_index || 1;
+  }
+  $('#queryCount').textContent = `${list.length} matching flows`;
+  $('#queryList').innerHTML = list.length ? list.map(scenario => {
+    const firstTurn = scenario.matchedTurns[0] || scenario.turns[0] || {};
+    const active = scenario.id === state.selectedScenarioId ? 'active' : '';
+    return `<button class="query-item ${active}" data-scenario="${esc(scenario.id)}" data-turn="${esc(firstTurn.turn_index || 1)}">
+      <div class="query-title">${esc(firstTurn.user || scenario.id)}</div>
+      <div class="query-meta">${scenarioSummary(scenario)}</div>
+      <div class="query-meta">${esc(scenario.id)}</div>
+    </button>`;
+  }).join('') : '<div class="empty">No flows match the filters.</div>';
+  $$('.query-item').forEach(item => {
+    item.addEventListener('click', () => {
+      state.selectedScenarioId = item.dataset.scenario;
+      state.selectedTurnIndex = Number(item.dataset.turn || 1);
+      render();
+    });
+  });
+}
+
+function productMini(products) {
+  if (!products?.length) return '';
+  return `<div class="product-strip">${products.slice(0, 5).map(product => `
+    <div class="mini-product"><b>${esc(product.title || product.id)}</b><span>${esc(product.product_type || '')}</span></div>
+  `).join('')}</div>`;
+}
+
+function renderChat() {
+  const scenario = selectedScenario();
+  if (!scenario) {
+    $('#chatPane').innerHTML = '<div class="empty">No conversation selected.</div>';
+    return;
+  }
+  $('#chatTitle').textContent = scenario.id;
+  $('#chatMeta').innerHTML = `${esc(scenario.description || '')} ${scenarioSummary(scenario)}`;
+  $('#chatPane').innerHTML = (scenario.turns || []).map(turn => {
+    const active = turn.turn_index === state.selectedTurnIndex ? 'active' : '';
+    const assistantText = turn.needs_clarification
+      ? (turn.clarifying_questions || []).join('\\n')
+      : (turn.response_text || 'No response text logged.');
+    return `<section class="turn-block ${active}" data-turn="${esc(turn.turn_index)}">
+      <div class="bubble user">
+        <div class="bubble-label">User · turn ${esc(turn.turn_index)}</div>
+        <div class="bubble-text">${esc(turn.user)}</div>
+      </div>
+      <div class="bubble assistant">
+        <div class="bubble-label">${turn.needs_clarification ? 'Clarifying question' : 'Assistant response'}</div>
+        <div class="bubble-text">${esc(assistantText)}</div>
+        ${productMini(turn.primary_products)}
+      </div>
+      <div class="pill-row">${turnPills(turn)}</div>
+    </section>`;
+  }).join('');
+  $$('.turn-block').forEach(block => {
+    block.addEventListener('click', () => {
+      state.selectedTurnIndex = Number(block.dataset.turn || 1);
+      render();
+    });
+  });
+}
+
+function intentChips(intents) {
+  const entries = Object.entries(intents || {});
+  if (!entries.length) return '<div class="empty">No intents logged.</div>';
+  return `<div class="intent-grid">${entries.map(([key,value]) => `<span class="intent-chip"><b>${esc(key)}</b>: ${esc(Array.isArray(value) ? value.join(', ') : value)}</span>`).join('')}</div>`;
+}
+
+function kgRows(turn) {
+  const summary = turn.kg_trace?.result_summary || turn.kg_context || {};
+  const rows = Object.entries(summary).filter(([, value]) => value && typeof value === 'object');
+  if (!rows.length) return '<div class="empty">No KG summary logged.</div>';
+  return rows.map(([tag, groups]) => {
+    const chips = ['recommended', 'acceptable', 'avoid'].map(group => {
+      const values = groups[group] || [];
+      if (!values.length) return '';
+      const cls = group === 'avoid' ? 'bad' : (group === 'acceptable' ? '' : 'ok');
+      return `<div class="chip-line">${pill(group, cls)}${values.slice(0, 12).map(value => pill(value, cls)).join('')}</div>`;
+    }).join('');
+    return `<div class="kg-row"><b>${esc(tag)}</b><div>${chips}</div></div>`;
+  }).join('');
+}
+
+function lookupRows(turn) {
+  const keys = turn.kg_trace?.lookup_keys || [];
+  if (!keys.length) return '<div class="empty">No KG lookup keys logged.</div>';
+  return `<div class="kv-grid">${keys.slice(0, 12).map(key => `
+    <b>${esc(key.entity || 'entity')}</b>
+    <span>${esc(key.value)} → ${esc(key.lookup_value || key.resolved_value || '')} · ${esc(key.matched_count ?? 0)} matches${key.expanded ? ' · expanded' : ''}</span>
+  `).join('')}</div>`;
+}
+
+function productRows(products) {
+  if (!products?.length) return '<div class="empty">No primary products logged.</div>';
+  return `<div class="product-table">${products.slice(0, 8).map(product => `
+    <div class="product-row">
+      <b>${esc(product.title || product.id)}</b>
+      <span>${esc(product.product_type || '')}</span>
+      <span>${esc(product.colors || '')}</span>
+      <span>${esc(product.price || '')}</span>
+    </div>
+  `).join('')}</div>`;
+}
+
+function judgeBlocks(turn) {
+  const entries = Object.entries(turn.judges || {});
+  if (!entries.length) return '<div class="empty">No judge output attached to this turn.</div>';
+  return entries.map(([name, judge]) => {
+    const cls = judge.classification === 'ok' ? '' : (Number(judge.score) <= 1 ? 'bad' : 'warn');
+    return `<div class="judge ${cls}">
+      <div class="pill-row">${pill(name, 'accent')}${pill(judge.classification || 'unknown', cls || 'ok')}${pill(`score ${judge.score ?? '?'}`)}</div>
+      <div style="margin-top:7px">${esc(judge.rationale || '')}</div>
+      ${(judge.labels || []).length ? `<div class="pane-sub">${esc(judge.labels.join(', '))}</div>` : ''}
+    </div>`;
+  }).join('');
+}
+
+function renderTrace() {
+  const scenario = selectedScenario();
+  const turn = selectedTurn(scenario);
+  if (!scenario || !turn) {
+    $('#tracePane').innerHTML = '<div class="empty">No trace selected.</div>';
+    return;
+  }
+  const rt = turn.runtime_trace || {};
+  $('#traceTitle').textContent = `${scenario.id} · turn ${turn.turn_index}`;
+  $('#traceMeta').innerHTML = turnPills(turn);
+  $('#tracePane').innerHTML = `
+    <section class="section">
+      <h2>Decision</h2>
+      <div class="section-body">
+        <div class="kv-grid">
+          <b>query</b><span>${esc(turn.user)}</span>
+          <b>workflow</b><span>${esc(turn.workflow)} · ${esc(rt.router?.reason || '')}</span>
+          <b>follow-up</b><span>${esc(turn.is_followup)} · ${esc(rt.followup_reason || '')}</span>
+          <b>merge mode</b><span>${esc(rt.merge_mode || '')}</span>
+          <b>clarification</b><span>${esc(turn.needs_clarification)} ${(turn.clarifying_questions || []).map(q => pill(q, 'warn')).join('')}</span>
+          <b>catalog status</b><span>${esc(turn.catalog_status?.label || 'unknown')} · ${esc(turn.catalog_status?.reason || '')}</span>
+          <b>products</b><span>DB ${esc(turn.db_product_count)} · primary ${esc(turn.primary_product_count)}/${esc(turn.unique_primary_product_count)}</span>
+          <b>elapsed</b><span>${esc(turn.elapsed_ms)}ms</span>
+        </div>
+      </div>
+    </section>
+    <section class="section">
+      <h2>Final Intents</h2>
+      <div class="section-body">${intentChips(turn.intents)}<details><summary>Intent diff</summary>${jsonBlock(rt.intent_diff || {})}</details></div>
+    </section>
+    <section class="section">
+      <h2>KG Grounding</h2>
+      <div class="section-body">${kgRows(turn)}<details open><summary>Lookup provenance</summary>${lookupRows(turn)}</details><details><summary>KG conflicts and misses</summary>${jsonBlock({missing_keys: turn.kg_trace?.missing_keys || [], conflicts: turn.kg_trace?.conflicts || []})}</details></div>
+    </section>
+    <section class="section">
+      <h2>SQL / DB</h2>
+      <div class="section-body">
+        ${(turn.db_errors || []).length ? `<div class="pill-row">${turn.db_errors.map(error => pill(error, 'warn')).join('')}</div>` : ''}
+        <pre class="code">${esc(turn.sql || 'No SQL logged.')}</pre>
+        <details><summary>DB trace</summary>${jsonBlock(turn.db_trace || {})}</details>
+      </div>
+    </section>
+    <section class="section">
+      <h2>Products</h2>
+      <div class="section-body">${productRows(turn.primary_products)}<details><summary>Outfit scoring</summary>${jsonBlock(turn.outfit_debug || {})}</details></div>
+    </section>
+    <section class="section">
+      <h2>Judges</h2>
+      <div class="section-body">${judgeBlocks(turn)}</div>
+    </section>
+  `;
+}
+
+function render() {
+  renderQueryList();
+  renderChat();
+  renderTrace();
+}
+
+function bindControls() {
+  ['#search','#category','#workflow','#catalog','#turnType','#pass','#judge'].forEach(id => {
+    $(id).addEventListener('input', () => {
+      state.selectedScenarioId = null;
+      state.selectedTurnIndex = 1;
+      render();
+    });
+  });
+  $('#reset').addEventListener('click', () => {
+    ['#search','#category','#workflow','#catalog','#turnType','#pass','#judge'].forEach(id => { $(id).value = ''; });
+    state.selectedScenarioId = null;
+    state.selectedTurnIndex = 1;
+    render();
+  });
+}
+
+renderShell();
+bindControls();
+render();
+</script>
+</body>
+</html>"""
+    return (
+        template.replace("__TITLE__", title_html)
+        .replace("__DATA_JSON__", data_json)
+    )
 
 
 def main():
