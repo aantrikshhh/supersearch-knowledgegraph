@@ -62,7 +62,7 @@ BRAND_BASE_URLS = {
 }
 
 
-def normalize_image_src(value):
+def normalize_product_image_src(value):
     if not value:
         return ""
     if isinstance(value, (list, tuple)):
@@ -78,10 +78,10 @@ def normalize_image_src(value):
     return text
 
 
-def normalize_product_url(url, brand):
-    if not url:
+def normalize_product_detail_url(product_url, brand):
+    if not product_url:
         return ""
-    text = str(url)
+    text = str(product_url)
     if text.startswith(("http://", "https://")):
         return text
     base = BRAND_BASE_URLS.get((brand or "").lower(), "")
@@ -90,18 +90,18 @@ def normalize_product_url(url, brand):
     return text
 
 
-def resolve_local_image_path(local_path):
-    if not local_path:
+def resolve_local_pdp_image_path(local_image_path):
+    if not local_image_path:
         return None
-    path = Path(str(local_path))
+    path = Path(str(local_image_path))
     if not path.is_absolute():
         path = SCRAPER_DATA_DIR / path
     return path if path.exists() else None
 
 
-def iter_catalog_items(path):
+def iter_catalog_manifest_items(manifest_path):
     try:
-        data = load_json(path)
+        data = load_json(manifest_path)
     except (OSError, json.JSONDecodeError):
         return []
     if isinstance(data, list):
@@ -111,7 +111,7 @@ def iter_catalog_items(path):
     return []
 
 
-def load_local_image_media(brand, product_ids):
+def load_local_pdp_image_media_index(brand, product_ids):
     """Load checked-out PDP image files for brands that have local downloads.
 
     Aza is intentionally URL-backed: the current checked-out scraper data has
@@ -123,41 +123,41 @@ def load_local_image_media(brand, product_ids):
         return {}
 
     remaining = set(str(product_id) for product_id in product_ids)
-    media = {}
-    paths = sorted(LOCAL_IMAGE_CATALOG_DIR.glob(f"{prefix}_products_with_local_images__products_*.json"))
-    for path in paths:
+    local_pdp_media_index = {}
+    manifest_paths = sorted(LOCAL_IMAGE_CATALOG_DIR.glob(f"{prefix}_products_with_local_images__products_*.json"))
+    for manifest_path in manifest_paths:
         if not remaining:
             break
-        for item in iter_catalog_items(path):
+        for item in iter_catalog_manifest_items(manifest_path):
             product_id = str(item.get("id") or "")
             if product_id not in remaining:
                 continue
-            for local_image in item.get("local_images") or []:
-                local_path = resolve_local_image_path(local_image.get("local_path"))
-                if not local_path:
+            for local_image_entry in item.get("local_images") or []:
+                local_image_path = resolve_local_pdp_image_path(local_image_entry.get("local_path"))
+                if not local_image_path:
                     continue
-                media[(brand, product_id)] = {
-                    "image_url": local_path.as_uri(),
-                    "remote_image_url": normalize_image_src(local_image.get("remote_url")),
-                    "url": normalize_product_url(
-                        local_image.get("product_url") or item.get("product_url") or item.get("url"),
+                local_pdp_media_index[(brand, product_id)] = {
+                    "image_url": local_image_path.as_uri(),
+                    "remote_image_url": normalize_product_image_src(local_image_entry.get("remote_url")),
+                    "url": normalize_product_detail_url(
+                        local_image_entry.get("product_url") or item.get("product_url") or item.get("url"),
                         brand,
                     ),
-                    "image_source": str(local_path),
+                    "image_source": str(local_image_path),
                     "image_source_type": "local_file",
                 }
                 remaining.discard(product_id)
                 break
-    return media
+    return local_pdp_media_index
 
 
-def collect_product_ids_by_brand(result):
-    ids_by_brand = {}
+def collect_media_product_ids_by_brand(result):
+    product_ids_by_brand = {}
     for scenario in result.get("results", []):
         brand = (scenario.get("brand") or "").lower()
         if not brand:
             continue
-        ids = ids_by_brand.setdefault(brand, set())
+        brand_product_ids = product_ids_by_brand.setdefault(brand, set())
         for turn in scenario.get("turns", []):
             product_groups = [
                 turn.get("primary_products", []),
@@ -168,14 +168,14 @@ def collect_product_ids_by_brand(result):
                 for product in products or []:
                     product_id = product.get("id")
                     if product_id is not None:
-                        ids.add(str(product_id))
-    return ids_by_brand
+                        brand_product_ids.add(str(product_id))
+    return product_ids_by_brand
 
 
-def load_product_media(result):
-    ids_by_brand = collect_product_ids_by_brand(result)
-    media = {}
-    for brand, product_ids in ids_by_brand.items():
+def load_product_media_index(result):
+    product_ids_by_brand = collect_media_product_ids_by_brand(result)
+    product_media_index = {}
+    for brand, product_ids in product_ids_by_brand.items():
         db_path = BRAND_DB_PATHS.get(brand)
         if not db_path or not Path(db_path).exists() or not product_ids:
             continue
@@ -191,27 +191,27 @@ def load_product_media(result):
                     chunk,
                 ).fetchall()
                 for row in rows:
-                    image_url = normalize_image_src(row["image_url"])
+                    remote_image_url = normalize_product_image_src(row["image_url"])
                     key = (brand, str(row["id"]))
-                    media[key] = {
-                        "image_url": image_url,
-                        "url": normalize_product_url(row["url"], brand),
-                        "image_source": image_url or CATALOG_PATHS.get(brand, db_path),
-                        "image_source_type": "remote_url" if image_url.startswith(("http://", "https://")) else "catalog",
+                    product_media_index[key] = {
+                        "image_url": remote_image_url,
+                        "url": normalize_product_detail_url(row["url"], brand),
+                        "image_source": remote_image_url or CATALOG_PATHS.get(brand, db_path),
+                        "image_source_type": "remote_url" if remote_image_url.startswith(("http://", "https://")) else "catalog",
                     }
         finally:
             conn.close()
 
-        for key, local_media in load_local_image_media(brand, product_ids).items():
-            media[key] = {**media.get(key, {}), **local_media}
-    return media
+        for key, local_pdp_media in load_local_pdp_image_media_index(brand, product_ids).items():
+            product_media_index[key] = {**product_media_index.get(key, {}), **local_pdp_media}
+    return product_media_index
 
 
-def compact_product(product, media=None, brand=""):
+def compact_product_for_payload(product, product_media_index=None, brand=""):
     product_id = str(product.get("id")) if product.get("id") is not None else ""
-    product_media = (media or {}).get(((brand or "").lower(), product_id), {})
-    image_url = product.get("image_url") or product_media.get("image_url") or ""
-    url = product.get("url") or product_media.get("url") or ""
+    indexed_product_media = (product_media_index or {}).get(((brand or "").lower(), product_id), {})
+    product_image_url = product.get("image_url") or indexed_product_media.get("image_url") or ""
+    product_detail_url = product.get("url") or indexed_product_media.get("url") or ""
     return {
         "id": product.get("id"),
         "title": product.get("title", ""),
@@ -220,12 +220,24 @@ def compact_product(product, media=None, brand=""):
         "materials": product.get("materials", ""),
         "patterns": product.get("patterns", ""),
         "price": product.get("price", ""),
-        "image_url": normalize_image_src(image_url),
-        "url": normalize_product_url(url, brand),
-        "image_source": product_media.get("image_source", ""),
-        "image_source_type": product_media.get("image_source_type", ""),
-        "remote_image_url": product_media.get("remote_image_url", ""),
+        "image_url": normalize_product_image_src(product_image_url),
+        "url": normalize_product_detail_url(product_detail_url, brand),
+        "image_source": indexed_product_media.get("image_source", ""),
+        "image_source_type": indexed_product_media.get("image_source_type", ""),
+        "remote_image_url": indexed_product_media.get("remote_image_url", ""),
     }
+
+
+# Backward-compatible names used by older tests and ad hoc imports.
+normalize_image_src = normalize_product_image_src
+normalize_product_url = normalize_product_detail_url
+load_product_media = load_product_media_index
+load_local_image_media = load_local_pdp_image_media_index
+collect_product_ids_by_brand = collect_media_product_ids_by_brand
+
+
+def compact_product(product, media=None, brand=""):
+    return compact_product_for_payload(product, product_media_index=media, brand=brand)
 
 
 def compact_kg_trace(trace):
@@ -300,13 +312,18 @@ def compact_outfit_debug(debug):
     }
 
 
-def compact_db_trace(turn, media=None, brand=""):
+def compact_db_trace(turn, product_media_index=None, brand="", media=None):
+    if product_media_index is None and media is not None:
+        product_media_index = media
     trace = turn.get("db_trace", {}) or {}
     return {
         "timings": trace.get("timings", {}),
         "retries": trace.get("retries", [])[:5],
         "candidate_count": len(trace.get("candidates", [])),
-        "candidates": [compact_product(p, media=media, brand=brand) for p in trace.get("candidates", [])[:10]],
+        "candidates": [
+            compact_product_for_payload(p, product_media_index=product_media_index, brand=brand)
+            for p in trace.get("candidates", [])[:10]
+        ],
         "available_type_count": len(trace.get("available_types", [])),
         "available_types_sample": trace.get("available_types", [])[:50],
         "raw_llm_sql_response": trace.get("raw_llm_sql_response"),
@@ -333,9 +350,9 @@ def attach_judges(main_result, judge_results):
 
 
 def build_payload(result, source_paths):
-    media = load_product_media(result)
-    scenarios = []
-    all_turns = []
+    product_media_index = load_product_media_index(result)
+    scenario_payloads = []
+    turn_payloads = []
     for scenario in result.get("results", []):
         brand = scenario.get("brand", "")
         compact_turns = []
@@ -355,11 +372,14 @@ def build_payload(result, source_paths):
                 "intents": turn.get("intents", {}),
                 "primary_product_count": turn.get("primary_product_count", 0),
                 "unique_primary_product_count": turn.get("unique_primary_product_count", 0),
-                "primary_products": [compact_product(p, media=media, brand=brand) for p in turn.get("primary_products", [])],
+                "primary_products": [
+                    compact_product_for_payload(p, product_media_index=product_media_index, brand=brand)
+                    for p in turn.get("primary_products", [])
+                ],
                 "db_product_count": turn.get("db_product_count", 0),
                 "db_errors": turn.get("db_errors", []),
                 "sql": turn.get("sql", ""),
-                "db_trace": compact_db_trace(turn, media=media, brand=brand),
+                "db_trace": compact_db_trace(turn, product_media_index=product_media_index, brand=brand),
                 "kg_context": turn.get("kg_context", {}),
                 "kg_trace": compact_kg_trace(turn.get("kg_trace", {})),
                 "outfit_debug": compact_outfit_debug(turn.get("outfit_debug", {})),
@@ -372,13 +392,13 @@ def build_payload(result, source_paths):
                 "judges": turn.get("judges", {}),
             }
             compact_turns.append(compact)
-            all_turns.append({
+            turn_payloads.append({
                 **compact,
                 "scenario_id": scenario.get("id", ""),
                 "category": scenario.get("category", ""),
                 "brand": scenario.get("brand", ""),
             })
-        scenarios.append({
+        scenario_payloads.append({
             "id": scenario.get("id", ""),
             "brand": scenario.get("brand", ""),
             "category": scenario.get("category", ""),
@@ -389,12 +409,12 @@ def build_payload(result, source_paths):
             "turns": compact_turns,
         })
 
-    elapsed = [t.get("elapsed_ms", 0) for t in all_turns if isinstance(t.get("elapsed_ms"), (int, float))]
-    db_counts = [t.get("db_product_count", 0) for t in all_turns]
-    primary_counts = [t.get("primary_product_count", 0) for t in all_turns]
+    elapsed = [t.get("elapsed_ms", 0) for t in turn_payloads if isinstance(t.get("elapsed_ms"), (int, float))]
+    db_counts = [t.get("db_product_count", 0) for t in turn_payloads]
+    primary_counts = [t.get("primary_product_count", 0) for t in turn_payloads]
     judge_counts = Counter()
     judge_classifications = Counter()
-    for turn in all_turns:
+    for turn in turn_payloads:
         for judge_name, judge in (turn.get("judges") or {}).items():
             judge_counts[judge_name] += 1
             judge_classifications[f"{judge_name}:{judge.get('classification', 'unknown')}"] += 1
@@ -404,12 +424,12 @@ def build_payload(result, source_paths):
         "source_paths": source_paths,
         "generated_at": result.get("generated_at"),
         "visualized_at": datetime.now().isoformat(timespec="seconds"),
-        "category_counts": count_by(all_turns, lambda t: t.get("category") or "unknown"),
-        "workflow_counts": count_by(all_turns, lambda t: t.get("workflow") or "unknown"),
-        "catalog_status_counts": count_by(all_turns, lambda t: (t.get("catalog_status") or {}).get("label", "unknown")),
-        "followup_counts": count_by(all_turns, lambda t: "followup" if t.get("is_followup") else "new_query"),
-        "clarification_counts": count_by(all_turns, lambda t: "clarification" if t.get("needs_clarification") else "result"),
-        "passed_turn_counts": count_by(all_turns, lambda t: "passed" if t.get("passed") else "failed"),
+        "category_counts": count_by(turn_payloads, lambda t: t.get("category") or "unknown"),
+        "workflow_counts": count_by(turn_payloads, lambda t: t.get("workflow") or "unknown"),
+        "catalog_status_counts": count_by(turn_payloads, lambda t: (t.get("catalog_status") or {}).get("label", "unknown")),
+        "followup_counts": count_by(turn_payloads, lambda t: "followup" if t.get("is_followup") else "new_query"),
+        "clarification_counts": count_by(turn_payloads, lambda t: "clarification" if t.get("needs_clarification") else "result"),
+        "passed_turn_counts": count_by(turn_payloads, lambda t: "passed" if t.get("passed") else "failed"),
         "judge_counts": dict(judge_counts),
         "judge_classifications": dict(judge_classifications),
         "timings": {
@@ -424,7 +444,7 @@ def build_payload(result, source_paths):
             "zero_primary_turns": sum(1 for c in primary_counts if c == 0),
         },
     }
-    return {"summary": summary, "scenarios": scenarios, "turns": all_turns}
+    return {"summary": summary, "scenarios": scenario_payloads, "turns": turn_payloads}
 
 
 def esc_json(data):
@@ -630,25 +650,25 @@ function turnText(turn, scenario) {{
     JSON.stringify(turn.catalog_status), JSON.stringify(turn.judges)
   ].join(' '));
 }}
-function filteredScenarios() {{
-  const q = lower($('#search').value);
-  const cat = $('#category').value, wf = $('#workflow').value, cs = $('#catalog').value;
-  const tt = $('#turnType').value, pass = $('#pass').value, judge = $('#judge').value;
+function matchingScenarios() {{
+  const searchText = lower($('#search').value);
+  const category = $('#category').value, workflow = $('#workflow').value, catalogStatus = $('#catalog').value;
+  const turnType = $('#turnType').value, passStatus = $('#pass').value, judgeFilter = $('#judge').value;
   return payload.scenarios.map(s => {{
     const turns = s.turns.filter(t => {{
-      if (cat && s.category !== cat) return false;
-      if (wf && t.workflow !== wf) return false;
-      if (cs && (t.catalog_status?.label || 'unknown') !== cs) return false;
-      if (pass === 'passed' && !t.passed) return false;
-      if (pass === 'failed' && t.passed) return false;
-      if (tt === 'followup' && !t.is_followup) return false;
-      if (tt === 'new' && t.is_followup) return false;
-      if (tt === 'clarification' && !t.needs_clarification) return false;
-      if (tt === 'result' && t.needs_clarification) return false;
-      const js = judgeState(t);
-      if (judge === 'has' && js === 'none') return false;
-      if (judge === 'non_ok' && js !== 'non_ok') return false;
-      if (q && !turnText(t,s).includes(q)) return false;
+      if (category && s.category !== category) return false;
+      if (workflow && t.workflow !== workflow) return false;
+      if (catalogStatus && (t.catalog_status?.label || 'unknown') !== catalogStatus) return false;
+      if (passStatus === 'passed' && !t.passed) return false;
+      if (passStatus === 'failed' && t.passed) return false;
+      if (turnType === 'followup' && !t.is_followup) return false;
+      if (turnType === 'new' && t.is_followup) return false;
+      if (turnType === 'clarification' && !t.needs_clarification) return false;
+      if (turnType === 'result' && t.needs_clarification) return false;
+      const judgeStatus = judgeState(t);
+      if (judgeFilter === 'has' && judgeStatus === 'none') return false;
+      if (judgeFilter === 'non_ok' && judgeStatus !== 'non_ok') return false;
+      if (searchText && !turnText(t,s).includes(searchText)) return false;
       return true;
     }});
     return {{...s, turns}};
@@ -688,7 +708,7 @@ function judgeBlocks(turn) {{
   }}).join('');
 }}
 function turnHtml(t) {{
-  const rt = t.runtime_trace || {{}};
+  const runtimeTrace = t.runtime_trace || {{}};
   return `<div class="turn">
     <div class="turn-top">
       <div><div class="query">${{esc(t.user)}}</div><div class="scenario-meta">${{statusPills(t)}}</div></div>
@@ -698,11 +718,11 @@ function turnHtml(t) {{
     <div class="grid2">
       <div class="box"><h3>Intents</h3>${{jsonBlock(t.intents)}}</div>
       <div class="box"><h3>Runtime Decision</h3>${{jsonBlock({{
-        followup_reason: rt.followup_reason,
-        merge_mode: rt.merge_mode,
-        router: rt.router,
-        clarification: rt.clarification,
-        intent_diff: rt.intent_diff
+        followup_reason: runtimeTrace.followup_reason,
+        merge_mode: runtimeTrace.merge_mode,
+        router: runtimeTrace.router,
+        clarification: runtimeTrace.clarification,
+        intent_diff: runtimeTrace.intent_diff
       }})}}</div>
     </div>
     <div class="grid2">
@@ -740,20 +760,20 @@ function scenarioHtml(s) {{
   </article>`;
 }}
 function renderScenarios() {{
-  const list = filteredScenarios();
+  const list = matchingScenarios();
   $('#content').innerHTML = list.length ? `<div class="scenario-list">${{list.map(scenarioHtml).join('')}}</div>` : '<div class="empty">No scenarios match the filters.</div>';
 }}
 function renderFailures() {{
-  const turns = filteredScenarios().flatMap(s => s.turns.map(t => ({{...t, scenario_id:s.id, category:s.category}})));
+  const turns = matchingScenarios().flatMap(s => s.turns.map(t => ({{...t, scenario_id:s.id, category:s.category}})));
   const interesting = turns.filter(t => !t.passed || (t.catalog_status?.label||'').includes('gap') || t.non_blocking_findings?.length);
   $('#content').innerHTML = interesting.length ? `<div class="scenario-list">${{interesting.map(t => `<article class="scenario open"><div class="scenario-head"><div><div class="scenario-title">${{esc(t.scenario_id)}} · turn ${{t.turn_index}} · ${{esc(t.category)}}</div><div class="query">${{esc(t.user)}}</div><div class="scenario-meta">${{statusPills(t)}}</div></div></div><div class="turns">${{turnHtml(t)}}</div></article>`).join('')}}</div>` : '<div class="empty">No deterministic failures or catalog gaps in the filtered set.</div>';
 }}
 function renderJudges() {{
-  const turns = filteredScenarios().flatMap(s => s.turns.map(t => ({{...t, scenario_id:s.id, category:s.category}}))).filter(t => Object.keys(t.judges||{{}}).length);
+  const turns = matchingScenarios().flatMap(s => s.turns.map(t => ({{...t, scenario_id:s.id, category:s.category}}))).filter(t => Object.keys(t.judges||{{}}).length);
   $('#content').innerHTML = turns.length ? `<div class="scenario-list">${{turns.map(t => `<article class="scenario open"><div class="scenario-head"><div><div class="scenario-title">${{esc(t.scenario_id)}} · ${{esc(t.category)}}</div><div class="query">${{esc(t.user)}}</div><div class="scenario-meta">${{statusPills(t)}}</div></div></div><div class="turns"><div class="turn"><div class="grid2"><div class="box"><h3>Judges</h3>${{judgeBlocks(t)}}</div><div class="box"><h3>Evidence</h3>${{jsonBlock({{intents:t.intents, workflow:t.workflow, catalog_status:t.catalog_status, products:t.primary_products}})}}</div></div></div></div></article>`).join('')}}</div>` : '<div class="empty">No judge outputs attached to this artifact/filter.</div>';
 }}
 function renderSqlKg() {{
-  const turns = filteredScenarios().flatMap(s => s.turns.map(t => ({{...t, scenario_id:s.id, category:s.category}}))).filter(t => !t.needs_clarification);
+  const turns = matchingScenarios().flatMap(s => s.turns.map(t => ({{...t, scenario_id:s.id, category:s.category}}))).filter(t => !t.needs_clarification);
   $('#content').innerHTML = turns.length ? `<div class="scenario-list">${{turns.map(t => `<article class="scenario"><div class="scenario-head" onclick="this.parentElement.classList.toggle('open')"><div><div class="scenario-title">${{esc(t.scenario_id)}} · ${{esc(t.workflow)}} · DB ${{t.db_product_count}}</div><div class="query">${{esc(t.user)}}</div><div class="scenario-meta">${{statusPills(t)}}</div></div></div><div class="turns">${{turnHtml(t)}}</div></article>`).join('')}}</div>` : '<div class="empty">No result turns match the filters.</div>';
 }}
 function render() {{
@@ -1251,22 +1271,22 @@ function jsonBlock(obj) {
   return `<pre class="code">${esc(JSON.stringify(obj ?? {}, null, 2))}</pre>`;
 }
 
-function productImage(product, cls='') {
+function renderProductImage(product, imageCssClass='') {
   if (!product?.image_url) {
-    return `<div class="${cls ? `${cls} missing` : 'image-placeholder'}">No image</div>`;
+    return `<div class="${imageCssClass ? `${imageCssClass} missing` : 'image-placeholder'}">No image</div>`;
   }
-  return `<img class="${cls}" src="${esc(product.image_url)}" alt="${esc(product.title || 'Product image')}" loading="lazy">`;
+  return `<img class="${imageCssClass}" src="${esc(product.image_url)}" alt="${esc(product.title || 'Product image')}" loading="lazy">`;
 }
 
-function shortSource(path) {
-  const text = String(path || '');
+function formatImageSourceLabel(imageSourcePath) {
+  const text = String(imageSourcePath || '');
   const marker = '/scraper-infra/';
-  const idx = text.indexOf(marker);
-  return idx >= 0 ? `~${text.slice(idx)}` : text;
+  const scraperPathStart = text.indexOf(marker);
+  return scraperPathStart >= 0 ? `~${text.slice(scraperPathStart)}` : text;
 }
 
-function optionList(id, counts) {
-  const select = $(id);
+function populateFilterSelect(selectId, counts) {
+  const select = $(selectId);
   countEntries(counts).forEach(([name, count]) => {
     const option = document.createElement('option');
     option.value = name;
@@ -1282,7 +1302,7 @@ function judgeState(turn) {
 }
 
 function turnMatches(turn, scenario) {
-  const q = lower($('#search').value);
+  const searchText = lower($('#search').value);
   const category = $('#category').value;
   const workflow = $('#workflow').value;
   const catalog = $('#catalog').value;
@@ -1298,10 +1318,10 @@ function turnMatches(turn, scenario) {
   if (turnType === 'result' && turn.needs_clarification) return false;
   if (pass === 'passed' && !turn.passed) return false;
   if (pass === 'failed' && turn.passed) return false;
-  const js = judgeState(turn);
-  if (judge === 'has' && js === 'none') return false;
-  if (judge === 'non_ok' && js !== 'non_ok') return false;
-  if (!q) return true;
+  const judgeStatus = judgeState(turn);
+  if (judge === 'has' && judgeStatus === 'none') return false;
+  if (judge === 'non_ok' && judgeStatus !== 'non_ok') return false;
+  if (!searchText) return true;
   const haystack = [
     scenario.id, scenario.category, scenario.brand, scenario.description,
     turn.user, turn.workflow, turn.sql, turn.response_text,
@@ -1309,21 +1329,21 @@ function turnMatches(turn, scenario) {
     JSON.stringify(turn.primary_products), JSON.stringify(turn.kg_context),
     JSON.stringify(turn.kg_trace), JSON.stringify(turn.judges),
   ].join(' ');
-  return lower(haystack).includes(q);
+  return lower(haystack).includes(searchText);
 }
 
-function filteredScenarios() {
+function matchingScenarios() {
   return scenarios.map(scenario => {
     const matchedTurns = (scenario.turns || []).filter(turn => turnMatches(turn, scenario));
     return {...scenario, matchedTurns};
   }).filter(scenario => scenario.matchedTurns.length);
 }
 
-function selectedScenario() {
+function getSelectedScenario() {
   return scenarios.find(scenario => scenario.id === state.selectedScenarioId) || scenarios[0] || null;
 }
 
-function selectedTurn(scenario) {
+function getSelectedTurn(scenario) {
   if (!scenario) return null;
   return (scenario.turns || []).find(turn => turn.turn_index === state.selectedTurnIndex) || (scenario.turns || [])[0] || null;
 }
@@ -1364,19 +1384,19 @@ function renderShell() {
     [`${(summary.catalog_status_counts || {}).retrieval_gap || 0}`, 'retrieval gaps'],
   ];
   $('#summaryStrip').innerHTML = metrics.map(([value, label]) => `<div class="metric"><b>${esc(value)}</b><span>${esc(label)}</span></div>`).join('');
-  optionList('#category', summary.category_counts);
-  optionList('#workflow', summary.workflow_counts);
-  optionList('#catalog', summary.catalog_status_counts);
+  populateFilterSelect('#category', summary.category_counts);
+  populateFilterSelect('#workflow', summary.workflow_counts);
+  populateFilterSelect('#catalog', summary.catalog_status_counts);
 }
 
 function renderQueryList() {
-  const list = filteredScenarios();
-  if (!list.some(scenario => scenario.id === state.selectedScenarioId)) {
-    state.selectedScenarioId = list[0]?.id || scenarios[0]?.id || null;
-    state.selectedTurnIndex = list[0]?.matchedTurns?.[0]?.turn_index || 1;
+  const matchingScenarioList = matchingScenarios();
+  if (!matchingScenarioList.some(scenario => scenario.id === state.selectedScenarioId)) {
+    state.selectedScenarioId = matchingScenarioList[0]?.id || scenarios[0]?.id || null;
+    state.selectedTurnIndex = matchingScenarioList[0]?.matchedTurns?.[0]?.turn_index || 1;
   }
-  $('#queryCount').textContent = `${list.length} matching flows`;
-  $('#queryList').innerHTML = list.length ? list.map(scenario => {
+  $('#queryCount').textContent = `${matchingScenarioList.length} matching flows`;
+  $('#queryList').innerHTML = matchingScenarioList.length ? matchingScenarioList.map(scenario => {
     const firstTurn = scenario.matchedTurns[0] || scenario.turns[0] || {};
     const active = scenario.id === state.selectedScenarioId ? 'active' : '';
     return `<button class="query-item ${active}" data-scenario="${esc(scenario.id)}" data-turn="${esc(firstTurn.turn_index || 1)}">
@@ -1394,11 +1414,11 @@ function renderQueryList() {
   });
 }
 
-function productMini(products) {
+function renderProductStrip(products) {
   if (!products?.length) return '';
   return `<div class="product-strip">${products.slice(0, 5).map(product => `
     <div class="mini-product">
-      ${productImage(product)}
+      ${renderProductImage(product)}
       <b title="${esc(product.title || product.id)}">${esc(product.title || product.id)}</b>
       <span>${esc(product.product_type || '')}${product.price ? ` · ${esc(product.price)}` : ''}</span>
     </div>
@@ -1406,7 +1426,7 @@ function productMini(products) {
 }
 
 function renderChat() {
-  const scenario = selectedScenario();
+  const scenario = getSelectedScenario();
   if (!scenario) {
     $('#chatPane').innerHTML = '<div class="empty">No conversation selected.</div>';
     return;
@@ -1426,7 +1446,7 @@ function renderChat() {
       <div class="bubble assistant">
         <div class="bubble-label">${turn.needs_clarification ? 'Clarifying question' : 'Assistant response'}</div>
         <div class="bubble-text">${esc(assistantText)}</div>
-        ${productMini(turn.primary_products)}
+        ${renderProductStrip(turn.primary_products)}
       </div>
       <div class="pill-row">${turnPills(turn)}</div>
     </section>`;
@@ -1473,7 +1493,7 @@ function productRows(products) {
   if (!products?.length) return '<div class="empty">No primary products logged.</div>';
   return `<div class="product-table">${products.slice(0, 8).map(product => `
     <div class="product-row">
-      ${productImage(product, 'product-thumb')}
+      ${renderProductImage(product, 'product-thumb')}
       <div>
         ${product.url ? `<a href="${esc(product.url)}" target="_blank" rel="noreferrer"><b>${esc(product.title || product.id)}</b></a>` : `<b>${esc(product.title || product.id)}</b>`}
         <div class="product-meta">
@@ -1481,7 +1501,7 @@ function productRows(products) {
           ${product.colors ? pill(product.colors) : ''}
           ${product.price ? pill(product.price) : ''}
         </div>
-        ${product.image_source ? `<div class="pane-sub">image source: ${esc(shortSource(product.image_source))}</div>` : ''}
+        ${product.image_source ? `<div class="pane-sub">image source: ${esc(formatImageSourceLabel(product.image_source))}</div>` : ''}
       </div>
     </div>
   `).join('')}</div>`;
@@ -1501,13 +1521,13 @@ function judgeBlocks(turn) {
 }
 
 function renderTrace() {
-  const scenario = selectedScenario();
-  const turn = selectedTurn(scenario);
+  const scenario = getSelectedScenario();
+  const turn = getSelectedTurn(scenario);
   if (!scenario || !turn) {
     $('#tracePane').innerHTML = '<div class="empty">No trace selected.</div>';
     return;
   }
-  const rt = turn.runtime_trace || {};
+  const runtimeTrace = turn.runtime_trace || {};
   $('#traceTitle').textContent = `${scenario.id} · turn ${turn.turn_index}`;
   $('#traceMeta').innerHTML = turnPills(turn);
   $('#tracePane').innerHTML = `
@@ -1516,9 +1536,9 @@ function renderTrace() {
       <div class="section-body">
         <div class="kv-grid">
           <b>query</b><span>${esc(turn.user)}</span>
-          <b>workflow</b><span>${esc(turn.workflow)} · ${esc(rt.router?.reason || '')}</span>
-          <b>follow-up</b><span>${esc(turn.is_followup)} · ${esc(rt.followup_reason || '')}</span>
-          <b>merge mode</b><span>${esc(rt.merge_mode || '')}</span>
+          <b>workflow</b><span>${esc(turn.workflow)} · ${esc(runtimeTrace.router?.reason || '')}</span>
+          <b>follow-up</b><span>${esc(turn.is_followup)} · ${esc(runtimeTrace.followup_reason || '')}</span>
+          <b>merge mode</b><span>${esc(runtimeTrace.merge_mode || '')}</span>
           <b>clarification</b><span>${esc(turn.needs_clarification)} ${(turn.clarifying_questions || []).map(q => pill(q, 'warn')).join('')}</span>
           <b>catalog status</b><span>${esc(turn.catalog_status?.label || 'unknown')} · ${esc(turn.catalog_status?.reason || '')}</span>
           <b>products</b><span>DB ${esc(turn.db_product_count)} · primary ${esc(turn.primary_product_count)}/${esc(turn.unique_primary_product_count)}</span>
@@ -1528,7 +1548,7 @@ function renderTrace() {
     </section>
     <section class="section">
       <h2>Final Intents</h2>
-      <div class="section-body">${intentChips(turn.intents)}<details><summary>Intent diff</summary>${jsonBlock(rt.intent_diff || {})}</details></div>
+      <div class="section-body">${intentChips(turn.intents)}<details><summary>Intent diff</summary>${jsonBlock(runtimeTrace.intent_diff || {})}</details></div>
     </section>
     <section class="section">
       <h2>KG Grounding</h2>
