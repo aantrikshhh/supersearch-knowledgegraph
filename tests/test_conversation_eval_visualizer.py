@@ -2,7 +2,7 @@ import json
 import unittest
 from html.parser import HTMLParser
 
-from scripts.eval.conversation_eval_visualizer import render_html
+from scripts.eval.conversation_eval_visualizer import compact_product, normalize_image_src, render_html
 
 
 class PayloadScriptParser(HTMLParser):
@@ -48,6 +48,27 @@ class ConversationEvalVisualizerTests(unittest.TestCase):
         self.assertNotIn("&quot;", raw_payload)
         parsed = json.loads(raw_payload)
         self.assertEqual(parsed["turns"][0]["user"], payload["turns"][0]["user"])
+
+    def test_product_media_prefers_enriched_image_fields(self):
+        product = {"id": "123", "title": "Test Kurta"}
+        media = {
+            ("kalki", "123"): {
+                "image_url": "file:///tmp/test.jpg",
+                "url": "https://www.kalkifashion.com/products/test-kurta",
+                "image_source": "/Users/aant/repos/scraper-infra/data/pdp_images/kalki_fashion/test/001.jpg",
+                "image_source_type": "local_file",
+                "remote_image_url": "https://cdn.shopify.com/test.jpg",
+            }
+        }
+
+        compact = compact_product(product, media=media, brand="kalki")
+
+        self.assertEqual(compact["image_url"], "file:///tmp/test.jpg")
+        self.assertEqual(compact["image_source_type"], "local_file")
+        self.assertEqual(compact["remote_image_url"], "https://cdn.shopify.com/test.jpg")
+
+    def test_normalize_image_src_accepts_catalog_lists(self):
+        self.assertEqual(normalize_image_src(["", "https://example.com/a.jpg"]), "https://example.com/a.jpg")
 
 
 if __name__ == "__main__":

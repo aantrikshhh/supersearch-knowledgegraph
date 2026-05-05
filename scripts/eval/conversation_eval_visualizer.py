@@ -9,6 +9,7 @@ HTML report for mining workflow/config/KG/prompt insights.
 import argparse
 import html
 import json
+import sqlite3
 import statistics
 import sys
 from collections import Counter
@@ -20,11 +21,18 @@ ROOT_DIR = Path(__file__).resolve().parents[2]
 if str(ROOT_DIR) not in sys.path:
     sys.path.insert(0, str(ROOT_DIR))
 
-from config import EVAL_RESULTS_DIR
+from config import BRAND_DB_PATHS, CATALOG_PATHS, EVAL_RESULTS_DIR
 
 
 DEFAULT_EVAL = Path(EVAL_RESULTS_DIR) / "aza_conversation_500_deterministic_final.json"
 DEFAULT_OUT = Path(EVAL_RESULTS_DIR) / "aza_conversation_500_visualizer.html"
+
+SCRAPER_DATA_DIR = Path(CATALOG_PATHS.get("aza", "/Users/aant/repos/scraper-infra/data/aza_fashions_products.json")).parent
+LOCAL_IMAGE_CATALOG_DIR = SCRAPER_DATA_DIR / "pdp_catalogs_with_local_images"
+LOCAL_IMAGE_CATALOG_PREFIXES = {
+    "kalki": "kalki_fashion",
+    "masaba": "house_of_masaba",
+}
 
 
 def load_json(path):
@@ -47,7 +55,163 @@ def percentile(values, pct):
     return ordered[idx]
 
 
-def compact_product(product):
+BRAND_BASE_URLS = {
+    "aza": "https://www.azafashions.com",
+    "kalki": "https://www.kalkifashion.com",
+    "masaba": "https://www.houseofmasaba.com",
+}
+
+
+def normalize_image_src(value):
+    if not value:
+        return ""
+    if isinstance(value, (list, tuple)):
+        value = next((item for item in value if item), "")
+        if not value:
+            return ""
+    text = str(value)
+    if text.startswith(("http://", "https://", "data:", "file:")):
+        return text
+    path = Path(text)
+    if path.is_absolute() and path.exists():
+        return path.as_uri()
+    return text
+
+
+def normalize_product_url(url, brand):
+    if not url:
+        return ""
+    text = str(url)
+    if text.startswith(("http://", "https://")):
+        return text
+    base = BRAND_BASE_URLS.get((brand or "").lower(), "")
+    if base and text.startswith("/"):
+        return base + text
+    return text
+
+
+def resolve_local_image_path(local_path):
+    if not local_path:
+        return None
+    path = Path(str(local_path))
+    if not path.is_absolute():
+        path = SCRAPER_DATA_DIR / path
+    return path if path.exists() else None
+
+
+def iter_catalog_items(path):
+    try:
+        data = load_json(path)
+    except (OSError, json.JSONDecodeError):
+        return []
+    if isinstance(data, list):
+        return data
+    if isinstance(data, dict):
+        return data.get("products") or data.get("items") or []
+    return []
+
+
+def load_local_image_media(brand, product_ids):
+    """Load checked-out PDP image files for brands that have local downloads.
+
+    Aza is intentionally URL-backed: the current checked-out scraper data has
+    catalog URLs but no local PDP image bundle. Kalki and Masaba have local image
+    manifests, so the visualizer should use the actual files on disk.
+    """
+    prefix = LOCAL_IMAGE_CATALOG_PREFIXES.get(brand)
+    if not prefix or not product_ids or not LOCAL_IMAGE_CATALOG_DIR.exists():
+        return {}
+
+    remaining = set(str(product_id) for product_id in product_ids)
+    media = {}
+    paths = sorted(LOCAL_IMAGE_CATALOG_DIR.glob(f"{prefix}_products_with_local_images__products_*.json"))
+    for path in paths:
+        if not remaining:
+            break
+        for item in iter_catalog_items(path):
+            product_id = str(item.get("id") or "")
+            if product_id not in remaining:
+                continue
+            for local_image in item.get("local_images") or []:
+                local_path = resolve_local_image_path(local_image.get("local_path"))
+                if not local_path:
+                    continue
+                media[(brand, product_id)] = {
+                    "image_url": local_path.as_uri(),
+                    "remote_image_url": normalize_image_src(local_image.get("remote_url")),
+                    "url": normalize_product_url(
+                        local_image.get("product_url") or item.get("product_url") or item.get("url"),
+                        brand,
+                    ),
+                    "image_source": str(local_path),
+                    "image_source_type": "local_file",
+                }
+                remaining.discard(product_id)
+                break
+    return media
+
+
+def collect_product_ids_by_brand(result):
+    ids_by_brand = {}
+    for scenario in result.get("results", []):
+        brand = (scenario.get("brand") or "").lower()
+        if not brand:
+            continue
+        ids = ids_by_brand.setdefault(brand, set())
+        for turn in scenario.get("turns", []):
+            product_groups = [
+                turn.get("primary_products", []),
+                (turn.get("db_trace", {}) or {}).get("candidates", []),
+                (turn.get("outfit_debug", {}) or {}).get("scored_candidates", []),
+            ]
+            for products in product_groups:
+                for product in products or []:
+                    product_id = product.get("id")
+                    if product_id is not None:
+                        ids.add(str(product_id))
+    return ids_by_brand
+
+
+def load_product_media(result):
+    ids_by_brand = collect_product_ids_by_brand(result)
+    media = {}
+    for brand, product_ids in ids_by_brand.items():
+        db_path = BRAND_DB_PATHS.get(brand)
+        if not db_path or not Path(db_path).exists() or not product_ids:
+            continue
+        conn = sqlite3.connect(db_path)
+        conn.row_factory = sqlite3.Row
+        try:
+            ids = sorted(product_ids)
+            for start in range(0, len(ids), 800):
+                chunk = ids[start:start + 800]
+                placeholders = ",".join("?" for _ in chunk)
+                rows = conn.execute(
+                    f"SELECT id, image_url, url FROM products WHERE id IN ({placeholders})",
+                    chunk,
+                ).fetchall()
+                for row in rows:
+                    image_url = normalize_image_src(row["image_url"])
+                    key = (brand, str(row["id"]))
+                    media[key] = {
+                        "image_url": image_url,
+                        "url": normalize_product_url(row["url"], brand),
+                        "image_source": image_url or CATALOG_PATHS.get(brand, db_path),
+                        "image_source_type": "remote_url" if image_url.startswith(("http://", "https://")) else "catalog",
+                    }
+        finally:
+            conn.close()
+
+        for key, local_media in load_local_image_media(brand, product_ids).items():
+            media[key] = {**media.get(key, {}), **local_media}
+    return media
+
+
+def compact_product(product, media=None, brand=""):
+    product_id = str(product.get("id")) if product.get("id") is not None else ""
+    product_media = (media or {}).get(((brand or "").lower(), product_id), {})
+    image_url = product.get("image_url") or product_media.get("image_url") or ""
+    url = product.get("url") or product_media.get("url") or ""
     return {
         "id": product.get("id"),
         "title": product.get("title", ""),
@@ -56,6 +220,11 @@ def compact_product(product):
         "materials": product.get("materials", ""),
         "patterns": product.get("patterns", ""),
         "price": product.get("price", ""),
+        "image_url": normalize_image_src(image_url),
+        "url": normalize_product_url(url, brand),
+        "image_source": product_media.get("image_source", ""),
+        "image_source_type": product_media.get("image_source_type", ""),
+        "remote_image_url": product_media.get("remote_image_url", ""),
     }
 
 
@@ -131,13 +300,13 @@ def compact_outfit_debug(debug):
     }
 
 
-def compact_db_trace(turn):
+def compact_db_trace(turn, media=None, brand=""):
     trace = turn.get("db_trace", {}) or {}
     return {
         "timings": trace.get("timings", {}),
         "retries": trace.get("retries", [])[:5],
         "candidate_count": len(trace.get("candidates", [])),
-        "candidates": [compact_product(p) for p in trace.get("candidates", [])[:10]],
+        "candidates": [compact_product(p, media=media, brand=brand) for p in trace.get("candidates", [])[:10]],
         "available_type_count": len(trace.get("available_types", [])),
         "available_types_sample": trace.get("available_types", [])[:50],
         "raw_llm_sql_response": trace.get("raw_llm_sql_response"),
@@ -164,9 +333,11 @@ def attach_judges(main_result, judge_results):
 
 
 def build_payload(result, source_paths):
+    media = load_product_media(result)
     scenarios = []
     all_turns = []
     for scenario in result.get("results", []):
+        brand = scenario.get("brand", "")
         compact_turns = []
         for idx, turn in enumerate(scenario.get("turns", []), 1):
             case_id = f"{scenario['id']}::turn_{idx}"
@@ -184,11 +355,11 @@ def build_payload(result, source_paths):
                 "intents": turn.get("intents", {}),
                 "primary_product_count": turn.get("primary_product_count", 0),
                 "unique_primary_product_count": turn.get("unique_primary_product_count", 0),
-                "primary_products": [compact_product(p) for p in turn.get("primary_products", [])],
+                "primary_products": [compact_product(p, media=media, brand=brand) for p in turn.get("primary_products", [])],
                 "db_product_count": turn.get("db_product_count", 0),
                 "db_errors": turn.get("db_errors", []),
                 "sql": turn.get("sql", ""),
-                "db_trace": compact_db_trace(turn),
+                "db_trace": compact_db_trace(turn, media=media, brand=brand),
                 "kg_context": turn.get("kg_context", {}),
                 "kg_trace": compact_kg_trace(turn.get("kg_trace", {})),
                 "outfit_debug": compact_outfit_debug(turn.get("outfit_debug", {})),
@@ -631,10 +802,12 @@ body {
   margin:0;
   background:var(--bg);
   color:var(--ink);
-  font:14px/1.45 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;
+  font:13px/1.4 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;
 }
 button,input,select { font:inherit }
 button { color:inherit }
+a { color:var(--accent); text-decoration:none }
+a:hover { text-decoration:underline }
 .app {
   height:100vh;
   display:grid;
@@ -644,31 +817,31 @@ button { color:inherit }
   display:flex;
   align-items:center;
   justify-content:space-between;
-  gap:20px;
-  padding:12px 16px;
+  gap:12px;
+  padding:9px 12px;
   border-bottom:1px solid var(--line);
   background:rgba(244,245,242,.96);
   backdrop-filter:blur(10px);
 }
-h1 { margin:0; font-size:17px; line-height:1.2; letter-spacing:0; font-weight:760 }
-.source { margin-top:2px; color:var(--muted); font-size:12px }
+h1 { margin:0; font-size:16px; line-height:1.2; letter-spacing:0; font-weight:760 }
+.source { margin-top:2px; color:var(--muted); font-size:11px }
 .summary-strip { display:flex; gap:8px; flex-wrap:wrap; justify-content:flex-end }
 .metric {
-  min-width:86px;
-  padding:7px 10px;
+  min-width:70px;
+  padding:6px 8px;
   border:1px solid var(--line);
   border-radius:7px;
   background:var(--surface);
 }
-.metric b { display:block; font-size:16px; line-height:1.1 }
-.metric span { color:var(--muted); font-size:11px }
+.metric b { display:block; font-size:15px; line-height:1.1 }
+.metric span { color:var(--muted); font-size:10px }
 .workspace {
   min-height:0;
   display:grid;
-  grid-template-columns:minmax(360px,.95fr) minmax(440px,1.05fr);
-  grid-template-rows:230px minmax(0,1fr);
+  grid-template-columns:minmax(0,.92fr) minmax(0,1.08fr);
+  grid-template-rows:168px minmax(0,1fr);
   gap:0;
-  overflow:auto;
+  overflow:hidden;
 }
 .query-rail,.chat-pane,.trace-pane {
   min-height:0;
@@ -680,7 +853,7 @@ h1 { margin:0; font-size:17px; line-height:1.2; letter-spacing:0; font-weight:76
   grid-row:1;
   background:var(--surface);
   display:grid;
-  grid-template-columns:300px minmax(0,1fr);
+  grid-template-columns:220px minmax(0,1fr);
   border-right:0;
   border-bottom:1px solid var(--line);
 }
@@ -689,8 +862,8 @@ h1 { margin:0; font-size:17px; line-height:1.2; letter-spacing:0; font-weight:76
   overflow:auto;
   z-index:2;
   display:grid;
-  gap:8px;
-  padding:12px;
+  gap:6px;
+  padding:9px;
   border-right:1px solid var(--line);
   background:var(--surface);
 }
@@ -702,7 +875,7 @@ input,select {
   border-radius:6px;
   background:#fff;
   color:var(--ink);
-  padding:8px 9px;
+  padding:6px 8px;
   min-width:0;
 }
 .rail-count {
@@ -710,22 +883,22 @@ input,select {
   justify-content:space-between;
   align-items:center;
   color:var(--muted);
-  font-size:12px;
+  font-size:11px;
 }
 .reset-btn {
   border:1px solid var(--line);
   background:var(--surface-2);
   border-radius:6px;
-  padding:6px 9px;
+  padding:5px 8px;
   cursor:pointer;
   font-weight:700;
 }
 .query-list {
   min-height:0;
   overflow:auto;
-  padding:10px;
+  padding:8px;
   display:grid;
-  grid-template-columns:repeat(auto-fill,minmax(280px,1fr));
+  grid-template-columns:repeat(auto-fill,minmax(220px,1fr));
   gap:8px;
   align-content:start;
 }
@@ -737,7 +910,7 @@ input,select {
   border:1px solid transparent;
   border-radius:7px;
   background:transparent;
-  padding:10px;
+  padding:8px;
   cursor:pointer;
 }
 .query-item:hover { background:var(--surface-2); border-color:var(--line) }
@@ -745,7 +918,7 @@ input,select {
   background:var(--accent-soft);
   border-color:#9ecac3;
 }
-.query-title { font-weight:760; line-height:1.28 }
+.query-title { font-weight:760; line-height:1.25; font-size:13px }
 .query-meta,.pill-row { display:flex; gap:5px; flex-wrap:wrap; align-items:center }
 .pill {
   display:inline-flex;
@@ -774,17 +947,17 @@ input,select {
   position:sticky;
   top:0;
   z-index:2;
-  padding:13px 16px;
+  padding:10px 12px;
   border-bottom:1px solid var(--line);
   background:rgba(250,250,248,.97);
   backdrop-filter:blur(10px);
 }
-.pane-title { font-weight:800; font-size:15px }
-.pane-sub { color:var(--muted); font-size:12px; margin-top:2px }
+.pane-title { font-weight:800; font-size:14px }
+.pane-sub { color:var(--muted); font-size:11px; margin-top:2px }
 .chat-thread {
   min-height:0;
   overflow:auto;
-  padding:18px 16px 24px;
+  padding:12px;
   display:grid;
   gap:14px;
   align-content:start;
@@ -792,7 +965,7 @@ input,select {
 .turn-block {
   display:grid;
   gap:8px;
-  padding:10px;
+  padding:8px;
   border:1px solid transparent;
   border-radius:8px;
   cursor:pointer;
@@ -800,10 +973,10 @@ input,select {
 .turn-block:hover { border-color:var(--line); background:#fff }
 .turn-block.active { border-color:#9ecac3; background:#fff }
 .bubble {
-  max-width:88%;
+  max-width:96%;
   border:1px solid var(--line);
   border-radius:8px;
-  padding:10px 12px;
+  padding:9px 10px;
   background:#fff;
 }
 .bubble.user {
@@ -816,25 +989,56 @@ input,select {
 .bubble-label {
   margin-bottom:5px;
   color:var(--muted);
-  font-size:11px;
+  font-size:10px;
   font-weight:800;
   text-transform:uppercase;
   letter-spacing:.04em;
 }
 .bubble.user .bubble-label { color:#c9d6d3 }
 .bubble-text { white-space:pre-wrap; overflow-wrap:anywhere }
-.product-strip { display:grid; gap:6px; margin-top:8px }
+.product-strip {
+  display:grid;
+  grid-template-columns:repeat(auto-fill,minmax(96px,1fr));
+  gap:7px;
+  margin-top:9px;
+}
 .mini-product {
   display:grid;
-  grid-template-columns:minmax(0,1fr) auto;
-  gap:8px;
+  gap:5px;
   border:1px solid var(--line);
   border-radius:6px;
-  padding:7px 8px;
+  padding:5px;
   background:#fff;
-  font-size:12px;
+  font-size:11px;
+  min-width:0;
 }
-.mini-product b { overflow:hidden; text-overflow:ellipsis; white-space:nowrap }
+.mini-product img {
+  width:100%;
+  aspect-ratio:3/4;
+  object-fit:cover;
+  border-radius:5px;
+  background:#eef0ea;
+  display:block;
+}
+.image-placeholder {
+  width:100%;
+  aspect-ratio:3/4;
+  border-radius:5px;
+  border:1px dashed var(--line);
+  background:#f3f4ef;
+  color:var(--muted);
+  display:grid;
+  place-items:center;
+  text-align:center;
+  font-size:10px;
+}
+.mini-product b {
+  display:block;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+}
+.mini-product span { color:var(--muted) }
 .trace-pane {
   grid-column:2;
   grid-row:2;
@@ -847,9 +1051,9 @@ input,select {
 .trace-scroll {
   min-height:0;
   overflow:auto;
-  padding:14px 16px 24px;
+  padding:10px 12px 16px;
   display:grid;
-  gap:12px;
+  gap:9px;
   align-content:start;
 }
 .section {
@@ -860,19 +1064,19 @@ input,select {
 }
 .section h2 {
   margin:0;
-  padding:10px 12px;
+  padding:8px 10px;
   border-bottom:1px solid var(--line);
-  font-size:12px;
+  font-size:11px;
   text-transform:uppercase;
   letter-spacing:.04em;
   color:#536071;
 }
-.section-body { padding:11px 12px; display:grid; gap:10px }
+.section-body { padding:9px 10px; display:grid; gap:9px }
 .kv-grid {
   display:grid;
-  grid-template-columns:150px minmax(0,1fr);
+  grid-template-columns:116px minmax(0,1fr);
   gap:7px 10px;
-  font-size:12px;
+  font-size:11px;
 }
 .kv-grid b { color:var(--muted); font-weight:730 }
 .kv-grid span { min-width:0; overflow-wrap:anywhere }
@@ -884,14 +1088,14 @@ input,select {
 .intent-chip {
   border:1px solid var(--line);
   border-radius:999px;
-  padding:5px 8px;
+  padding:4px 7px;
   background:var(--surface-2);
-  font-size:12px;
+  font-size:11px;
 }
 .intent-chip b { color:#4f5b68 }
 .kg-row {
   display:grid;
-  grid-template-columns:86px minmax(0,1fr);
+  grid-template-columns:72px minmax(0,1fr);
   gap:8px;
   align-items:start;
   padding:7px 0;
@@ -904,7 +1108,7 @@ input,select {
   margin:0;
   white-space:pre-wrap;
   overflow-wrap:anywhere;
-  font:12px/1.45 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+  font:11px/1.42 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
   color:#222a35;
 }
 details {
@@ -917,15 +1121,36 @@ summary { cursor:pointer; font-weight:760 }
 .product-table { display:grid; gap:6px }
 .product-row {
   display:grid;
-  grid-template-columns:minmax(0,1.3fr) 100px 96px 82px;
+  grid-template-columns:62px minmax(0,1fr);
   gap:8px;
   align-items:start;
-  padding:8px 0;
+  padding:7px 0;
   border-bottom:1px solid #edf0ec;
-  font-size:12px;
+  font-size:11px;
 }
 .product-row:last-child { border-bottom:0 }
-.product-row b { overflow:hidden; text-overflow:ellipsis; white-space:nowrap }
+.product-row b { display:block; overflow:hidden; text-overflow:ellipsis; white-space:nowrap }
+.product-thumb {
+  width:62px;
+  aspect-ratio:3/4;
+  border-radius:6px;
+  object-fit:cover;
+  background:#eef0ea;
+  border:1px solid var(--line);
+}
+.product-thumb.missing {
+  display:grid;
+  place-items:center;
+  color:var(--muted);
+  font-size:10px;
+  text-align:center;
+}
+.product-meta {
+  display:flex;
+  gap:5px;
+  flex-wrap:wrap;
+  margin-top:5px;
+}
 .judge {
   border-left:3px solid var(--accent);
   background:var(--accent-soft);
@@ -942,11 +1167,21 @@ summary { cursor:pointer; font-weight:760 }
   text-align:center;
 }
 @media (max-width:1220px) {
-  .app { min-width:850px }
-  .workspace { grid-template-columns:390px 460px }
+  .workspace { grid-template-columns:minmax(0,.92fr) minmax(0,1.08fr) }
 }
 @media (max-width:760px) {
-  .filter-row,.product-row,.kv-grid { grid-template-columns:1fr }
+  .topbar { padding:7px 10px }
+  .summary-strip { display:none }
+  .workspace {
+    grid-template-columns:minmax(0,.9fr) minmax(0,1.1fr);
+    grid-template-rows:150px minmax(0,1fr);
+  }
+  .query-rail { grid-template-columns:188px minmax(0,1fr) }
+  .filter-row,.kv-grid { grid-template-columns:1fr }
+  .query-list { grid-template-columns:repeat(auto-fill,minmax(190px,1fr)) }
+  .product-row { grid-template-columns:54px minmax(0,1fr) }
+  .product-thumb { width:54px }
+  .pill { font-size:10px; padding:2px 6px }
 }
 </style>
 </head>
@@ -1014,6 +1249,20 @@ function pill(text, cls='') {
 
 function jsonBlock(obj) {
   return `<pre class="code">${esc(JSON.stringify(obj ?? {}, null, 2))}</pre>`;
+}
+
+function productImage(product, cls='') {
+  if (!product?.image_url) {
+    return `<div class="${cls ? `${cls} missing` : 'image-placeholder'}">No image</div>`;
+  }
+  return `<img class="${cls}" src="${esc(product.image_url)}" alt="${esc(product.title || 'Product image')}" loading="lazy">`;
+}
+
+function shortSource(path) {
+  const text = String(path || '');
+  const marker = '/scraper-infra/';
+  const idx = text.indexOf(marker);
+  return idx >= 0 ? `~${text.slice(idx)}` : text;
 }
 
 function optionList(id, counts) {
@@ -1148,7 +1397,11 @@ function renderQueryList() {
 function productMini(products) {
   if (!products?.length) return '';
   return `<div class="product-strip">${products.slice(0, 5).map(product => `
-    <div class="mini-product"><b>${esc(product.title || product.id)}</b><span>${esc(product.product_type || '')}</span></div>
+    <div class="mini-product">
+      ${productImage(product)}
+      <b title="${esc(product.title || product.id)}">${esc(product.title || product.id)}</b>
+      <span>${esc(product.product_type || '')}${product.price ? ` · ${esc(product.price)}` : ''}</span>
+    </div>
   `).join('')}</div>`;
 }
 
@@ -1220,10 +1473,16 @@ function productRows(products) {
   if (!products?.length) return '<div class="empty">No primary products logged.</div>';
   return `<div class="product-table">${products.slice(0, 8).map(product => `
     <div class="product-row">
-      <b>${esc(product.title || product.id)}</b>
-      <span>${esc(product.product_type || '')}</span>
-      <span>${esc(product.colors || '')}</span>
-      <span>${esc(product.price || '')}</span>
+      ${productImage(product, 'product-thumb')}
+      <div>
+        ${product.url ? `<a href="${esc(product.url)}" target="_blank" rel="noreferrer"><b>${esc(product.title || product.id)}</b></a>` : `<b>${esc(product.title || product.id)}</b>`}
+        <div class="product-meta">
+          ${pill(product.product_type || 'type')}
+          ${product.colors ? pill(product.colors) : ''}
+          ${product.price ? pill(product.price) : ''}
+        </div>
+        ${product.image_source ? `<div class="pane-sub">image source: ${esc(shortSource(product.image_source))}</div>` : ''}
+      </div>
     </div>
   `).join('')}</div>`;
 }
