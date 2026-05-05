@@ -48,10 +48,15 @@ python3 scripts/eval/run_conversation_eval.py --skip-response-llm
 # Results saved to eval_results/golden_eval_{timestamp}.json
 ```
 
+See `docs/SEARCH_EVAL_METHODOLOGY.md` for the full search-quality methodology, including deterministic checks, LLM judges, catalog-gap classification, and the Aza 500 conversation eval.
+
 ### Visualizer
 ```bash
 # Generate the saved-eval audit UI
 python3 scripts/eval/eval_audit_visualizer.py --eval eval_results/golden_eval_YYYYMMDD_HHMMSS.json
+
+# Generate the Aza conversation eval visualizer
+python3 scripts/eval/conversation_eval_visualizer.py --eval eval_results/aza_conversation_500_deterministic_final.json --out eval_results/aza_conversation_500_visualizer.html
 
 # Legacy pipeline visualizer lives under legacy/ for archaeology only.
 ```

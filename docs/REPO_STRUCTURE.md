@@ -71,3 +71,5 @@ For each query-brand job:
 5. Metrics are computed: NDCG@5, MRR, and hit rate.
 
 The exhaustive eval uses 8 parallel workers and currently runs 165 jobs (`55 queries × 3 brands`).
+
+Runtime conversation evals are separate from golden ranking evals. They run scenarios through `ConversationManager` so clarifications, follow-ups, topic switches, KG trace, SQL trace, catalog-gap handling, and response behavior can be inspected. See `docs/SEARCH_EVAL_METHODOLOGY.md` for the full methodology and commands.

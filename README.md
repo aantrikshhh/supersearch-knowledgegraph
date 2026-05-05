@@ -45,6 +45,8 @@ python3 scripts/eval/run_conversation_eval.py --skip-response-llm
 python3 scripts/eval/eval_audit_visualizer.py --eval eval_results/golden_eval_YYYYMMDD_HHMMSS.json
 ```
 
+See [docs/SEARCH_EVAL_METHODOLOGY.md](docs/SEARCH_EVAL_METHODOLOGY.md) for how we test search quality, conversational flows, catalog gaps, KG grounding, and eval-driven improvements.
+
 ## Pipeline Overview
 
 ```
@@ -116,5 +118,7 @@ python3 scripts/eval/run_golden_eval_parallel.py
 # Cross-brand eval
 python3 scripts/eval/run_golden_eval_all_brands.py
 ```
+
+The search-quality methodology, Aza 500 conversation eval commands, logging fields, and visualizer workflow are documented in [docs/SEARCH_EVAL_METHODOLOGY.md](docs/SEARCH_EVAL_METHODOLOGY.md).
 
 See [docs/REPO_STRUCTURE.md](docs/REPO_STRUCTURE.md) for a module-by-module overview and request handling guide.
