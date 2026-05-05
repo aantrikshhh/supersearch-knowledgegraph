@@ -77,6 +77,7 @@ python3 scripts/eval/run_conversation_eval.py --eval data/eval/generated/aza_con
 python3 scripts/eval/mine_conversation_eval.py eval_results/aza_conversation_500_deterministic_final.json --markdown-out docs/eval_runs/aza_500_final_insights.md
 KG_JUDGE_LLM_TIMEOUT=60 python3 scripts/eval/run_conversation_eval.py --eval data/eval/generated/aza_conversation_500_judge_sample_seed13.json --limit 1 --skip-core-llm --skip-response-llm --judge all --judge-batch-size 1 --judge-workers 2 --out eval_results/aza_conversation_500_all_judges_smoke.json --jsonl-trace eval_results/aza_conversation_500_all_judges_smoke.jsonl
 KG_JUDGE_LLM_TIMEOUT=60 python3 scripts/eval/run_conversation_eval.py --eval data/eval/generated/aza_conversation_500_seed13.json --scenario aza_refinement_075 --skip-core-llm --skip-response-llm --judge memory --judge-batch-size 1 --judge-workers 1 --out eval_results/aza_conversation_500_memory_judge_smoke.json --jsonl-trace eval_results/aza_conversation_500_memory_judge_smoke.jsonl
+python3 scripts/eval/conversation_eval_visualizer.py --eval eval_results/aza_conversation_500_deterministic_final.json --judge eval_results/aza_conversation_500_all_judges_smoke.json --judge eval_results/aza_conversation_500_memory_judge_smoke.json --out eval_results/aza_conversation_500_visualizer.html
 ```
 
 Judge-run note:
@@ -84,6 +85,7 @@ Judge-run note:
 - The four judge types are implemented and smoke-tested.
 - Full judged sweeps through the Codex CLI subprocess path are slow; the attempted 45- and 90-scenario all-judge samples were killed after proving the payload/latency issue.
 - The runner now trims judge payloads and supports `KG_JUDGE_LLM_TIMEOUT`; for larger judged sweeps, run smaller batches or move the same JSON case payloads to an async Batch API path.
+- A static local visualizer is available at `eval_results/aza_conversation_500_visualizer.html`.
 
 Remaining risks:
 
