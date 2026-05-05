@@ -257,7 +257,16 @@ def build_payload(result, source_paths):
 
 
 def esc_json(data):
-    return html.escape(json.dumps(data, separators=(",", ":"), ensure_ascii=False))
+    # Keep the script payload as valid JSON text while making it safe to embed
+    # inside an HTML script element.
+    return (
+        json.dumps(data, separators=(",", ":"), ensure_ascii=False)
+        .replace("&", "\\u0026")
+        .replace("<", "\\u003c")
+        .replace(">", "\\u003e")
+        .replace("\u2028", "\\u2028")
+        .replace("\u2029", "\\u2029")
+    )
 
 
 def render_html(payload, title):
