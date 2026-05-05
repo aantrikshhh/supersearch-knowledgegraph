@@ -82,6 +82,10 @@ STYLE_KEYWORDS = {
 
 EVENT_KEYWORDS = {
     "diwali": "Diwali",
+    "durga puja": "Durga Puja",
+    "ganesh chaturthi": "Ganesh Chaturthi",
+    "lakshmi puja": "Lakshmi Puja",
+    "puja": "Lakshmi Puja",
     "holi": "Holi",
     "onam": "Onam",
     "navratri": "Navratri",
@@ -92,8 +96,6 @@ EVENT_KEYWORDS = {
     "bihu": "Bihu",
     "lohri": "Lohri",
     "baisakhi": "Baisakhi",
-    "durga puja": "Durga Puja",
-    "ganesh chaturthi": "Ganesh Chaturthi",
 }
 
 OCCASION_KEYWORDS = {
@@ -101,9 +103,12 @@ OCCASION_KEYWORDS = {
     "mehendi": "mehendi",
     "haldi": "haldi",
     "engagement": "engagement",
+    "roka": "roka",
     "wedding": "wedding",
     "reception": "wedding",
     "gala": "gala",
+    "cocktail party": "gala",
+    "cocktail": "gala",
     "bachelorette": "bachelorette",
     "farewell": "farewell party",
     "date": "date night",
@@ -113,15 +118,26 @@ OCCASION_KEYWORDS = {
     "birthday": "birthday party",
     "baby shower": "baby shower",
     "anniversary": "anniversary",
+    "housewarming": "housewarming",
     "retirement": "retirement party",
+    "nikah": "muslim wedding",
+    "nikkah": "muslim wedding",
+    "church wedding": "christian wedding",
     "interview": "interview",
+    "corporate event": "corporate event",
     "office party": "office party",
+    "graduation": "graduation",
+    "picnic": "picnic",
+    "prom": "prom",
+    "concert": "concert",
     "funeral": "funeral",
 }
 
 PLACE_KEYWORDS = {
     "office": "office",
     "temple": "temple",
+    "mosque": "mosque",
+    "church": "church",
     "airport": "airport",
     "museum": "museum",
     "beach": "beach",
@@ -132,6 +148,7 @@ PLACE_KEYWORDS = {
     "college": "office",
     "school": "office",
     "mountain": "mountains",
+    "mountains": "mountains",
 }
 
 PROFESSION_KEYWORDS = {
@@ -170,7 +187,9 @@ ACTIVITY_KEYWORDS = {
     "cycling": "cycling",
     "cycle": "cycling",
     "dance": "dancing",
+    "dancing": "dancing",
     "clubbing": "dancing",
+    "swimming": "swimming",
 }
 
 BODYTYPE_KEYWORDS = {
@@ -184,6 +203,10 @@ HEALTH_KEYWORDS = {
     "back pain": "back pain",
     "sensitive skin": "sensitive skin",
     "hypoallergenic": "sensitive skin",
+    "knee pain": "knee pain",
+    "flat feet": "flat feet",
+    "poor circulation": "poor circulation",
+    "allergies": "allergies",
     "sweat": "sweating",
     "sweating": "sweating",
 }
@@ -212,6 +235,17 @@ def _infer_relation(query_lower):
     return None
 
 
+def _canonical_product_type(value):
+    value_lower = str(value or "").lower().strip()
+    if not value_lower:
+        return None
+    for canonical, aliases in PRODUCT_TYPE_ALIASES.items():
+        terms = [canonical] + aliases
+        if any(value_lower == term.lower() for term in terms):
+            return canonical
+    return value_lower
+
+
 def _is_generic_wedding_query(query_lower):
     if not _has_phrase(query_lower, "wedding"):
         return False
@@ -221,7 +255,11 @@ def _is_generic_wedding_query(query_lower):
 
 
 def _is_accepted_general_wedding(query_lower):
-    return _has_phrase(query_lower, "general wedding") or _has_phrase(query_lower, "general wedding guest")
+    return (
+        _has_phrase(query_lower, "general wedding")
+        or _has_phrase(query_lower, "general wedding guest")
+        or re.search(r"\bgeneral\b.{0,40}\bwedding\b", query_lower) is not None
+    )
 
 
 def normalize_intents(query, intents=None, preserve_existing=False):
@@ -232,6 +270,11 @@ def normalize_intents(query, intents=None, preserve_existing=False):
 def _enrich_intents(intents, query, preserve_existing=False):
     """Add inferred fields the LLM might have missed."""
     query_lower = query.lower()
+
+    if "product_type" in intents:
+        canonical_product = _canonical_product_type(intents.get("product_type"))
+        if canonical_product:
+            intents["product_type"] = canonical_product
 
     # Deterministic enrichment only handles high-confidence canonicalization.
     if "event" not in intents:
@@ -313,7 +356,9 @@ def _enrich_intents(intents, query, preserve_existing=False):
     if "budget" not in intents:
         if any(w in query_lower for w in ("cheap", "budget", "affordable", "economical")):
             intents["budget"] = "affordable"
-        elif any(w in query_lower for w in ("luxury", "premium", "designer")):
+        elif "luxury" in query_lower:
+            intents["budget"] = "luxury"
+        elif any(w in query_lower for w in ("premium", "designer")):
             intents["budget"] = "premium"
 
     if "month" not in intents:
@@ -324,7 +369,10 @@ def _enrich_intents(intents, query, preserve_existing=False):
                 break
 
     if "location" not in intents:
-        for location in ("goa", "mumbai", "rajasthan", "sri lanka", "europe", "kerala"):
+        for location in (
+            "goa", "mumbai", "rajasthan", "sri lanka", "europe", "kerala",
+            "dubai", "delhi", "bangalore", "hyderabad", "chennai", "kolkata",
+        ):
             if location in query_lower:
                 intents["location"] = location.title()
                 break

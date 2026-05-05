@@ -367,6 +367,19 @@ def _product_terms(canonical):
     return [t.lower() for t in terms if t]
 
 
+def _product_terms_overlap(left, right):
+    left_terms = set(_product_terms(left))
+    right_terms = set(_product_terms(right))
+    return any(
+        l == r
+        or l in r
+        or r in l
+        or l.rstrip("s") == r.rstrip("s")
+        for l in left_terms
+        for r in right_terms
+    )
+
+
 def _resolve_db_types(canonical_types, available_types):
     """Map canonical KG/user product types to actual brand DB values."""
     resolved = []
@@ -567,7 +580,10 @@ def _deterministic_sql(query, intents, kg_context_str, available_types):
     if not allowed_types:
         allowed_types = [t for t in available_types if t][:10]
 
-    avoided_canonical = kg.get("product", {}).get("avoid", [])
+    avoided_canonical = [
+        t for t in kg.get("product", {}).get("avoid", [])
+        if not any(_product_terms_overlap(t, requested) for requested in requested_types)
+    ]
     avoided_canonical += _split_csv(intents.get("avoid_product_type"))
     avoided_types = _resolve_db_types(avoided_canonical, available_types)
 

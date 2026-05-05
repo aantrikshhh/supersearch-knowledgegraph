@@ -26,6 +26,10 @@ class RuntimeFlowRegressionTests(unittest.TestCase):
         self.assertEqual(intents["price_max"], 2000)
         self.assertEqual(intents["gender"], "female")
 
+    def test_llm_product_alias_is_canonicalized(self):
+        intents = _enrich_intents({"product_type": "bandi"}, "Bandi for Diwali men")
+        self.assertEqual(intents["product_type"], "jacket")
+
     def test_chaniya_choli_does_not_trigger_holi(self):
         intents = _enrich_intents({}, "Navratri garba chaniya choli")
         self.assertEqual(intents["event"], "Navratri")

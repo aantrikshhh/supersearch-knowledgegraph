@@ -224,7 +224,21 @@ def check_expectations(turn_summary, expect):
     return failures
 
 
-def run_scenario(scenario, skip_response_llm=False):
+def run_scenario(scenario, skip_response_llm=False, skip_core_llm=False):
+    if skip_core_llm:
+        import db_query as db_query_module
+        import intent_extractor as intent_extractor_module
+        import workflows.vacation as vacation_module
+        import conversation as conversation_module
+
+        def fail_core_llm(*_args, **_kwargs):
+            raise RuntimeError("core LLM disabled for conversation eval")
+
+        db_query_module.call_llm = fail_core_llm
+        intent_extractor_module.call_llm = fail_core_llm
+        vacation_module.call_llm = fail_core_llm
+        conversation_module.call_llm = fail_core_llm
+
     if skip_response_llm:
         import conversation as conversation_module
 
@@ -268,7 +282,7 @@ def run_scenario(scenario, skip_response_llm=False):
     }
 
 
-def run_eval(path, scenario_filter=None, skip_response_llm=False, progress=False):
+def run_eval(path, scenario_filter=None, skip_response_llm=False, skip_core_llm=False, progress=False):
     scenarios = load_json(path)
     if scenario_filter:
         wanted = set(scenario_filter)
@@ -278,7 +292,11 @@ def run_eval(path, scenario_filter=None, skip_response_llm=False, progress=False
     for idx, scenario in enumerate(scenarios, 1):
         if progress:
             print(f"[{idx}/{len(scenarios)}] {scenario['id']}", flush=True)
-        results.append(run_scenario(scenario, skip_response_llm=skip_response_llm))
+        results.append(run_scenario(
+            scenario,
+            skip_response_llm=skip_response_llm,
+            skip_core_llm=skip_core_llm,
+        ))
     passed = sum(1 for r in results if r["passed"])
     total_turns = sum(len(r["turns"]) for r in results)
     failed_turns = sum(1 for r in results for t in r["turns"] if not t["passed"])
@@ -305,6 +323,11 @@ def main():
         action="store_true",
         help="Use deterministic fallback response text to speed up flow checks.",
     )
+    parser.add_argument(
+        "--skip-core-llm",
+        action="store_true",
+        help="Force deterministic intent, SQL, vacation-plan, and response fallbacks.",
+    )
     parser.add_argument("--progress", action="store_true", help="Print scenario progress while running.")
     parser.add_argument("--out", default=None)
     args = parser.parse_args()
@@ -313,6 +336,7 @@ def main():
         args.eval,
         scenario_filter=args.scenario,
         skip_response_llm=args.skip_response_llm,
+        skip_core_llm=args.skip_core_llm,
         progress=args.progress,
     )
 

@@ -9,9 +9,17 @@
         "expect": {
           "workflow": "occasion",
           "needs_clarification": true,
-          "clarifying_contains": ["wedding context", "women, men, or kids"],
-          "intent_equals": {"occasion": "wedding", "budget": "affordable"},
-          "intent_truthy": ["_needs_religion"],
+          "clarifying_contains": [
+            "wedding context",
+            "women, men, or kids"
+          ],
+          "intent_equals": {
+            "occasion": "wedding",
+            "budget": "affordable"
+          },
+          "intent_truthy": [
+            "_needs_religion"
+          ],
           "max_primary_products": 0
         }
       },
@@ -21,13 +29,28 @@
           "workflow": "occasion",
           "needs_clarification": false,
           "is_followup": true,
-          "intent_equals": {"occasion": "wedding", "gender": "female", "budget": "affordable"},
-          "intent_absent": ["_needs_religion"],
+          "intent_equals": {
+            "occasion": "wedding",
+            "gender": "female",
+            "budget": "affordable"
+          },
+          "intent_absent": [
+            "_needs_religion"
+          ],
           "min_db_products": 1,
           "min_primary_products": 1,
-          "sql_contains": ["gender IN", "NOT"],
-          "sql_not_contains": ["LIKE '%,red,%' THEN 0"],
-          "response_not_contains": ["black accents", "red accents", "white accents"]
+          "sql_contains": [
+            "gender IN",
+            "NOT"
+          ],
+          "sql_not_contains": [
+            "LIKE '%,red,%' THEN 0"
+          ],
+          "response_not_contains": [
+            "black accents",
+            "red accents",
+            "white accents"
+          ]
         }
       }
     ]
@@ -41,8 +64,14 @@
         "user": "Affordable music festival outfit for humid Mumbai",
         "expect": {
           "needs_clarification": true,
-          "clarifying_contains": ["women, men, or kids"],
-          "intent_equals": {"budget": "affordable", "location": "Mumbai", "weather": "humid"},
+          "clarifying_contains": [
+            "women, men, or kids"
+          ],
+          "intent_equals": {
+            "budget": "affordable",
+            "location": "Mumbai",
+            "weather": "humid"
+          },
           "max_primary_products": 0
         }
       },
@@ -51,7 +80,12 @@
         "expect": {
           "needs_clarification": false,
           "is_followup": true,
-          "intent_equals": {"gender": "female", "budget": "affordable", "location": "Mumbai", "weather": "humid"},
+          "intent_equals": {
+            "gender": "female",
+            "budget": "affordable",
+            "location": "Mumbai",
+            "weather": "humid"
+          },
           "min_db_products": 1,
           "min_primary_products": 1
         }
@@ -68,9 +102,16 @@
         "expect": {
           "workflow": "gifting",
           "needs_clarification": true,
-          "clarifying_contains": ["women, men, or kids"],
-          "intent_equals": {"occasion": "baby shower", "product_type": "dress"},
-          "intent_truthy": ["_is_gift"],
+          "clarifying_contains": [
+            "women, men, or kids"
+          ],
+          "intent_equals": {
+            "occasion": "baby shower",
+            "product_type": "dress"
+          },
+          "intent_truthy": [
+            "_is_gift"
+          ],
           "max_primary_products": 0
         }
       },
@@ -80,11 +121,19 @@
           "workflow": "gifting",
           "needs_clarification": false,
           "is_followup": true,
-          "intent_equals": {"occasion": "baby shower", "gender": "female", "product_type": "dress"},
-          "intent_truthy": ["_is_gift"],
+          "intent_equals": {
+            "occasion": "baby shower",
+            "gender": "female",
+            "product_type": "dress"
+          },
+          "intent_truthy": [
+            "_is_gift"
+          ],
           "min_db_products": 1,
           "min_primary_products": 1,
-          "product_types_all": ["dress"]
+          "product_types_all": [
+            "dress"
+          ]
         }
       }
     ]
@@ -99,11 +148,19 @@
         "expect": {
           "workflow": "gifting",
           "needs_clarification": false,
-          "intent_equals": {"occasion": "baby shower", "gender": "female", "product_type": "dress"},
-          "intent_truthy": ["_is_gift"],
+          "intent_equals": {
+            "occasion": "baby shower",
+            "gender": "female",
+            "product_type": "dress"
+          },
+          "intent_truthy": [
+            "_is_gift"
+          ],
           "min_db_products": 1,
           "min_primary_products": 1,
-          "product_types_all": ["dress"]
+          "product_types_all": [
+            "dress"
+          ]
         }
       },
       {
@@ -112,11 +169,20 @@
           "workflow": "gifting",
           "needs_clarification": false,
           "is_followup": true,
-          "intent_equals": {"occasion": "baby shower", "gender": "female", "product_type": "dress", "budget": "affordable"},
-          "intent_truthy": ["_is_gift"],
+          "intent_equals": {
+            "occasion": "baby shower",
+            "gender": "female",
+            "product_type": "dress",
+            "budget": "affordable"
+          },
+          "intent_truthy": [
+            "_is_gift"
+          ],
           "min_db_products": 1,
           "min_primary_products": 1,
-          "product_types_all": ["dress"]
+          "product_types_all": [
+            "dress"
+          ]
         }
       }
     ]
@@ -131,11 +197,20 @@
         "expect": {
           "workflow": "gifting",
           "needs_clarification": false,
-          "intent_equals": {"occasion": "retirement party", "relation": "colleague", "gender": "female", "product_type": "scarf"},
-          "intent_truthy": ["_is_gift"],
+          "intent_equals": {
+            "occasion": "retirement party",
+            "relation": "colleague",
+            "gender": "female",
+            "product_type": "scarf"
+          },
+          "intent_truthy": [
+            "_is_gift"
+          ],
           "min_db_products": 1,
           "min_primary_products": 1,
-          "product_types_all": ["scarf"]
+          "product_types_all": [
+            "scarf"
+          ]
         }
       }
     ]
@@ -150,11 +225,20 @@
         "expect": {
           "workflow": "occasion",
           "needs_clarification": false,
-          "intent_equals": {"event": "Diwali", "product_type": "kurta", "gender": "female", "price_max": 2000},
+          "intent_equals": {
+            "event": "Diwali",
+            "product_type": "kurta",
+            "gender": "female",
+            "price_max": 2000
+          },
           "min_db_products": 1,
           "min_primary_products": 1,
-          "product_types_all": ["kurta"],
-          "sql_contains": ["price <="]
+          "product_types_all": [
+            "kurta"
+          ],
+          "sql_contains": [
+            "price <="
+          ]
         }
       },
       {
@@ -163,11 +247,22 @@
           "workflow": "occasion",
           "needs_clarification": false,
           "is_followup": true,
-          "intent_equals": {"event": "Diwali", "product_type": "kurta", "gender": "female", "price_max": 2000, "colour": "red"},
+          "intent_equals": {
+            "event": "Diwali",
+            "product_type": "kurta",
+            "gender": "female",
+            "price_max": 2000,
+            "colour": "red"
+          },
           "min_db_products": 1,
           "min_primary_products": 1,
-          "product_types_all": ["kurta"],
-          "sql_contains": ["price <=", "red"]
+          "product_types_all": [
+            "kurta"
+          ],
+          "sql_contains": [
+            "price <=",
+            "red"
+          ]
         }
       }
     ]
@@ -182,10 +277,17 @@
         "expect": {
           "workflow": "occasion",
           "needs_clarification": false,
-          "intent_equals": {"event": "Onam", "product_type": "saree", "gender": "female", "location": "Kerala"},
+          "intent_equals": {
+            "event": "Onam",
+            "product_type": "saree",
+            "gender": "female",
+            "location": "Kerala"
+          },
           "min_db_products": 1,
           "min_primary_products": 1,
-          "product_types_all": ["saree"]
+          "product_types_all": [
+            "saree"
+          ]
         }
       }
     ]
@@ -200,10 +302,16 @@
         "expect": {
           "workflow": "occasion",
           "needs_clarification": false,
-          "intent_equals": {"event": "Navratri", "product_type": "lehenga", "gender": "female"},
+          "intent_equals": {
+            "event": "Navratri",
+            "product_type": "lehenga",
+            "gender": "female"
+          },
           "min_db_products": 1,
           "min_primary_products": 1,
-          "product_types_all": ["lehenga"]
+          "product_types_all": [
+            "lehenga"
+          ]
         }
       }
     ]
@@ -218,11 +326,22 @@
         "expect": {
           "workflow": "place_profession",
           "needs_clarification": false,
-          "intent_equals": {"place": "office", "product_type": "kurta", "gender": "female", "weather": "summer", "price_max": 5000},
+          "intent_equals": {
+            "place": "office",
+            "product_type": "kurta",
+            "gender": "female",
+            "weather": "summer",
+            "price_max": 5000
+          },
           "min_db_products": 1,
           "min_primary_products": 1,
-          "product_types_all": ["kurta"],
-          "sql_contains": ["price <=", "gender IN"]
+          "product_types_all": [
+            "kurta"
+          ],
+          "sql_contains": [
+            "price <=",
+            "gender IN"
+          ]
         }
       }
     ]
@@ -237,11 +356,20 @@
         "expect": {
           "workflow": "place_profession",
           "needs_clarification": false,
-          "intent_equals": {"place": "museum", "product_type": "dress", "gender": "female", "weather": "rainy"},
-          "intent_contains": {"functional_needs": "waterproof"},
+          "intent_equals": {
+            "place": "museum",
+            "product_type": "dress",
+            "gender": "female",
+            "weather": "rainy"
+          },
+          "intent_contains": {
+            "functional_needs": "waterproof"
+          },
           "min_db_products": 1,
           "min_primary_products": 1,
-          "product_types_all": ["dress"]
+          "product_types_all": [
+            "dress"
+          ]
         }
       }
     ]
@@ -256,8 +384,17 @@
         "expect": {
           "workflow": "activity",
           "needs_clarification": false,
-          "intent_equals": {"activity": "hiking", "gender": "female", "weather": "summer"},
-          "intent_contains": {"functional_needs": ["breathable", "quick-dry"]},
+          "intent_equals": {
+            "activity": "hiking",
+            "gender": "female",
+            "weather": "summer"
+          },
+          "intent_contains": {
+            "functional_needs": [
+              "breathable",
+              "quick-dry"
+            ]
+          },
           "min_db_products": 1,
           "min_primary_products": 1
         }
@@ -274,7 +411,10 @@
         "expect": {
           "workflow": "health",
           "needs_clarification": false,
-          "intent_equals": {"health": "back pain", "gender": "female"},
+          "intent_equals": {
+            "health": "back pain",
+            "gender": "female"
+          },
           "min_db_products": 1,
           "min_primary_products": 1
         }
@@ -291,8 +431,14 @@
         "expect": {
           "workflow": "occasion",
           "needs_clarification": false,
-          "intent_equals": {"occasion": "office party", "gender": "female", "health": "sweating"},
-          "intent_contains": {"functional_needs": "sweat-proof"},
+          "intent_equals": {
+            "occasion": "office party",
+            "gender": "female",
+            "health": "sweating"
+          },
+          "intent_contains": {
+            "functional_needs": "sweat-proof"
+          },
           "min_db_products": 1,
           "min_primary_products": 1
         }
@@ -309,7 +455,12 @@
         "expect": {
           "workflow": "vacation",
           "needs_clarification": false,
-          "intent_equals": {"location": "Goa", "month": "December", "duration": 3, "gender": "female"},
+          "intent_equals": {
+            "location": "Goa",
+            "month": "December",
+            "duration": 3,
+            "gender": "female"
+          },
           "min_day_plans": 3,
           "min_unique_primary_products": 2
         }
@@ -326,11 +477,21 @@
         "expect": {
           "workflow": "occasion",
           "needs_clarification": false,
-          "intent_equals": {"event": "Diwali", "gender": "female", "avoid_product_type": "lehenga", "price_max": 8000},
+          "intent_equals": {
+            "event": "Diwali",
+            "gender": "female",
+            "avoid_product_type": "lehenga",
+            "price_max": 8000
+          },
           "min_db_products": 1,
           "min_primary_products": 1,
-          "product_types_none": ["lehenga"],
-          "sql_contains": ["price <=", "NOT IN"]
+          "product_types_none": [
+            "lehenga"
+          ],
+          "sql_contains": [
+            "price <=",
+            "NOT IN"
+          ]
         }
       }
     ]
@@ -345,10 +506,16 @@
         "expect": {
           "workflow": "occasion",
           "needs_clarification": false,
-          "intent_equals": {"occasion": "sangeet", "product_type": "saree", "gender": "female"},
+          "intent_equals": {
+            "occasion": "sangeet",
+            "product_type": "saree",
+            "gender": "female"
+          },
           "min_db_products": 1,
           "min_primary_products": 1,
-          "product_types_all": ["saree"]
+          "product_types_all": [
+            "saree"
+          ]
         }
       },
       {
@@ -357,10 +524,17 @@
           "workflow": "occasion",
           "needs_clarification": false,
           "is_followup": true,
-          "intent_equals": {"occasion": "sangeet", "product_type": "saree", "gender": "female", "colour": "red"},
+          "intent_equals": {
+            "occasion": "sangeet",
+            "product_type": "saree",
+            "gender": "female",
+            "colour": "red"
+          },
           "min_db_products": 1,
           "min_primary_products": 1,
-          "product_types_all": ["saree"]
+          "product_types_all": [
+            "saree"
+          ]
         }
       },
       {
@@ -369,11 +543,20 @@
           "workflow": "occasion",
           "needs_clarification": false,
           "is_followup": false,
-          "intent_equals": {"event": "Diwali", "product_type": "kurta", "gender": "female", "price_max": 2000},
-          "intent_not_equals": {"occasion": "sangeet"},
+          "intent_equals": {
+            "event": "Diwali",
+            "product_type": "kurta",
+            "gender": "female",
+            "price_max": 2000
+          },
+          "intent_not_equals": {
+            "occasion": "sangeet"
+          },
           "min_db_products": 1,
           "min_primary_products": 1,
-          "product_types_all": ["kurta"]
+          "product_types_all": [
+            "kurta"
+          ]
         }
       }
     ]
@@ -388,10 +571,17 @@
         "expect": {
           "workflow": "occasion",
           "needs_clarification": false,
-          "intent_equals": {"occasion": "mehendi", "product_type": "lehenga", "gender": "female", "price_max": 10000},
+          "intent_equals": {
+            "occasion": "mehendi",
+            "product_type": "lehenga",
+            "gender": "female",
+            "price_max": 10000
+          },
           "min_db_products": 1,
           "min_primary_products": 1,
-          "product_types_all": ["lehenga"]
+          "product_types_all": [
+            "lehenga"
+          ]
         }
       },
       {
@@ -400,11 +590,22 @@
           "workflow": "occasion",
           "needs_clarification": false,
           "is_followup": true,
-          "intent_equals": {"occasion": "mehendi", "product_type": "saree", "gender": "female", "price_max": 10000, "colour": "green"},
+          "intent_equals": {
+            "occasion": "mehendi",
+            "product_type": "saree",
+            "gender": "female",
+            "price_max": 10000,
+            "colour": "green"
+          },
           "min_db_products": 1,
           "min_primary_products": 1,
-          "product_types_all": ["saree"],
-          "sql_contains": ["price <=", "green"]
+          "product_types_all": [
+            "saree"
+          ],
+          "sql_contains": [
+            "price <=",
+            "green"
+          ]
         }
       }
     ]
@@ -419,12 +620,20 @@
         "expect": {
           "workflow": "occasion",
           "needs_clarification": false,
-          "intent_equals": {"event": "Diwali", "product_type": "kurta", "gender": "female"},
+          "intent_equals": {
+            "event": "Diwali",
+            "product_type": "kurta",
+            "gender": "female"
+          },
           "min_db_products": 1,
           "min_primary_products": 1,
           "min_suggested_followups": 1,
-          "suggested_contains": ["budget"],
-          "product_types_all": ["kurta"]
+          "suggested_contains": [
+            "budget"
+          ],
+          "product_types_all": [
+            "kurta"
+          ]
         }
       }
     ]
@@ -439,10 +648,16 @@
         "expect": {
           "workflow": "place_profession",
           "needs_clarification": false,
-          "intent_equals": {"place": "beach", "product_type": "kaftan", "gender": "female"},
+          "intent_equals": {
+            "place": "beach",
+            "product_type": "kaftan",
+            "gender": "female"
+          },
           "min_db_products": 1,
           "min_primary_products": 1,
-          "product_types_all": ["kaftan"]
+          "product_types_all": [
+            "kaftan"
+          ]
         }
       }
     ]
@@ -457,11 +672,19 @@
         "expect": {
           "workflow": "occasion",
           "needs_clarification": false,
-          "intent_equals": {"event": "Diwali", "product_type": "kurta", "gender": "male"},
+          "intent_equals": {
+            "event": "Diwali",
+            "product_type": "kurta",
+            "gender": "male"
+          },
           "min_db_products": 1,
           "min_primary_products": 1,
-          "product_types_all": ["kurta"],
-          "sql_contains": ["gender IN"]
+          "product_types_all": [
+            "kurta"
+          ],
+          "sql_contains": [
+            "gender IN"
+          ]
         }
       }
     ]
@@ -476,10 +699,16 @@
         "expect": {
           "workflow": "occasion",
           "needs_clarification": false,
-          "intent_equals": {"event": "Diwali", "product_type": "coord", "gender": "female"},
+          "intent_equals": {
+            "event": "Diwali",
+            "product_type": "coord",
+            "gender": "female"
+          },
           "min_db_products": 1,
           "min_primary_products": 1,
-          "product_types_all": ["coord"]
+          "product_types_all": [
+            "coord"
+          ]
         }
       }
     ]
@@ -494,11 +723,20 @@
         "expect": {
           "workflow": "occasion",
           "needs_clarification": false,
-          "intent_equals": {"occasion": "sangeet", "product_type": "lehenga", "gender": "female", "budget": "luxury"},
+          "intent_equals": {
+            "occasion": "sangeet",
+            "product_type": "lehenga",
+            "gender": "female",
+            "budget": "luxury"
+          },
           "min_db_products": 1,
           "min_primary_products": 1,
-          "product_types_all": ["lehenga"],
-          "sql_contains": ["price DESC"]
+          "product_types_all": [
+            "lehenga"
+          ],
+          "sql_contains": [
+            "price DESC"
+          ]
         }
       }
     ]
@@ -513,12 +751,25 @@
         "expect": {
           "workflow": "occasion",
           "needs_clarification": false,
-          "intent_equals": {"religion": "Hinduism", "product_type": "sherwani", "gender": "male"},
-          "intent_one_of": {"occasion": ["wedding", "hindu wedding"]},
+          "intent_equals": {
+            "religion": "Hinduism",
+            "product_type": "sherwani",
+            "gender": "male"
+          },
+          "intent_one_of": {
+            "occasion": [
+              "wedding",
+              "hindu wedding"
+            ]
+          },
           "min_db_products": 1,
           "min_primary_products": 1,
-          "product_types_all": ["sherwani"],
-          "sql_contains": ["LOWER(title) LIKE"]
+          "product_types_all": [
+            "sherwani"
+          ],
+          "sql_contains": [
+            "LOWER(title) LIKE"
+          ]
         }
       }
     ]
@@ -533,11 +784,20 @@
         "expect": {
           "workflow": "occasion",
           "needs_clarification": false,
-          "intent_equals": {"occasion": "haldi", "product_type": "salwar", "gender": "female", "price_max": 500},
+          "intent_equals": {
+            "occasion": "haldi",
+            "product_type": "salwar",
+            "gender": "female",
+            "price_max": 500
+          },
           "min_db_products": 1,
           "min_primary_products": 1,
-          "product_types_all": ["salwar"],
-          "sql_contains": ["price <="]
+          "product_types_all": [
+            "salwar"
+          ],
+          "sql_contains": [
+            "price <="
+          ]
         }
       }
     ]
@@ -552,11 +812,21 @@
         "expect": {
           "workflow": "occasion",
           "needs_clarification": false,
-          "intent_equals": {"event": "Diwali", "agegroup": "child", "gender": "female", "product_type": "lehenga"},
+          "intent_equals": {
+            "event": "Diwali",
+            "agegroup": "child",
+            "gender": "female",
+            "product_type": "lehenga"
+          },
           "min_db_products": 1,
           "min_primary_products": 1,
-          "product_types_all": ["lehenga"],
-          "sql_contains": ["kidswear", "LOWER(title) LIKE"]
+          "product_types_all": [
+            "lehenga"
+          ],
+          "sql_contains": [
+            "kidswear",
+            "LOWER(title) LIKE"
+          ]
         }
       }
     ]
@@ -571,11 +841,21 @@
         "expect": {
           "workflow": "occasion",
           "needs_clarification": false,
-          "intent_equals": {"occasion": "date night", "bodytype": "plus size", "product_type": "dress", "gender": "female", "colour": "black"},
+          "intent_equals": {
+            "occasion": "date night",
+            "bodytype": "plus size",
+            "product_type": "dress",
+            "gender": "female",
+            "colour": "black"
+          },
           "min_db_products": 1,
           "min_primary_products": 1,
-          "product_types_all": ["dress"],
-          "sql_contains": ["black"]
+          "product_types_all": [
+            "dress"
+          ],
+          "sql_contains": [
+            "black"
+          ]
         }
       }
     ]
@@ -590,10 +870,16 @@
         "expect": {
           "workflow": "occasion",
           "needs_clarification": false,
-          "intent_equals": {"occasion": "sangeet", "product_type": "sherwani", "gender": "male"},
+          "intent_equals": {
+            "occasion": "sangeet",
+            "product_type": "sherwani",
+            "gender": "male"
+          },
           "min_db_products": 1,
           "min_primary_products": 1,
-          "product_types_all": ["sherwani"]
+          "product_types_all": [
+            "sherwani"
+          ]
         }
       }
     ]
@@ -608,12 +894,24 @@
         "expect": {
           "workflow": "gifting",
           "needs_clarification": false,
-          "intent_equals": {"event": "Eid", "relation": "mom", "gender": "female", "product_type": "kaftan", "price_max": 20000},
-          "intent_truthy": ["_is_gift"],
+          "intent_equals": {
+            "event": "Eid",
+            "relation": "mom",
+            "gender": "female",
+            "product_type": "kaftan",
+            "price_max": 20000
+          },
+          "intent_truthy": [
+            "_is_gift"
+          ],
           "min_db_products": 1,
           "min_primary_products": 1,
-          "product_types_all": ["kaftan"],
-          "sql_contains": ["price <="]
+          "product_types_all": [
+            "kaftan"
+          ],
+          "sql_contains": [
+            "price <="
+          ]
         }
       }
     ]
@@ -628,10 +926,16 @@
         "expect": {
           "workflow": "occasion",
           "needs_clarification": false,
-          "intent_equals": {"occasion": "gala", "product_type": "dress", "gender": "female"},
+          "intent_equals": {
+            "occasion": "gala",
+            "product_type": "dress",
+            "gender": "female"
+          },
           "min_db_products": 1,
           "min_primary_products": 1,
-          "product_types_all": ["dress"]
+          "product_types_all": [
+            "dress"
+          ]
         }
       }
     ]
@@ -646,9 +950,16 @@
         "expect": {
           "workflow": "occasion",
           "needs_clarification": true,
-          "clarifying_contains": ["wedding context"],
-          "intent_equals": {"occasion": "wedding", "product_type": "saree"},
-          "intent_truthy": ["_needs_religion"],
+          "clarifying_contains": [
+            "wedding context"
+          ],
+          "intent_equals": {
+            "occasion": "wedding",
+            "product_type": "saree"
+          },
+          "intent_truthy": [
+            "_needs_religion"
+          ],
           "max_primary_products": 0
         }
       },
@@ -658,11 +969,19 @@
           "workflow": "occasion",
           "needs_clarification": false,
           "is_followup": true,
-          "intent_equals": {"occasion": "wedding", "product_type": "saree", "religion": "Sikhism"},
-          "intent_absent": ["_needs_religion"],
+          "intent_equals": {
+            "occasion": "wedding",
+            "product_type": "saree",
+            "religion": "Sikhism"
+          },
+          "intent_absent": [
+            "_needs_religion"
+          ],
           "min_db_products": 1,
           "min_primary_products": 1,
-          "product_types_all": ["saree"]
+          "product_types_all": [
+            "saree"
+          ]
         }
       }
     ]
@@ -677,10 +996,16 @@
         "expect": {
           "workflow": "occasion",
           "needs_clarification": false,
-          "intent_equals": {"occasion": "sangeet", "product_type": "lehenga", "gender": "female"},
+          "intent_equals": {
+            "occasion": "sangeet",
+            "product_type": "lehenga",
+            "gender": "female"
+          },
           "min_db_products": 1,
           "min_primary_products": 1,
-          "product_types_all": ["lehenga"]
+          "product_types_all": [
+            "lehenga"
+          ]
         }
       },
       {
@@ -689,11 +1014,20 @@
           "workflow": "occasion",
           "needs_clarification": false,
           "is_followup": true,
-          "intent_equals": {"occasion": "sangeet", "product_type": "saree", "gender": "female", "avoid_product_type": "lehenga"},
+          "intent_equals": {
+            "occasion": "sangeet",
+            "product_type": "saree",
+            "gender": "female",
+            "avoid_product_type": "lehenga"
+          },
           "min_db_products": 1,
           "min_primary_products": 1,
-          "product_types_all": ["saree"],
-          "product_types_none": ["lehenga"]
+          "product_types_all": [
+            "saree"
+          ],
+          "product_types_none": [
+            "lehenga"
+          ]
         }
       }
     ]
@@ -708,10 +1042,16 @@
         "expect": {
           "workflow": "occasion",
           "needs_clarification": false,
-          "intent_equals": {"event": "Diwali", "product_type": "saree", "gender": "female"},
+          "intent_equals": {
+            "event": "Diwali",
+            "product_type": "saree",
+            "gender": "female"
+          },
           "min_db_products": 1,
           "min_primary_products": 1,
-          "product_types_all": ["saree"]
+          "product_types_all": [
+            "saree"
+          ]
         }
       },
       {
@@ -720,11 +1060,20 @@
           "workflow": "occasion",
           "needs_clarification": false,
           "is_followup": true,
-          "intent_equals": {"event": "Diwali", "product_type": "saree", "gender": "female", "price_max": 5000},
+          "intent_equals": {
+            "event": "Diwali",
+            "product_type": "saree",
+            "gender": "female",
+            "price_max": 5000
+          },
           "min_db_products": 1,
           "min_primary_products": 1,
-          "product_types_all": ["saree"],
-          "sql_contains": ["price <="]
+          "product_types_all": [
+            "saree"
+          ],
+          "sql_contains": [
+            "price <="
+          ]
         }
       }
     ]
@@ -739,10 +1088,16 @@
         "expect": {
           "workflow": "place_profession",
           "needs_clarification": false,
-          "intent_equals": {"place": "office", "product_type": "kurta", "gender": "female"},
+          "intent_equals": {
+            "place": "office",
+            "product_type": "kurta",
+            "gender": "female"
+          },
           "min_db_products": 1,
           "min_primary_products": 1,
-          "product_types_all": ["kurta"]
+          "product_types_all": [
+            "kurta"
+          ]
         }
       },
       {
@@ -751,10 +1106,17 @@
           "workflow": "place_profession",
           "needs_clarification": false,
           "is_followup": true,
-          "intent_equals": {"place": "office", "product_type": "kurta", "gender": "female", "weather": "rainy"},
+          "intent_equals": {
+            "place": "office",
+            "product_type": "kurta",
+            "gender": "female",
+            "weather": "rainy"
+          },
           "min_db_products": 1,
           "min_primary_products": 1,
-          "product_types_all": ["kurta"]
+          "product_types_all": [
+            "kurta"
+          ]
         }
       }
     ]
@@ -769,9 +1131,17 @@
         "expect": {
           "workflow": "gifting",
           "needs_clarification": true,
-          "clarifying_contains": ["women, men, or kids"],
-          "intent_equals": {"occasion": "birthday party", "relation": "colleague", "product_type": "kurta"},
-          "intent_truthy": ["_is_gift"],
+          "clarifying_contains": [
+            "women, men, or kids"
+          ],
+          "intent_equals": {
+            "occasion": "birthday party",
+            "relation": "colleague",
+            "product_type": "kurta"
+          },
+          "intent_truthy": [
+            "_is_gift"
+          ],
           "max_primary_products": 0
         }
       },
@@ -781,11 +1151,20 @@
           "workflow": "gifting",
           "needs_clarification": false,
           "is_followup": true,
-          "intent_equals": {"occasion": "birthday party", "relation": "colleague", "product_type": "kurta", "gender": "male"},
-          "intent_truthy": ["_is_gift"],
+          "intent_equals": {
+            "occasion": "birthday party",
+            "relation": "colleague",
+            "product_type": "kurta",
+            "gender": "male"
+          },
+          "intent_truthy": [
+            "_is_gift"
+          ],
           "min_db_products": 1,
           "min_primary_products": 1,
-          "product_types_all": ["kurta"]
+          "product_types_all": [
+            "kurta"
+          ]
         }
       }
     ]
@@ -800,12 +1179,23 @@
         "expect": {
           "workflow": "occasion",
           "needs_clarification": false,
-          "intent_equals": {"event": "Diwali", "agegroup": "child", "product_type": "kurta"},
-          "intent_absent": ["gender"],
+          "intent_equals": {
+            "event": "Diwali",
+            "agegroup": "child",
+            "product_type": "kurta"
+          },
+          "intent_absent": [
+            "gender"
+          ],
           "min_db_products": 1,
           "min_primary_products": 1,
-          "product_types_all": ["kurta"],
-          "sql_contains": ["kidswear", "LOWER(title) LIKE"]
+          "product_types_all": [
+            "kurta"
+          ],
+          "sql_contains": [
+            "kidswear",
+            "LOWER(title) LIKE"
+          ]
         }
       }
     ]
@@ -820,11 +1210,20 @@
         "expect": {
           "workflow": "place_profession",
           "needs_clarification": false,
-          "intent_equals": {"place": "airport", "activity": "traveling", "product_type": "coord", "gender": "female"},
-          "intent_contains": {"functional_needs": "travel-friendly"},
+          "intent_equals": {
+            "place": "airport",
+            "activity": "traveling",
+            "product_type": "coord",
+            "gender": "female"
+          },
+          "intent_contains": {
+            "functional_needs": "travel-friendly"
+          },
           "min_db_products": 1,
           "min_primary_products": 1,
-          "product_types_all": ["coord"]
+          "product_types_all": [
+            "coord"
+          ]
         }
       }
     ]
@@ -839,10 +1238,17 @@
         "expect": {
           "workflow": "place_profession",
           "needs_clarification": false,
-          "intent_equals": {"place": "temple", "style_goals": "modest", "product_type": "saree", "gender": "female"},
+          "intent_equals": {
+            "place": "temple",
+            "style_goals": "modest",
+            "product_type": "saree",
+            "gender": "female"
+          },
           "min_db_products": 1,
           "min_primary_products": 1,
-          "product_types_all": ["saree"]
+          "product_types_all": [
+            "saree"
+          ]
         }
       }
     ]
@@ -857,10 +1263,17 @@
         "expect": {
           "workflow": "place_profession",
           "needs_clarification": false,
-          "intent_equals": {"place": "office", "profession": "lawyer", "product_type": "jacket", "gender": "male"},
+          "intent_equals": {
+            "place": "office",
+            "profession": "lawyer",
+            "product_type": "jacket",
+            "gender": "male"
+          },
           "min_db_products": 1,
           "min_primary_products": 1,
-          "product_types_all": ["jacket"]
+          "product_types_all": [
+            "jacket"
+          ]
         }
       }
     ]
@@ -875,10 +1288,16 @@
         "expect": {
           "workflow": "health",
           "needs_clarification": false,
-          "intent_equals": {"health": "sensitive skin", "product_type": "kurta", "gender": "female"},
+          "intent_equals": {
+            "health": "sensitive skin",
+            "product_type": "kurta",
+            "gender": "female"
+          },
           "min_db_products": 1,
           "min_primary_products": 1,
-          "product_types_all": ["kurta"]
+          "product_types_all": [
+            "kurta"
+          ]
         }
       }
     ]
@@ -893,7 +1312,11 @@
         "expect": {
           "workflow": "activity",
           "needs_clarification": false,
-          "intent_equals": {"activity": "yoga", "health": "back pain", "gender": "female"},
+          "intent_equals": {
+            "activity": "yoga",
+            "health": "back pain",
+            "gender": "female"
+          },
           "min_db_products": 1,
           "min_primary_products": 1
         }
@@ -910,12 +1333,24 @@
         "expect": {
           "workflow": "occasion",
           "needs_clarification": false,
-          "intent_equals": {"occasion": "wedding", "product_type": "saree", "gender": "female", "price_min": 50000, "budget": "premium"},
-          "intent_absent": ["_needs_religion"],
+          "intent_equals": {
+            "occasion": "wedding",
+            "product_type": "saree",
+            "gender": "female",
+            "price_min": 50000,
+            "budget": "premium"
+          },
+          "intent_absent": [
+            "_needs_religion"
+          ],
           "min_db_products": 1,
           "min_primary_products": 1,
-          "product_types_all": ["saree"],
-          "sql_contains": ["price >="]
+          "product_types_all": [
+            "saree"
+          ],
+          "sql_contains": [
+            "price >="
+          ]
         }
       }
     ]
@@ -930,8 +1365,14 @@
         "expect": {
           "workflow": "occasion",
           "needs_clarification": false,
-          "intent_equals": {"occasion": "bachelorette", "relation": "friend", "gender": "female"},
-          "intent_absent": ["_is_gift"],
+          "intent_equals": {
+            "occasion": "bachelorette",
+            "relation": "friend",
+            "gender": "female"
+          },
+          "intent_absent": [
+            "_is_gift"
+          ],
           "min_db_products": 1,
           "min_primary_products": 1
         }
@@ -948,10 +1389,17 @@
         "expect": {
           "workflow": "occasion",
           "needs_clarification": false,
-          "intent_equals": {"event": "Diwali", "product_type": "saree", "gender": "female", "colour": "green"},
+          "intent_equals": {
+            "event": "Diwali",
+            "product_type": "saree",
+            "gender": "female",
+            "colour": "green"
+          },
           "min_db_products": 1,
           "min_primary_products": 1,
-          "product_types_all": ["saree"]
+          "product_types_all": [
+            "saree"
+          ]
         }
       },
       {
@@ -960,11 +1408,20 @@
           "workflow": "occasion",
           "needs_clarification": false,
           "is_followup": true,
-          "intent_equals": {"event": "Diwali", "product_type": "saree", "gender": "female", "colour": "blue"},
+          "intent_equals": {
+            "event": "Diwali",
+            "product_type": "saree",
+            "gender": "female",
+            "colour": "blue"
+          },
           "min_db_products": 1,
           "min_primary_products": 1,
-          "product_types_all": ["saree"],
-          "sql_contains": ["blue"]
+          "product_types_all": [
+            "saree"
+          ],
+          "sql_contains": [
+            "blue"
+          ]
         }
       }
     ]
@@ -979,11 +1436,22 @@
         "expect": {
           "workflow": "place_profession",
           "needs_clarification": false,
-          "intent_equals": {"place": "office", "location": "Mumbai", "weather": "rainy", "product_type": "dress", "gender": "female", "price_max": 10000},
+          "intent_equals": {
+            "place": "office",
+            "location": "Mumbai",
+            "weather": "rainy",
+            "product_type": "dress",
+            "gender": "female",
+            "price_max": 10000
+          },
           "min_db_products": 1,
           "min_primary_products": 1,
-          "product_types_all": ["dress"],
-          "sql_contains": ["price <="]
+          "product_types_all": [
+            "dress"
+          ],
+          "sql_contains": [
+            "price <="
+          ]
         }
       }
     ]
@@ -998,11 +1466,20 @@
         "expect": {
           "workflow": "place_profession",
           "needs_clarification": false,
-          "intent_equals": {"place": "airport", "weather": "winter", "product_type": "jacket", "gender": "male"},
-          "intent_contains": {"functional_needs": "warm"},
+          "intent_equals": {
+            "place": "airport",
+            "weather": "winter",
+            "product_type": "jacket",
+            "gender": "male"
+          },
+          "intent_contains": {
+            "functional_needs": "warm"
+          },
           "min_db_products": 1,
           "min_primary_products": 1,
-          "product_types_all": ["jacket"]
+          "product_types_all": [
+            "jacket"
+          ]
         }
       }
     ]
@@ -1017,11 +1494,20 @@
         "expect": {
           "workflow": "occasion",
           "needs_clarification": false,
-          "intent_equals": {"event": "Onam", "product_type": "kurta", "avoid_product_type": "saree", "gender": "female"},
+          "intent_equals": {
+            "event": "Onam",
+            "product_type": "kurta",
+            "avoid_product_type": "saree",
+            "gender": "female"
+          },
           "min_db_products": 1,
           "min_primary_products": 1,
-          "product_types_all": ["kurta"],
-          "product_types_none": ["saree"]
+          "product_types_all": [
+            "kurta"
+          ],
+          "product_types_none": [
+            "saree"
+          ]
         }
       }
     ]
@@ -1036,11 +1522,19 @@
         "expect": {
           "workflow": "occasion",
           "needs_clarification": false,
-          "intent_equals": {"occasion": "haldi", "product_type": "kurta", "gender": "female"},
-          "intent_contains": {"functional_needs": "haldi-proof"},
+          "intent_equals": {
+            "occasion": "haldi",
+            "product_type": "kurta",
+            "gender": "female"
+          },
+          "intent_contains": {
+            "functional_needs": "haldi-proof"
+          },
           "min_db_products": 1,
           "min_primary_products": 1,
-          "product_types_all": ["kurta"]
+          "product_types_all": [
+            "kurta"
+          ]
         }
       }
     ]
@@ -1055,12 +1549,23 @@
         "expect": {
           "workflow": "occasion",
           "needs_clarification": false,
-          "intent_equals": {"occasion": "sangeet", "product_type": "lehenga", "gender": "female", "price_max": 30000},
-          "intent_contains": {"functional_needs": "dance-friendly"},
+          "intent_equals": {
+            "occasion": "sangeet",
+            "product_type": "lehenga",
+            "gender": "female",
+            "price_max": 30000
+          },
+          "intent_contains": {
+            "functional_needs": "dance-friendly"
+          },
           "min_db_products": 1,
           "min_primary_products": 1,
-          "product_types_all": ["lehenga"],
-          "sql_contains": ["price <="]
+          "product_types_all": [
+            "lehenga"
+          ],
+          "sql_contains": [
+            "price <="
+          ]
         }
       }
     ]
@@ -1075,12 +1580,23 @@
         "expect": {
           "workflow": "occasion",
           "needs_clarification": false,
-          "intent_equals": {"occasion": "wedding", "product_type": "saree", "gender": "female"},
-          "intent_absent": ["_needs_religion"],
+          "intent_equals": {
+            "occasion": "wedding",
+            "product_type": "saree",
+            "gender": "female"
+          },
+          "intent_absent": [
+            "_needs_religion"
+          ],
           "min_db_products": 1,
           "min_primary_products": 1,
-          "product_types_all": ["saree"],
-          "sql_contains": ["NOT", "red"]
+          "product_types_all": [
+            "saree"
+          ],
+          "sql_contains": [
+            "NOT",
+            "red"
+          ]
         }
       }
     ]
@@ -1095,12 +1611,25 @@
         "expect": {
           "workflow": "occasion",
           "needs_clarification": false,
-          "intent_equals": {"religion": "Christianity", "product_type": "dress", "gender": "female"},
-          "intent_one_of": {"occasion": ["wedding", "christian wedding"]},
-          "intent_absent": ["_needs_religion"],
+          "intent_equals": {
+            "religion": "Christianity",
+            "product_type": "dress",
+            "gender": "female"
+          },
+          "intent_one_of": {
+            "occasion": [
+              "wedding",
+              "christian wedding"
+            ]
+          },
+          "intent_absent": [
+            "_needs_religion"
+          ],
           "min_db_products": 1,
           "min_primary_products": 1,
-          "product_types_all": ["dress"]
+          "product_types_all": [
+            "dress"
+          ]
         }
       }
     ]
@@ -1115,12 +1644,25 @@
         "expect": {
           "workflow": "occasion",
           "needs_clarification": false,
-          "intent_equals": {"religion": "Islam", "product_type": "salwar", "gender": "female"},
-          "intent_one_of": {"occasion": ["wedding", "muslim wedding"]},
-          "intent_absent": ["_needs_religion"],
+          "intent_equals": {
+            "religion": "Islam",
+            "product_type": "salwar",
+            "gender": "female"
+          },
+          "intent_one_of": {
+            "occasion": [
+              "wedding",
+              "muslim wedding"
+            ]
+          },
+          "intent_absent": [
+            "_needs_religion"
+          ],
           "min_db_products": 1,
           "min_primary_products": 1,
-          "product_types_all": ["salwar"]
+          "product_types_all": [
+            "salwar"
+          ]
         }
       }
     ]
@@ -1135,10 +1677,17 @@
         "expect": {
           "workflow": "occasion",
           "needs_clarification": false,
-          "intent_equals": {"occasion": "engagement", "bodytype": "petite", "product_type": "lehenga", "gender": "female"},
+          "intent_equals": {
+            "occasion": "engagement",
+            "bodytype": "petite",
+            "product_type": "lehenga",
+            "gender": "female"
+          },
           "min_db_products": 1,
           "min_primary_products": 1,
-          "product_types_all": ["lehenga"]
+          "product_types_all": [
+            "lehenga"
+          ]
         }
       }
     ]
@@ -1153,10 +1702,16 @@
         "expect": {
           "workflow": "occasion",
           "needs_clarification": false,
-          "intent_equals": {"event": "Diwali", "product_type": "kurta", "gender": "female"},
+          "intent_equals": {
+            "event": "Diwali",
+            "product_type": "kurta",
+            "gender": "female"
+          },
           "min_db_products": 1,
           "min_primary_products": 1,
-          "product_types_all": ["kurta"]
+          "product_types_all": [
+            "kurta"
+          ]
         }
       },
       {
@@ -1165,10 +1720,3284 @@
           "workflow": "occasion",
           "needs_clarification": false,
           "is_followup": true,
-          "intent_equals": {"event": "Diwali", "product_type": "kurta", "gender": "female"},
+          "intent_equals": {
+            "event": "Diwali",
+            "product_type": "kurta",
+            "gender": "female"
+          },
           "min_db_products": 1,
           "min_primary_products": 1,
-          "product_types_all": ["kurta"]
+          "product_types_all": [
+            "kurta"
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "id": "market_masaba_mehendi_fusion_set_women",
+    "brand": "masaba",
+    "description": "Market-researched workflow coverage case.",
+    "turns": [
+      {
+        "user": "Mehendi fusion set women",
+        "expect": {
+          "workflow": "occasion",
+          "needs_clarification": false,
+          "intent_equals": {
+            "occasion": "mehendi",
+            "product_type": "coord",
+            "gender": "female"
+          },
+          "min_db_products": 1,
+          "min_primary_products": 1,
+          "product_types_all": [
+            "coord"
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "id": "market_masaba_haldi_kaftan_women",
+    "brand": "masaba",
+    "description": "Market-researched workflow coverage case.",
+    "turns": [
+      {
+        "user": "Haldi kaftan women",
+        "expect": {
+          "workflow": "occasion",
+          "needs_clarification": false,
+          "intent_equals": {
+            "occasion": "haldi",
+            "product_type": "kaftan",
+            "gender": "female"
+          },
+          "min_db_products": 1,
+          "min_primary_products": 1,
+          "product_types_all": [
+            "kaftan"
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "id": "market_masaba_sangeet_saree_women",
+    "brand": "masaba",
+    "description": "Market-researched workflow coverage case.",
+    "turns": [
+      {
+        "user": "Sangeet saree women",
+        "expect": {
+          "workflow": "occasion",
+          "needs_clarification": false,
+          "intent_equals": {
+            "occasion": "sangeet",
+            "product_type": "saree",
+            "gender": "female"
+          },
+          "min_db_products": 1,
+          "min_primary_products": 1,
+          "product_types_all": [
+            "saree"
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "id": "market_masaba_roka_kurta_set_women",
+    "brand": "masaba",
+    "description": "Market-researched workflow coverage case.",
+    "turns": [
+      {
+        "user": "Roka kurta set women",
+        "expect": {
+          "workflow": "occasion",
+          "needs_clarification": false,
+          "intent_equals": {
+            "occasion": "roka",
+            "product_type": "kurta",
+            "gender": "female"
+          },
+          "min_db_products": 1,
+          "min_primary_products": 1,
+          "product_types_all": [
+            "kurta"
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "id": "market_masaba_diwali_bandi_men",
+    "brand": "masaba",
+    "description": "Market-researched workflow coverage case.",
+    "turns": [
+      {
+        "user": "Diwali bandi men",
+        "expect": {
+          "workflow": "occasion",
+          "needs_clarification": false,
+          "intent_equals": {
+            "event": "Diwali",
+            "product_type": "jacket",
+            "gender": "male"
+          },
+          "min_db_products": 1,
+          "min_primary_products": 1,
+          "product_types_all": [
+            "jacket"
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "id": "market_masaba_wedding_sherwani_set_groom_men",
+    "brand": "masaba",
+    "description": "Market-researched workflow coverage case.",
+    "turns": [
+      {
+        "user": "General wedding sherwani set groom men",
+        "expect": {
+          "workflow": "occasion",
+          "needs_clarification": false,
+          "intent_equals": {
+            "occasion": "wedding",
+            "product_type": "sherwani",
+            "gender": "male"
+          },
+          "min_db_products": 1,
+          "min_primary_products": 1,
+          "product_types_all": [
+            "sherwani"
+          ],
+          "intent_absent": [
+            "_needs_religion"
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "id": "market_masaba_birthday_party_dress_women",
+    "brand": "masaba",
+    "description": "Market-researched workflow coverage case.",
+    "turns": [
+      {
+        "user": "Birthday party dress women",
+        "expect": {
+          "workflow": "occasion",
+          "needs_clarification": false,
+          "intent_equals": {
+            "occasion": "birthday party",
+            "product_type": "dress",
+            "gender": "female"
+          },
+          "min_db_products": 1,
+          "min_primary_products": 1,
+          "product_types_all": [
+            "dress"
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "id": "market_masaba_anniversary_premium_saree_women",
+    "brand": "masaba",
+    "description": "Market-researched workflow coverage case.",
+    "turns": [
+      {
+        "user": "Anniversary premium saree women",
+        "expect": {
+          "workflow": "occasion",
+          "needs_clarification": false,
+          "intent_equals": {
+            "occasion": "anniversary",
+            "product_type": "saree",
+            "gender": "female",
+            "budget": "premium"
+          },
+          "min_db_products": 1,
+          "min_primary_products": 1,
+          "product_types_all": [
+            "saree"
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "id": "market_masaba_cocktail_gown_women",
+    "brand": "masaba",
+    "description": "Market-researched workflow coverage case.",
+    "turns": [
+      {
+        "user": "Cocktail gown women",
+        "expect": {
+          "workflow": "occasion",
+          "needs_clarification": false,
+          "intent_equals": {
+            "occasion": "gala",
+            "product_type": "dress",
+            "gender": "female"
+          },
+          "min_db_products": 1,
+          "min_primary_products": 1,
+          "product_types_all": [
+            "dress"
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "id": "market_masaba_brunch_coord_set_women",
+    "brand": "masaba",
+    "description": "Market-researched workflow coverage case.",
+    "turns": [
+      {
+        "user": "Brunch coord set women",
+        "expect": {
+          "workflow": "occasion",
+          "needs_clarification": false,
+          "intent_equals": {
+            "occasion": "date night",
+            "product_type": "coord",
+            "gender": "female"
+          },
+          "min_db_products": 1,
+          "min_primary_products": 1,
+          "product_types_all": [
+            "coord"
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "id": "market_masaba_beach_dress_women",
+    "brand": "masaba",
+    "description": "Market-researched workflow coverage case.",
+    "turns": [
+      {
+        "user": "Beach dress women",
+        "expect": {
+          "workflow": "place_profession",
+          "needs_clarification": false,
+          "intent_equals": {
+            "place": "beach",
+            "product_type": "dress",
+            "gender": "female"
+          },
+          "min_db_products": 1,
+          "min_primary_products": 1,
+          "product_types_all": [
+            "dress"
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "id": "market_masaba_temple_kurta_women",
+    "brand": "masaba",
+    "description": "Market-researched workflow coverage case.",
+    "turns": [
+      {
+        "user": "Temple kurta women",
+        "expect": {
+          "workflow": "place_profession",
+          "needs_clarification": false,
+          "intent_equals": {
+            "place": "temple",
+            "product_type": "kurta",
+            "gender": "female"
+          },
+          "min_db_products": 1,
+          "min_primary_products": 1,
+          "product_types_all": [
+            "kurta"
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "id": "market_masaba_housewarming_fusion_set_women",
+    "brand": "masaba",
+    "description": "Market-researched workflow coverage case.",
+    "turns": [
+      {
+        "user": "Housewarming fusion set women",
+        "expect": {
+          "workflow": "occasion",
+          "needs_clarification": false,
+          "intent_equals": {
+            "occasion": "housewarming",
+            "product_type": "coord",
+            "gender": "female"
+          },
+          "intent_contains": {
+            "functional_needs": "warm"
+          },
+          "min_db_products": 1,
+          "min_primary_products": 1,
+          "product_types_all": [
+            "coord"
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "id": "market_masaba_bachelorette_party_dress_women",
+    "brand": "masaba",
+    "description": "Market-researched workflow coverage case.",
+    "turns": [
+      {
+        "user": "Bachelorette party dress women",
+        "expect": {
+          "workflow": "occasion",
+          "needs_clarification": false,
+          "intent_equals": {
+            "occasion": "bachelorette",
+            "product_type": "dress",
+            "gender": "female"
+          },
+          "min_db_products": 1,
+          "min_primary_products": 1,
+          "product_types_all": [
+            "dress"
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "id": "market_masaba_navratri_lehenga_women",
+    "brand": "masaba",
+    "description": "Market-researched workflow coverage case.",
+    "turns": [
+      {
+        "user": "Navratri lehenga women",
+        "expect": {
+          "workflow": "occasion",
+          "needs_clarification": false,
+          "intent_equals": {
+            "event": "Navratri",
+            "product_type": "lehenga",
+            "gender": "female"
+          },
+          "min_db_products": 1,
+          "min_primary_products": 1,
+          "product_types_all": [
+            "lehenga"
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "id": "market_masaba_ganesh_chaturthi_kurta_women",
+    "brand": "masaba",
+    "description": "Market-researched workflow coverage case.",
+    "turns": [
+      {
+        "user": "Ganesh Chaturthi kurta women",
+        "expect": {
+          "workflow": "occasion",
+          "needs_clarification": false,
+          "intent_equals": {
+            "event": "Ganesh Chaturthi",
+            "product_type": "kurta",
+            "gender": "female"
+          },
+          "min_db_products": 1,
+          "min_primary_products": 1,
+          "product_types_all": [
+            "kurta"
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "id": "market_masaba_christmas_dress_women",
+    "brand": "masaba",
+    "description": "Market-researched workflow coverage case.",
+    "turns": [
+      {
+        "user": "Christmas dress women",
+        "expect": {
+          "workflow": "occasion",
+          "needs_clarification": false,
+          "intent_equals": {
+            "event": "Christmas",
+            "product_type": "dress",
+            "gender": "female"
+          },
+          "min_db_products": 1,
+          "min_primary_products": 1,
+          "product_types_all": [
+            "dress"
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "id": "market_masaba_eid_kurta_women",
+    "brand": "masaba",
+    "description": "Market-researched workflow coverage case.",
+    "turns": [
+      {
+        "user": "Eid kurta women",
+        "expect": {
+          "workflow": "occasion",
+          "needs_clarification": false,
+          "intent_equals": {
+            "event": "Eid",
+            "product_type": "kurta",
+            "gender": "female"
+          },
+          "min_db_products": 1,
+          "min_primary_products": 1,
+          "product_types_all": [
+            "kurta"
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "id": "market_masaba_date_night_top_women",
+    "brand": "masaba",
+    "description": "Market-researched workflow coverage case.",
+    "turns": [
+      {
+        "user": "Date night top women",
+        "expect": {
+          "workflow": "occasion",
+          "needs_clarification": false,
+          "intent_equals": {
+            "occasion": "date night",
+            "product_type": "top",
+            "gender": "female"
+          },
+          "min_db_products": 1,
+          "min_primary_products": 1,
+          "product_types_all": [
+            "top"
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "id": "market_masaba_office_jacket_men",
+    "brand": "masaba",
+    "description": "Market-researched workflow coverage case.",
+    "turns": [
+      {
+        "user": "Office jacket men",
+        "expect": {
+          "workflow": "place_profession",
+          "needs_clarification": false,
+          "intent_equals": {
+            "place": "office",
+            "product_type": "jacket",
+            "gender": "male"
+          },
+          "min_db_products": 1,
+          "min_primary_products": 1,
+          "product_types_all": [
+            "jacket"
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "id": "market_masaba_airport_kurta_men",
+    "brand": "masaba",
+    "description": "Market-researched workflow coverage case.",
+    "turns": [
+      {
+        "user": "Airport kurta men",
+        "expect": {
+          "workflow": "place_profession",
+          "needs_clarification": false,
+          "intent_equals": {
+            "place": "airport",
+            "product_type": "kurta",
+            "gender": "male"
+          },
+          "min_db_products": 1,
+          "min_primary_products": 1,
+          "product_types_all": [
+            "kurta"
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "id": "market_masaba_luxury_bridal_lehenga_women",
+    "brand": "masaba",
+    "description": "Market-researched workflow coverage case.",
+    "turns": [
+      {
+        "user": "Luxury bridal lehenga women",
+        "expect": {
+          "workflow": "general",
+          "needs_clarification": false,
+          "intent_equals": {
+            "product_type": "lehenga",
+            "gender": "female",
+            "budget": "luxury"
+          },
+          "min_db_products": 1,
+          "min_primary_products": 1,
+          "product_types_all": [
+            "lehenga"
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "id": "market_masaba_puja_saree_women",
+    "brand": "masaba",
+    "description": "Market-researched workflow coverage case.",
+    "turns": [
+      {
+        "user": "Puja saree women",
+        "expect": {
+          "workflow": "occasion",
+          "needs_clarification": false,
+          "intent_equals": {
+            "event": "Lakshmi Puja",
+            "product_type": "saree",
+            "gender": "female"
+          },
+          "min_db_products": 1,
+          "min_primary_products": 1,
+          "product_types_all": [
+            "saree"
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "id": "market_masaba_concert_dress_women",
+    "brand": "masaba",
+    "description": "Market-researched workflow coverage case.",
+    "turns": [
+      {
+        "user": "Concert dress women",
+        "expect": {
+          "workflow": "occasion",
+          "needs_clarification": false,
+          "intent_equals": {
+            "occasion": "concert",
+            "product_type": "dress",
+            "gender": "female"
+          },
+          "min_db_products": 1,
+          "min_primary_products": 1,
+          "product_types_all": [
+            "dress"
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "id": "market_masaba_farewell_kurta_women",
+    "brand": "masaba",
+    "description": "Market-researched workflow coverage case.",
+    "turns": [
+      {
+        "user": "Farewell kurta women",
+        "expect": {
+          "workflow": "occasion",
+          "needs_clarification": false,
+          "intent_equals": {
+            "occasion": "farewell party",
+            "product_type": "kurta",
+            "gender": "female"
+          },
+          "min_db_products": 1,
+          "min_primary_products": 1,
+          "product_types_all": [
+            "kurta"
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "id": "market_masaba_retirement_party_saree_women",
+    "brand": "masaba",
+    "description": "Market-researched workflow coverage case.",
+    "turns": [
+      {
+        "user": "Retirement party saree women",
+        "expect": {
+          "workflow": "occasion",
+          "needs_clarification": false,
+          "intent_equals": {
+            "occasion": "retirement party",
+            "product_type": "saree",
+            "gender": "female"
+          },
+          "min_db_products": 1,
+          "min_primary_products": 1,
+          "product_types_all": [
+            "saree"
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "id": "market_masaba_picnic_kaftan_women",
+    "brand": "masaba",
+    "description": "Market-researched workflow coverage case.",
+    "turns": [
+      {
+        "user": "Picnic kaftan women",
+        "expect": {
+          "workflow": "occasion",
+          "needs_clarification": false,
+          "intent_equals": {
+            "occasion": "picnic",
+            "product_type": "kaftan",
+            "gender": "female"
+          },
+          "min_db_products": 1,
+          "min_primary_products": 1,
+          "product_types_all": [
+            "kaftan"
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "id": "market_masaba_prom_gown_women",
+    "brand": "masaba",
+    "description": "Market-researched workflow coverage case.",
+    "turns": [
+      {
+        "user": "Prom gown women",
+        "expect": {
+          "workflow": "occasion",
+          "needs_clarification": false,
+          "intent_equals": {
+            "occasion": "prom",
+            "product_type": "dress",
+            "gender": "female"
+          },
+          "min_db_products": 1,
+          "min_primary_products": 1,
+          "product_types_all": [
+            "dress"
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "id": "market_masaba_festival_kurta_men",
+    "brand": "masaba",
+    "description": "Market-researched workflow coverage case.",
+    "turns": [
+      {
+        "user": "Festival kurta men",
+        "expect": {
+          "workflow": "occasion",
+          "needs_clarification": false,
+          "intent_equals": {
+            "occasion": "festival",
+            "product_type": "kurta",
+            "gender": "male"
+          },
+          "min_db_products": 1,
+          "min_primary_products": 1,
+          "product_types_all": [
+            "kurta"
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "id": "market_masaba_baby_shower_dress_women",
+    "brand": "masaba",
+    "description": "Market-researched workflow coverage case.",
+    "turns": [
+      {
+        "user": "Baby shower dress women",
+        "expect": {
+          "workflow": "occasion",
+          "needs_clarification": false,
+          "intent_equals": {
+            "occasion": "baby shower",
+            "product_type": "dress",
+            "gender": "female"
+          },
+          "min_db_products": 1,
+          "min_primary_products": 1,
+          "product_types_all": [
+            "dress"
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "id": "market_kalki_bridal_lehenga_for_engagement_women",
+    "brand": "kalki",
+    "description": "Market-researched workflow coverage case.",
+    "turns": [
+      {
+        "user": "Bridal lehenga for engagement women",
+        "expect": {
+          "workflow": "occasion",
+          "needs_clarification": false,
+          "intent_equals": {
+            "occasion": "engagement",
+            "product_type": "lehenga",
+            "gender": "female"
+          },
+          "min_db_products": 1,
+          "min_primary_products": 1,
+          "product_types_all": [
+            "lehenga"
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "id": "market_kalki_bridesmaid_lehenga_for_sangeet_women",
+    "brand": "kalki",
+    "description": "Market-researched workflow coverage case.",
+    "turns": [
+      {
+        "user": "Bridesmaid lehenga for sangeet women",
+        "expect": {
+          "workflow": "occasion",
+          "needs_clarification": false,
+          "intent_equals": {
+            "occasion": "sangeet",
+            "product_type": "lehenga",
+            "gender": "female"
+          },
+          "min_db_products": 1,
+          "min_primary_products": 1,
+          "product_types_all": [
+            "lehenga"
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "id": "market_kalki_anarkali_suit_for_eid_women",
+    "brand": "kalki",
+    "description": "Market-researched workflow coverage case.",
+    "turns": [
+      {
+        "user": "Anarkali suit for Eid women",
+        "expect": {
+          "workflow": "occasion",
+          "needs_clarification": false,
+          "intent_equals": {
+            "event": "Eid",
+            "product_type": "salwar",
+            "gender": "female"
+          },
+          "min_db_products": 1,
+          "min_primary_products": 1,
+          "product_types_all": [
+            "salwar"
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "id": "market_kalki_sharara_set_for_mehendi_women",
+    "brand": "kalki",
+    "description": "Market-researched workflow coverage case.",
+    "turns": [
+      {
+        "user": "Sharara set for mehendi women",
+        "expect": {
+          "workflow": "occasion",
+          "needs_clarification": false,
+          "intent_equals": {
+            "occasion": "mehendi",
+            "product_type": "salwar",
+            "gender": "female"
+          },
+          "min_db_products": 1,
+          "min_primary_products": 1,
+          "product_types_all": [
+            "salwar"
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "id": "market_kalki_gharara_for_nikah_women",
+    "brand": "kalki",
+    "description": "Market-researched workflow coverage case.",
+    "turns": [
+      {
+        "user": "Gharara for nikah women",
+        "expect": {
+          "workflow": "occasion",
+          "needs_clarification": false,
+          "intent_equals": {
+            "occasion": "muslim wedding",
+            "religion": "Islam",
+            "product_type": "salwar",
+            "gender": "female"
+          },
+          "min_db_products": 1,
+          "min_primary_products": 1,
+          "product_types_all": [
+            "salwar"
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "id": "market_kalki_kurta_jacket_set_for_diwali_men",
+    "brand": "kalki",
+    "description": "Market-researched workflow coverage case.",
+    "turns": [
+      {
+        "user": "Kurta jacket set for Diwali men",
+        "expect": {
+          "workflow": "occasion",
+          "needs_clarification": false,
+          "intent_equals": {
+            "event": "Diwali",
+            "product_type": "kurta",
+            "gender": "male"
+          },
+          "min_db_products": 1,
+          "min_primary_products": 1,
+          "product_types_all": [
+            "kurta"
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "id": "market_kalki_nehru_jacket_for_reception_men",
+    "brand": "kalki",
+    "description": "Market-researched workflow coverage case.",
+    "turns": [
+      {
+        "user": "Nehru jacket for general wedding reception men",
+        "expect": {
+          "workflow": "occasion",
+          "needs_clarification": false,
+          "intent_equals": {
+            "occasion": "wedding",
+            "product_type": "jacket",
+            "gender": "male"
+          },
+          "min_db_products": 1,
+          "min_primary_products": 1,
+          "product_types_all": [
+            "jacket"
+          ],
+          "intent_absent": [
+            "_needs_religion"
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "id": "market_kalki_tuxedo_for_cocktail_party_men",
+    "brand": "kalki",
+    "description": "Market-researched workflow coverage case.",
+    "turns": [
+      {
+        "user": "Tuxedo for cocktail party men",
+        "expect": {
+          "workflow": "occasion",
+          "needs_clarification": false,
+          "intent_equals": {
+            "occasion": "gala",
+            "product_type": "jacket",
+            "gender": "male"
+          },
+          "min_db_products": 1,
+          "min_primary_products": 1,
+          "product_types_all": [
+            "jacket"
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "id": "market_kalki_kids_sherwani_for_eid_boy",
+    "brand": "kalki",
+    "description": "Market-researched workflow coverage case.",
+    "turns": [
+      {
+        "user": "Kids sherwani for Eid boy",
+        "expect": {
+          "workflow": "occasion",
+          "needs_clarification": false,
+          "intent_equals": {
+            "event": "Eid",
+            "agegroup": "child",
+            "product_type": "sherwani",
+            "gender": "male"
+          },
+          "min_db_products": 1,
+          "min_primary_products": 1,
+          "product_types_all": [
+            "sherwani"
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "id": "market_kalki_kids_saree_for_diwali_girl",
+    "brand": "kalki",
+    "description": "Market-researched workflow coverage case.",
+    "turns": [
+      {
+        "user": "Kids saree for Diwali girl",
+        "expect": {
+          "workflow": "occasion",
+          "needs_clarification": false,
+          "intent_equals": {
+            "event": "Diwali",
+            "agegroup": "child",
+            "product_type": "saree",
+            "gender": "female"
+          },
+          "min_db_products": 1,
+          "min_primary_products": 1,
+          "product_types_all": [
+            "saree"
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "id": "market_kalki_kids_anarkali_for_navratri_girl",
+    "brand": "kalki",
+    "description": "Market-researched workflow coverage case.",
+    "turns": [
+      {
+        "user": "Kids anarkali for Navratri girl",
+        "expect": {
+          "workflow": "occasion",
+          "needs_clarification": false,
+          "intent_equals": {
+            "event": "Navratri",
+            "agegroup": "child",
+            "product_type": "salwar",
+            "gender": "female"
+          },
+          "min_db_products": 1,
+          "min_primary_products": 1,
+          "product_types_all": [
+            "salwar"
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "id": "market_kalki_mother_of_bride_saree_for_general_wedding_women",
+    "brand": "kalki",
+    "description": "Market-researched workflow coverage case.",
+    "turns": [
+      {
+        "user": "Mother of bride saree for general wedding women",
+        "expect": {
+          "workflow": "occasion",
+          "needs_clarification": false,
+          "intent_equals": {
+            "occasion": "wedding",
+            "product_type": "saree",
+            "gender": "female"
+          },
+          "min_db_products": 1,
+          "min_primary_products": 1,
+          "product_types_all": [
+            "saree"
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "id": "market_kalki_wedding_guest_lehenga_for_hindu_reception_women",
+    "brand": "kalki",
+    "description": "Market-researched workflow coverage case.",
+    "turns": [
+      {
+        "user": "Wedding guest lehenga for Hindu reception women",
+        "expect": {
+          "workflow": "occasion",
+          "needs_clarification": false,
+          "intent_equals": {
+            "religion": "Hinduism",
+            "product_type": "lehenga",
+            "gender": "female"
+          },
+          "min_db_products": 1,
+          "min_primary_products": 1,
+          "product_types_all": [
+            "lehenga"
+          ],
+          "intent_one_of": {
+            "occasion": [
+              "wedding",
+              "hindu wedding"
+            ]
+          }
+        }
+      }
+    ]
+  },
+  {
+    "id": "market_kalki_christian_wedding_saree_women",
+    "brand": "kalki",
+    "description": "Market-researched workflow coverage case.",
+    "turns": [
+      {
+        "user": "Christian wedding saree women",
+        "expect": {
+          "workflow": "occasion",
+          "needs_clarification": false,
+          "intent_equals": {
+            "religion": "Christianity",
+            "product_type": "saree",
+            "gender": "female"
+          },
+          "min_db_products": 1,
+          "min_primary_products": 1,
+          "product_types_all": [
+            "saree"
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "id": "market_kalki_muslim_wedding_gown_women",
+    "brand": "kalki",
+    "description": "Market-researched workflow coverage case.",
+    "turns": [
+      {
+        "user": "Muslim wedding gown women",
+        "expect": {
+          "workflow": "occasion",
+          "needs_clarification": false,
+          "intent_equals": {
+            "religion": "Islam",
+            "product_type": "dress",
+            "gender": "female"
+          },
+          "min_db_products": 1,
+          "min_primary_products": 1,
+          "product_types_all": [
+            "dress"
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "id": "market_kalki_pongal_saree_women",
+    "brand": "kalki",
+    "description": "Market-researched workflow coverage case.",
+    "turns": [
+      {
+        "user": "Pongal saree women",
+        "expect": {
+          "workflow": "occasion",
+          "needs_clarification": false,
+          "intent_equals": {
+            "event": "Pongal",
+            "product_type": "saree",
+            "gender": "female"
+          },
+          "min_db_products": 1,
+          "min_primary_products": 1,
+          "product_types_all": [
+            "saree"
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "id": "market_kalki_lohri_kurta_women",
+    "brand": "kalki",
+    "description": "Market-researched workflow coverage case.",
+    "turns": [
+      {
+        "user": "Lohri kurta women",
+        "expect": {
+          "workflow": "occasion",
+          "needs_clarification": false,
+          "intent_equals": {
+            "event": "Lohri",
+            "product_type": "kurta",
+            "gender": "female"
+          },
+          "min_db_products": 1,
+          "min_primary_products": 1,
+          "product_types_all": [
+            "kurta"
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "id": "market_kalki_baisakhi_salwar_women",
+    "brand": "kalki",
+    "description": "Market-researched workflow coverage case.",
+    "turns": [
+      {
+        "user": "Baisakhi salwar women",
+        "expect": {
+          "workflow": "occasion",
+          "needs_clarification": false,
+          "intent_equals": {
+            "event": "Baisakhi",
+            "product_type": "salwar",
+            "gender": "female"
+          },
+          "min_db_products": 1,
+          "min_primary_products": 1,
+          "product_types_all": [
+            "salwar"
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "id": "market_kalki_durga_puja_saree_women",
+    "brand": "kalki",
+    "description": "Market-researched workflow coverage case.",
+    "turns": [
+      {
+        "user": "Durga Puja saree women",
+        "expect": {
+          "workflow": "occasion",
+          "needs_clarification": false,
+          "intent_equals": {
+            "event": "Durga Puja",
+            "product_type": "saree",
+            "gender": "female"
+          },
+          "min_db_products": 1,
+          "min_primary_products": 1,
+          "product_types_all": [
+            "saree"
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "id": "market_kalki_holi_kurta_women",
+    "brand": "kalki",
+    "description": "Market-researched workflow coverage case.",
+    "turns": [
+      {
+        "user": "Holi kurta women",
+        "expect": {
+          "workflow": "occasion",
+          "needs_clarification": false,
+          "intent_equals": {
+            "event": "Holi",
+            "product_type": "kurta",
+            "gender": "female"
+          },
+          "min_db_products": 1,
+          "min_primary_products": 1,
+          "product_types_all": [
+            "kurta"
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "id": "market_kalki_onam_kurta_women",
+    "brand": "kalki",
+    "description": "Market-researched workflow coverage case.",
+    "turns": [
+      {
+        "user": "Onam kurta women",
+        "expect": {
+          "workflow": "occasion",
+          "needs_clarification": false,
+          "intent_equals": {
+            "event": "Onam",
+            "product_type": "kurta",
+            "gender": "female"
+          },
+          "min_db_products": 1,
+          "min_primary_products": 1,
+          "product_types_all": [
+            "kurta"
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "id": "market_kalki_graduation_saree_women",
+    "brand": "kalki",
+    "description": "Market-researched workflow coverage case.",
+    "turns": [
+      {
+        "user": "Graduation saree women",
+        "expect": {
+          "workflow": "occasion",
+          "needs_clarification": false,
+          "intent_equals": {
+            "occasion": "graduation",
+            "product_type": "saree",
+            "gender": "female"
+          },
+          "min_db_products": 1,
+          "min_primary_products": 1,
+          "product_types_all": [
+            "saree"
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "id": "market_kalki_interview_kurta_women_under_500",
+    "brand": "kalki",
+    "description": "Market-researched workflow coverage case.",
+    "turns": [
+      {
+        "user": "Interview kurta women under 500",
+        "expect": {
+          "workflow": "occasion",
+          "needs_clarification": false,
+          "intent_equals": {
+            "occasion": "interview",
+            "product_type": "kurta",
+            "gender": "female",
+            "price_max": 500
+          },
+          "min_db_products": 1,
+          "min_primary_products": 1,
+          "product_types_all": [
+            "kurta"
+          ],
+          "sql_contains": [
+            "price <="
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "id": "market_kalki_office_party_saree_women_under_1000",
+    "brand": "kalki",
+    "description": "Market-researched workflow coverage case.",
+    "turns": [
+      {
+        "user": "Office party saree women under 1000",
+        "expect": {
+          "workflow": "occasion",
+          "needs_clarification": false,
+          "intent_equals": {
+            "occasion": "office party",
+            "product_type": "saree",
+            "gender": "female",
+            "price_max": 1000
+          },
+          "min_db_products": 1,
+          "min_primary_products": 1,
+          "product_types_all": [
+            "saree"
+          ],
+          "sql_contains": [
+            "price <="
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "id": "market_kalki_corporate_gala_gown_women",
+    "brand": "kalki",
+    "description": "Market-researched workflow coverage case.",
+    "turns": [
+      {
+        "user": "Corporate gala gown women",
+        "expect": {
+          "workflow": "occasion",
+          "needs_clarification": false,
+          "intent_equals": {
+            "occasion": "gala",
+            "product_type": "dress",
+            "gender": "female"
+          },
+          "min_db_products": 1,
+          "min_primary_products": 1,
+          "product_types_all": [
+            "dress"
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "id": "market_kalki_prom_lehenga_women",
+    "brand": "kalki",
+    "description": "Market-researched workflow coverage case.",
+    "turns": [
+      {
+        "user": "Prom lehenga women",
+        "expect": {
+          "workflow": "occasion",
+          "needs_clarification": false,
+          "intent_equals": {
+            "occasion": "prom",
+            "product_type": "lehenga",
+            "gender": "female"
+          },
+          "min_db_products": 1,
+          "min_primary_products": 1,
+          "product_types_all": [
+            "lehenga"
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "id": "market_kalki_haldi_yellow_salwar_women",
+    "brand": "kalki",
+    "description": "Market-researched workflow coverage case.",
+    "turns": [
+      {
+        "user": "Haldi yellow salwar women",
+        "expect": {
+          "workflow": "occasion",
+          "needs_clarification": false,
+          "intent_equals": {
+            "occasion": "haldi",
+            "product_type": "salwar",
+            "gender": "female",
+            "colour": "yellow"
+          },
+          "min_db_products": 1,
+          "min_primary_products": 1,
+          "product_types_all": [
+            "salwar"
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "id": "market_kalki_mehendi_green_lehenga_women",
+    "brand": "kalki",
+    "description": "Market-researched workflow coverage case.",
+    "turns": [
+      {
+        "user": "Mehendi green lehenga women",
+        "expect": {
+          "workflow": "occasion",
+          "needs_clarification": false,
+          "intent_equals": {
+            "occasion": "mehendi",
+            "product_type": "lehenga",
+            "gender": "female",
+            "colour": "green"
+          },
+          "min_db_products": 1,
+          "min_primary_products": 1,
+          "product_types_all": [
+            "lehenga"
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "id": "market_kalki_sangeet_sequin_saree_women",
+    "brand": "kalki",
+    "description": "Market-researched workflow coverage case.",
+    "turns": [
+      {
+        "user": "Sangeet sequin saree women",
+        "expect": {
+          "workflow": "occasion",
+          "needs_clarification": false,
+          "intent_equals": {
+            "occasion": "sangeet",
+            "product_type": "saree",
+            "gender": "female"
+          },
+          "min_db_products": 1,
+          "min_primary_products": 1,
+          "product_types_all": [
+            "saree"
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "id": "market_kalki_budget_saree_under_300_for_diwali_women",
+    "brand": "kalki",
+    "description": "Market-researched workflow coverage case.",
+    "turns": [
+      {
+        "user": "Budget saree under 300 for Diwali women",
+        "expect": {
+          "workflow": "occasion",
+          "needs_clarification": false,
+          "intent_equals": {
+            "event": "Diwali",
+            "product_type": "saree",
+            "gender": "female",
+            "price_max": 300
+          },
+          "min_db_products": 1,
+          "min_primary_products": 1,
+          "product_types_all": [
+            "saree"
+          ],
+          "sql_contains": [
+            "price <="
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "id": "market_kalki_premium_lehenga_above_2000_for_wedding_women",
+    "brand": "kalki",
+    "description": "Market-researched workflow coverage case.",
+    "turns": [
+      {
+        "user": "Premium lehenga above 2000 for general wedding women",
+        "expect": {
+          "workflow": "occasion",
+          "needs_clarification": false,
+          "intent_equals": {
+            "occasion": "wedding",
+            "product_type": "lehenga",
+            "gender": "female",
+            "price_min": 2000,
+            "budget": "premium"
+          },
+          "min_db_products": 1,
+          "min_primary_products": 1,
+          "product_types_all": [
+            "lehenga"
+          ],
+          "sql_contains": [
+            "price >="
+          ],
+          "intent_absent": [
+            "_needs_religion"
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "id": "market_kalki_palazzo_set_for_office_women",
+    "brand": "kalki",
+    "description": "Market-researched workflow coverage case.",
+    "turns": [
+      {
+        "user": "Palazzo set for office women",
+        "expect": {
+          "workflow": "place_profession",
+          "needs_clarification": false,
+          "intent_equals": {
+            "place": "office",
+            "product_type": "pant",
+            "gender": "female"
+          },
+          "min_db_products": 1,
+          "min_primary_products": 1,
+          "product_types_all": [
+            "pant"
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "id": "market_kalki_kaftan_kurta_for_beach_women",
+    "brand": "kalki",
+    "description": "Market-researched workflow coverage case.",
+    "turns": [
+      {
+        "user": "Kaftan for beach women",
+        "expect": {
+          "workflow": "place_profession",
+          "needs_clarification": false,
+          "intent_equals": {
+            "place": "beach",
+            "product_type": "kaftan",
+            "gender": "female"
+          },
+          "min_db_products": 1,
+          "min_primary_products": 1,
+          "product_types_all": [
+            "kaftan"
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "id": "market_kalki_doctor_office_kurta_women",
+    "brand": "kalki",
+    "description": "Market-researched workflow coverage case.",
+    "turns": [
+      {
+        "user": "Doctor office kurta women",
+        "expect": {
+          "workflow": "place_profession",
+          "needs_clarification": false,
+          "intent_equals": {
+            "place": "office",
+            "profession": "doctor",
+            "product_type": "kurta",
+            "gender": "female"
+          },
+          "min_db_products": 1,
+          "min_primary_products": 1,
+          "product_types_all": [
+            "kurta"
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "id": "market_kalki_teacher_saree_for_school_women",
+    "brand": "kalki",
+    "description": "Market-researched workflow coverage case.",
+    "turns": [
+      {
+        "user": "Teacher saree for school women",
+        "expect": {
+          "workflow": "place_profession",
+          "needs_clarification": false,
+          "intent_equals": {
+            "place": "office",
+            "profession": "teacher",
+            "product_type": "saree",
+            "gender": "female"
+          },
+          "min_db_products": 1,
+          "min_primary_products": 1,
+          "product_types_all": [
+            "saree"
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "id": "market_kalki_pilot_airport_jacket_men",
+    "brand": "kalki",
+    "description": "Market-researched workflow coverage case.",
+    "turns": [
+      {
+        "user": "Pilot airport jacket men",
+        "expect": {
+          "workflow": "place_profession",
+          "needs_clarification": false,
+          "intent_equals": {
+            "place": "airport",
+            "profession": "pilot",
+            "product_type": "jacket",
+            "gender": "male"
+          },
+          "min_db_products": 1,
+          "min_primary_products": 1,
+          "product_types_all": [
+            "jacket"
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "id": "market_kalki_warm_kurta_for_winter_wedding_men",
+    "brand": "kalki",
+    "description": "Market-researched workflow coverage case.",
+    "turns": [
+      {
+        "user": "Warm kurta for general wedding winter men",
+        "expect": {
+          "workflow": "occasion",
+          "needs_clarification": false,
+          "intent_equals": {
+            "occasion": "wedding",
+            "weather": "winter",
+            "product_type": "kurta",
+            "gender": "male"
+          },
+          "min_db_products": 1,
+          "min_primary_products": 1,
+          "product_types_all": [
+            "kurta"
+          ],
+          "intent_absent": [
+            "_needs_religion"
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "id": "market_kalki_rainy_wedding_guest_salwar_women",
+    "brand": "kalki",
+    "description": "Market-researched workflow coverage case.",
+    "turns": [
+      {
+        "user": "Rainy general wedding guest salwar women",
+        "expect": {
+          "workflow": "occasion",
+          "needs_clarification": false,
+          "intent_equals": {
+            "occasion": "wedding",
+            "weather": "rainy",
+            "product_type": "salwar",
+            "gender": "female"
+          },
+          "min_db_products": 1,
+          "min_primary_products": 1,
+          "product_types_all": [
+            "salwar"
+          ],
+          "intent_absent": [
+            "_needs_religion"
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "id": "market_kalki_plus_size_anarkali_for_eid_women",
+    "brand": "kalki",
+    "description": "Market-researched workflow coverage case.",
+    "turns": [
+      {
+        "user": "Plus size anarkali for Eid women",
+        "expect": {
+          "workflow": "occasion",
+          "needs_clarification": false,
+          "intent_equals": {
+            "event": "Eid",
+            "bodytype": "plus size",
+            "product_type": "salwar",
+            "gender": "female"
+          },
+          "min_db_products": 1,
+          "min_primary_products": 1,
+          "product_types_all": [
+            "salwar"
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "id": "market_kalki_petite_saree_for_roka_women",
+    "brand": "kalki",
+    "description": "Market-researched workflow coverage case.",
+    "turns": [
+      {
+        "user": "Petite saree for roka women",
+        "expect": {
+          "workflow": "occasion",
+          "needs_clarification": false,
+          "intent_equals": {
+            "occasion": "roka",
+            "bodytype": "petite",
+            "product_type": "saree",
+            "gender": "female"
+          },
+          "min_db_products": 1,
+          "min_primary_products": 1,
+          "product_types_all": [
+            "saree"
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "id": "market_aza_designer_saree_for_diwali_women_above_50000",
+    "brand": "aza",
+    "description": "Market-researched workflow coverage case.",
+    "turns": [
+      {
+        "user": "Designer saree for Diwali women above 50000",
+        "expect": {
+          "workflow": "occasion",
+          "needs_clarification": false,
+          "intent_equals": {
+            "event": "Diwali",
+            "product_type": "saree",
+            "gender": "female",
+            "price_min": 50000
+          },
+          "min_db_products": 1,
+          "min_primary_products": 1,
+          "product_types_all": [
+            "saree"
+          ],
+          "sql_contains": [
+            "price >="
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "id": "market_aza_luxury_lehenga_for_engagement_women_above_100000",
+    "brand": "aza",
+    "description": "Market-researched workflow coverage case.",
+    "turns": [
+      {
+        "user": "Luxury lehenga for engagement women above 100000",
+        "expect": {
+          "workflow": "occasion",
+          "needs_clarification": false,
+          "intent_equals": {
+            "occasion": "engagement",
+            "product_type": "lehenga",
+            "gender": "female",
+            "price_min": 100000,
+            "budget": "luxury"
+          },
+          "min_db_products": 1,
+          "min_primary_products": 1,
+          "product_types_all": [
+            "lehenga"
+          ],
+          "sql_contains": [
+            "price >="
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "id": "market_aza_plus_size_kurta_for_office_women",
+    "brand": "aza",
+    "description": "Market-researched workflow coverage case.",
+    "turns": [
+      {
+        "user": "Plus size kurta for office women",
+        "expect": {
+          "workflow": "place_profession",
+          "needs_clarification": false,
+          "intent_equals": {
+            "place": "office",
+            "bodytype": "plus size",
+            "product_type": "kurta",
+            "gender": "female"
+          },
+          "min_db_products": 1,
+          "min_primary_products": 1,
+          "product_types_all": [
+            "kurta"
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "id": "market_aza_petite_dress_for_birthday_party_women",
+    "brand": "aza",
+    "description": "Market-researched workflow coverage case.",
+    "turns": [
+      {
+        "user": "Petite dress for birthday party women",
+        "expect": {
+          "workflow": "occasion",
+          "needs_clarification": false,
+          "intent_equals": {
+            "occasion": "birthday party",
+            "bodytype": "petite",
+            "product_type": "dress",
+            "gender": "female"
+          },
+          "min_db_products": 1,
+          "min_primary_products": 1,
+          "product_types_all": [
+            "dress"
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "id": "market_aza_scarf_gift_for_grandmother_winter",
+    "brand": "aza",
+    "description": "Market-researched workflow coverage case.",
+    "turns": [
+      {
+        "user": "Scarf gift for grandmother winter",
+        "expect": {
+          "workflow": "gifting",
+          "needs_clarification": false,
+          "intent_equals": {
+            "relation": "grandmother",
+            "gender": "female",
+            "product_type": "scarf",
+            "weather": "winter"
+          },
+          "min_db_products": 1,
+          "min_primary_products": 1,
+          "product_types_all": [
+            "scarf"
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "id": "market_aza_stole_gift_for_dad_winter",
+    "brand": "aza",
+    "description": "Market-researched workflow coverage case.",
+    "turns": [
+      {
+        "user": "Stole gift for dad winter",
+        "expect": {
+          "workflow": "gifting",
+          "needs_clarification": false,
+          "intent_equals": {
+            "relation": "dad",
+            "gender": "male",
+            "product_type": "scarf",
+            "weather": "winter"
+          },
+          "min_db_products": 1,
+          "min_primary_products": 1,
+          "product_types_all": [
+            "scarf"
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "id": "market_aza_anniversary_gift_saree_for_wife_under_30000",
+    "brand": "aza",
+    "description": "Market-researched workflow coverage case.",
+    "turns": [
+      {
+        "user": "Anniversary gift saree for wife under 30000",
+        "expect": {
+          "workflow": "gifting",
+          "needs_clarification": false,
+          "intent_equals": {
+            "occasion": "anniversary",
+            "relation": "wife",
+            "gender": "female",
+            "product_type": "saree",
+            "price_max": 30000
+          },
+          "min_db_products": 1,
+          "min_primary_products": 1,
+          "product_types_all": [
+            "saree"
+          ],
+          "sql_contains": [
+            "price <="
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "id": "market_aza_birthday_gift_sherwani_for_brother",
+    "brand": "aza",
+    "description": "Market-researched workflow coverage case.",
+    "turns": [
+      {
+        "user": "Birthday gift sherwani for brother",
+        "expect": {
+          "workflow": "gifting",
+          "needs_clarification": false,
+          "intent_equals": {
+            "occasion": "birthday party",
+            "relation": "brother",
+            "gender": "male",
+            "product_type": "sherwani"
+          },
+          "min_db_products": 1,
+          "min_primary_products": 1,
+          "product_types_all": [
+            "sherwani"
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "id": "market_aza_baby_shower_gift_kaftan_for_sister",
+    "brand": "aza",
+    "description": "Market-researched workflow coverage case.",
+    "turns": [
+      {
+        "user": "Baby shower gift kaftan for sister",
+        "expect": {
+          "workflow": "gifting",
+          "needs_clarification": false,
+          "intent_equals": {
+            "occasion": "baby shower",
+            "relation": "sister",
+            "gender": "female",
+            "product_type": "kaftan"
+          },
+          "min_db_products": 1,
+          "min_primary_products": 1,
+          "product_types_all": [
+            "kaftan"
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "id": "market_aza_retirement_gift_kurta_for_dad_under_25000",
+    "brand": "aza",
+    "description": "Market-researched workflow coverage case.",
+    "turns": [
+      {
+        "user": "Retirement gift kurta for dad under 25000",
+        "expect": {
+          "workflow": "gifting",
+          "needs_clarification": false,
+          "intent_equals": {
+            "occasion": "retirement party",
+            "relation": "dad",
+            "gender": "male",
+            "product_type": "kurta",
+            "price_max": 25000
+          },
+          "min_db_products": 1,
+          "min_primary_products": 1,
+          "product_types_all": [
+            "kurta"
+          ],
+          "sql_contains": [
+            "price <="
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "id": "market_aza_groom_bandhgala_for_reception_men",
+    "brand": "aza",
+    "description": "Market-researched workflow coverage case.",
+    "turns": [
+      {
+        "user": "Groom bandhgala for general wedding reception men",
+        "expect": {
+          "workflow": "occasion",
+          "needs_clarification": false,
+          "intent_equals": {
+            "occasion": "wedding",
+            "product_type": "sherwani",
+            "gender": "male"
+          },
+          "min_db_products": 1,
+          "min_primary_products": 1,
+          "product_types_all": [
+            "sherwani"
+          ],
+          "intent_absent": [
+            "_needs_religion"
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "id": "market_aza_blazer_set_for_corporate_event_men",
+    "brand": "aza",
+    "description": "Market-researched workflow coverage case.",
+    "turns": [
+      {
+        "user": "Blazer set for corporate event men",
+        "expect": {
+          "workflow": "occasion",
+          "needs_clarification": false,
+          "intent_equals": {
+            "occasion": "corporate event",
+            "product_type": "jacket",
+            "gender": "male"
+          },
+          "min_db_products": 1,
+          "min_primary_products": 1,
+          "product_types_all": [
+            "jacket"
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "id": "market_aza_jacket_set_for_cocktail_party_women",
+    "brand": "aza",
+    "description": "Market-researched workflow coverage case.",
+    "turns": [
+      {
+        "user": "Jacket set for cocktail party women",
+        "expect": {
+          "workflow": "occasion",
+          "needs_clarification": false,
+          "intent_equals": {
+            "occasion": "gala",
+            "product_type": "jacket",
+            "gender": "female"
+          },
+          "min_db_products": 1,
+          "min_primary_products": 1,
+          "product_types_all": [
+            "jacket"
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "id": "market_aza_pant_set_for_airport_women",
+    "brand": "aza",
+    "description": "Market-researched workflow coverage case.",
+    "turns": [
+      {
+        "user": "Pant set for airport women",
+        "expect": {
+          "workflow": "place_profession",
+          "needs_clarification": false,
+          "intent_equals": {
+            "place": "airport",
+            "product_type": "pant",
+            "gender": "female"
+          },
+          "min_db_products": 1,
+          "min_primary_products": 1,
+          "product_types_all": [
+            "pant"
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "id": "market_aza_topwear_for_cafe_women",
+    "brand": "aza",
+    "description": "Market-researched workflow coverage case.",
+    "turns": [
+      {
+        "user": "Topwear for cafe women",
+        "expect": {
+          "workflow": "place_profession",
+          "needs_clarification": false,
+          "intent_equals": {
+            "place": "cafe",
+            "product_type": "top",
+            "gender": "female"
+          },
+          "min_db_products": 1,
+          "min_primary_products": 1,
+          "product_types_all": [
+            "top"
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "id": "market_aza_ethnic_dress_for_baby_shower_women",
+    "brand": "aza",
+    "description": "Market-researched workflow coverage case.",
+    "turns": [
+      {
+        "user": "Ethnic dress for baby shower women",
+        "expect": {
+          "workflow": "occasion",
+          "needs_clarification": false,
+          "intent_equals": {
+            "occasion": "baby shower",
+            "product_type": "dress",
+            "gender": "female"
+          },
+          "min_db_products": 1,
+          "min_primary_products": 1,
+          "product_types_all": [
+            "dress"
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "id": "market_aza_co_ord_set_for_music_festival_women",
+    "brand": "aza",
+    "description": "Market-researched workflow coverage case.",
+    "turns": [
+      {
+        "user": "Co-ord set for music festival women",
+        "expect": {
+          "workflow": "occasion",
+          "needs_clarification": false,
+          "intent_equals": {
+            "occasion": "festival",
+            "product_type": "coord",
+            "gender": "female"
+          },
+          "min_db_products": 1,
+          "min_primary_products": 1,
+          "product_types_all": [
+            "coord"
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "id": "market_aza_kaftan_for_goa_vacation_women_december",
+    "brand": "aza",
+    "description": "Market-researched workflow coverage case.",
+    "turns": [
+      {
+        "user": "Kaftan for Goa vacation women December",
+        "expect": {
+          "workflow": "vacation",
+          "needs_clarification": false,
+          "intent_equals": {
+            "location": "Goa",
+            "month": "December",
+            "product_type": "kaftan",
+            "gender": "female"
+          },
+          "min_db_products": 1,
+          "min_primary_products": 1,
+          "product_types_all": [
+            "kaftan"
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "id": "market_aza_3_day_rajasthan_wedding_wardrobe_women_december",
+    "brand": "aza",
+    "description": "Market-researched workflow coverage case.",
+    "turns": [
+      {
+        "user": "3-day Rajasthan wedding wardrobe women December",
+        "expect": {
+          "workflow": "vacation",
+          "needs_clarification": false,
+          "intent_equals": {
+            "location": "Rajasthan",
+            "month": "December",
+            "duration": 3,
+            "gender": "female"
+          },
+          "min_db_products": 1,
+          "min_primary_products": 1
+        }
+      }
+    ]
+  },
+  {
+    "id": "market_aza_5_day_sri_lanka_beach_vacation_wardrobe_women_april",
+    "brand": "aza",
+    "description": "Market-researched workflow coverage case.",
+    "turns": [
+      {
+        "user": "5-day Sri Lanka beach vacation wardrobe women April",
+        "expect": {
+          "workflow": "vacation",
+          "needs_clarification": false,
+          "intent_equals": {
+            "location": "Sri Lanka",
+            "month": "April",
+            "duration": 5,
+            "gender": "female"
+          },
+          "min_db_products": 1,
+          "min_primary_products": 1
+        }
+      }
+    ]
+  },
+  {
+    "id": "market_aza_long_flight_coord_for_women",
+    "brand": "aza",
+    "description": "Market-researched workflow coverage case.",
+    "turns": [
+      {
+        "user": "Long flight coord for women",
+        "expect": {
+          "workflow": "activity",
+          "needs_clarification": false,
+          "intent_equals": {
+            "activity": "traveling",
+            "product_type": "coord",
+            "gender": "female"
+          },
+          "min_db_products": 1,
+          "min_primary_products": 1,
+          "product_types_all": [
+            "coord"
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "id": "market_aza_breathable_kurta_for_humid_mumbai_women",
+    "brand": "aza",
+    "description": "Market-researched workflow coverage case.",
+    "turns": [
+      {
+        "user": "Breathable kurta for humid Mumbai women",
+        "expect": {
+          "workflow": "general",
+          "needs_clarification": false,
+          "intent_equals": {
+            "weather": "humid",
+            "location": "Mumbai",
+            "product_type": "kurta",
+            "gender": "female"
+          },
+          "intent_contains": {
+            "functional_needs": "breathable"
+          },
+          "min_db_products": 1,
+          "min_primary_products": 1,
+          "product_types_all": [
+            "kurta"
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "id": "market_aza_sweat_proof_dress_for_outdoor_concert_women",
+    "brand": "aza",
+    "description": "Market-researched workflow coverage case.",
+    "turns": [
+      {
+        "user": "Sweat-proof dress for outdoor concert women",
+        "expect": {
+          "workflow": "occasion",
+          "needs_clarification": false,
+          "intent_equals": {
+            "occasion": "concert",
+            "product_type": "dress",
+            "gender": "female"
+          },
+          "intent_contains": {
+            "functional_needs": "sweat-proof"
+          },
+          "min_db_products": 1,
+          "min_primary_products": 1,
+          "product_types_all": [
+            "dress"
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "id": "market_aza_wrinkle_free_saree_for_destination_wedding_guest_women",
+    "brand": "aza",
+    "description": "Market-researched workflow coverage case.",
+    "turns": [
+      {
+        "user": "Wrinkle-free saree for general wedding destination guest women",
+        "expect": {
+          "workflow": "occasion",
+          "needs_clarification": false,
+          "intent_equals": {
+            "occasion": "wedding",
+            "product_type": "saree",
+            "gender": "female"
+          },
+          "intent_contains": {
+            "functional_needs": "wrinkle-free"
+          },
+          "min_db_products": 1,
+          "min_primary_products": 1,
+          "product_types_all": [
+            "saree"
+          ],
+          "intent_absent": [
+            "_needs_religion"
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "id": "market_aza_machine_washable_kurta_for_college_women",
+    "brand": "aza",
+    "description": "Market-researched workflow coverage case.",
+    "turns": [
+      {
+        "user": "Machine-washable kurta for college women",
+        "expect": {
+          "workflow": "place_profession",
+          "needs_clarification": false,
+          "intent_equals": {
+            "place": "office",
+            "product_type": "kurta",
+            "gender": "female"
+          },
+          "intent_contains": {
+            "functional_needs": "machine-washable"
+          },
+          "min_db_products": 1,
+          "min_primary_products": 1,
+          "product_types_all": [
+            "kurta"
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "id": "market_aza_modest_salwar_for_mosque_women",
+    "brand": "aza",
+    "description": "Market-researched workflow coverage case.",
+    "turns": [
+      {
+        "user": "Modest salwar for mosque women",
+        "expect": {
+          "workflow": "place_profession",
+          "needs_clarification": false,
+          "intent_equals": {
+            "place": "mosque",
+            "style_goals": "modest",
+            "product_type": "salwar",
+            "gender": "female"
+          },
+          "intent_contains": {
+            "style_goals": "modest"
+          },
+          "min_db_products": 1,
+          "min_primary_products": 1,
+          "product_types_all": [
+            "salwar"
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "id": "market_aza_church_dress_for_women",
+    "brand": "aza",
+    "description": "Market-researched workflow coverage case.",
+    "turns": [
+      {
+        "user": "Church dress for women",
+        "expect": {
+          "workflow": "place_profession",
+          "needs_clarification": false,
+          "intent_equals": {
+            "place": "church",
+            "product_type": "dress",
+            "gender": "female"
+          },
+          "min_db_products": 1,
+          "min_primary_products": 1,
+          "product_types_all": [
+            "dress"
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "id": "market_aza_temple_saree_for_elderly_mom",
+    "brand": "aza",
+    "description": "Market-researched workflow coverage case.",
+    "turns": [
+      {
+        "user": "Temple saree for elderly mom",
+        "expect": {
+          "workflow": "place_profession",
+          "needs_clarification": false,
+          "intent_equals": {
+            "place": "temple",
+            "relation": "mom",
+            "gender": "female",
+            "product_type": "saree"
+          },
+          "min_db_products": 1,
+          "min_primary_products": 1,
+          "product_types_all": [
+            "saree"
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "id": "market_aza_back_pain_friendly_kaftan_women",
+    "brand": "aza",
+    "description": "Market-researched workflow coverage case.",
+    "turns": [
+      {
+        "user": "Back pain friendly kaftan women",
+        "expect": {
+          "workflow": "health",
+          "needs_clarification": false,
+          "intent_equals": {
+            "health": "back pain",
+            "product_type": "kaftan",
+            "gender": "female"
+          },
+          "min_db_products": 1,
+          "min_primary_products": 1,
+          "product_types_all": [
+            "kaftan"
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "id": "market_aza_sensitive_skin_cotton_dress_women",
+    "brand": "aza",
+    "description": "Market-researched workflow coverage case.",
+    "turns": [
+      {
+        "user": "Sensitive skin cotton dress women",
+        "expect": {
+          "workflow": "health",
+          "needs_clarification": false,
+          "intent_equals": {
+            "health": "sensitive skin",
+            "product_type": "dress",
+            "gender": "female"
+          },
+          "min_db_products": 1,
+          "min_primary_products": 1,
+          "product_types_all": [
+            "dress"
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "id": "market_aza_knee_pain_comfortable_kurta_women",
+    "brand": "aza",
+    "description": "Market-researched workflow coverage case.",
+    "turns": [
+      {
+        "user": "Knee pain comfortable kurta women",
+        "expect": {
+          "workflow": "health",
+          "needs_clarification": false,
+          "intent_equals": {
+            "health": "knee pain",
+            "product_type": "kurta",
+            "gender": "female"
+          },
+          "min_db_products": 1,
+          "min_primary_products": 1,
+          "product_types_all": [
+            "kurta"
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "id": "market_aza_flat_feet_wedding_guest_dress_women",
+    "brand": "aza",
+    "description": "Market-researched workflow coverage case.",
+    "turns": [
+      {
+        "user": "Flat feet general wedding guest dress women",
+        "expect": {
+          "workflow": "occasion",
+          "needs_clarification": false,
+          "intent_equals": {
+            "occasion": "wedding",
+            "health": "flat feet",
+            "product_type": "dress",
+            "gender": "female"
+          },
+          "min_db_products": 1,
+          "min_primary_products": 1,
+          "product_types_all": [
+            "dress"
+          ],
+          "intent_absent": [
+            "_needs_religion"
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "id": "market_aza_yoga_coord_for_women",
+    "brand": "aza",
+    "description": "Market-researched workflow coverage case.",
+    "turns": [
+      {
+        "user": "Yoga coord for women",
+        "expect": {
+          "workflow": "activity",
+          "needs_clarification": false,
+          "intent_equals": {
+            "activity": "yoga",
+            "product_type": "coord",
+            "gender": "female"
+          },
+          "min_db_products": 1,
+          "min_primary_products": 1,
+          "product_types_all": [
+            "coord"
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "id": "market_aza_cycling_top_for_women",
+    "brand": "aza",
+    "description": "Market-researched workflow coverage case.",
+    "turns": [
+      {
+        "user": "Cycling top for women",
+        "expect": {
+          "workflow": "activity",
+          "needs_clarification": false,
+          "intent_equals": {
+            "activity": "cycling",
+            "product_type": "top",
+            "gender": "female"
+          },
+          "min_db_products": 1,
+          "min_primary_products": 1,
+          "product_types_all": [
+            "top"
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "id": "market_aza_dancing_lehenga_for_sangeet_women",
+    "brand": "aza",
+    "description": "Market-researched workflow coverage case.",
+    "turns": [
+      {
+        "user": "Dancing lehenga for sangeet women",
+        "expect": {
+          "workflow": "occasion",
+          "needs_clarification": false,
+          "intent_equals": {
+            "occasion": "sangeet",
+            "activity": "dancing",
+            "product_type": "lehenga",
+            "gender": "female"
+          },
+          "min_db_products": 1,
+          "min_primary_products": 1,
+          "product_types_all": [
+            "lehenga"
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "id": "market_aza_swimming_kaftan_for_beach_women",
+    "brand": "aza",
+    "description": "Market-researched workflow coverage case.",
+    "turns": [
+      {
+        "user": "Swimming kaftan for beach women",
+        "expect": {
+          "workflow": "activity",
+          "needs_clarification": false,
+          "intent_equals": {
+            "activity": "swimming",
+            "place": "beach",
+            "product_type": "kaftan",
+            "gender": "female"
+          },
+          "min_db_products": 1,
+          "min_primary_products": 1,
+          "product_types_all": [
+            "kaftan"
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "id": "market_aza_hiking_jacket_women_rainy",
+    "brand": "aza",
+    "description": "Market-researched workflow coverage case.",
+    "turns": [
+      {
+        "user": "Hiking jacket women rainy",
+        "expect": {
+          "workflow": "activity",
+          "needs_clarification": false,
+          "intent_equals": {
+            "activity": "hiking",
+            "weather": "rainy",
+            "product_type": "jacket",
+            "gender": "female"
+          },
+          "min_db_products": 1,
+          "min_primary_products": 1,
+          "product_types_all": [
+            "jacket"
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "id": "market_aza_restaurant_date_night_dress_women",
+    "brand": "aza",
+    "description": "Market-researched workflow coverage case.",
+    "turns": [
+      {
+        "user": "Restaurant date night dress women",
+        "expect": {
+          "workflow": "occasion",
+          "needs_clarification": false,
+          "intent_equals": {
+            "place": "restaurant",
+            "occasion": "date night",
+            "product_type": "dress",
+            "gender": "female"
+          },
+          "min_db_products": 1,
+          "min_primary_products": 1,
+          "product_types_all": [
+            "dress"
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "id": "market_aza_rooftop_bar_top_women",
+    "brand": "aza",
+    "description": "Market-researched workflow coverage case.",
+    "turns": [
+      {
+        "user": "Rooftop bar top women",
+        "expect": {
+          "workflow": "place_profession",
+          "needs_clarification": false,
+          "intent_equals": {
+            "place": "restaurant",
+            "product_type": "top",
+            "gender": "female"
+          },
+          "min_db_products": 1,
+          "min_primary_products": 1,
+          "product_types_all": [
+            "top"
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "id": "market_aza_museum_saree_women",
+    "brand": "aza",
+    "description": "Market-researched workflow coverage case.",
+    "turns": [
+      {
+        "user": "Museum saree women",
+        "expect": {
+          "workflow": "place_profession",
+          "needs_clarification": false,
+          "intent_equals": {
+            "place": "museum",
+            "product_type": "saree",
+            "gender": "female"
+          },
+          "min_db_products": 1,
+          "min_primary_products": 1,
+          "product_types_all": [
+            "saree"
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "id": "market_aza_mountains_warm_jacket_women_winter",
+    "brand": "aza",
+    "description": "Market-researched workflow coverage case.",
+    "turns": [
+      {
+        "user": "Mountains warm jacket women winter",
+        "expect": {
+          "workflow": "place_profession",
+          "needs_clarification": false,
+          "intent_equals": {
+            "place": "mountains",
+            "weather": "winter",
+            "product_type": "jacket",
+            "gender": "female"
+          },
+          "min_db_products": 1,
+          "min_primary_products": 1,
+          "product_types_all": [
+            "jacket"
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "id": "market_aza_airport_sherwani_men_wedding_travel",
+    "brand": "aza",
+    "description": "Market-researched workflow coverage case.",
+    "turns": [
+      {
+        "user": "3-day Dubai wedding wardrobe men December",
+        "expect": {
+          "workflow": "vacation",
+          "needs_clarification": false,
+          "intent_equals": {
+            "location": "Dubai",
+            "month": "December",
+            "duration": 3,
+            "gender": "male"
+          },
+          "min_day_plans": 3,
+          "min_unique_primary_products": 2
+        }
+      }
+    ]
+  },
+  {
+    "id": "market_aza_black_gown_for_gala_women",
+    "brand": "aza",
+    "description": "Market-researched workflow coverage case.",
+    "turns": [
+      {
+        "user": "Black gown for gala women",
+        "expect": {
+          "workflow": "occasion",
+          "needs_clarification": false,
+          "intent_equals": {
+            "occasion": "gala",
+            "colour": "black",
+            "product_type": "dress",
+            "gender": "female"
+          },
+          "min_db_products": 1,
+          "min_primary_products": 1,
+          "product_types_all": [
+            "dress"
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "id": "market_aza_red_saree_for_diwali_women",
+    "brand": "aza",
+    "description": "Market-researched workflow coverage case.",
+    "turns": [
+      {
+        "user": "Red saree for Diwali women",
+        "expect": {
+          "workflow": "occasion",
+          "needs_clarification": false,
+          "intent_equals": {
+            "event": "Diwali",
+            "colour": "red",
+            "product_type": "saree",
+            "gender": "female"
+          },
+          "min_db_products": 1,
+          "min_primary_products": 1,
+          "product_types_all": [
+            "saree"
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "id": "market_aza_white_saree_for_onam_women_kerala",
+    "brand": "aza",
+    "description": "Market-researched workflow coverage case.",
+    "turns": [
+      {
+        "user": "White saree for Onam women Kerala",
+        "expect": {
+          "workflow": "occasion",
+          "needs_clarification": false,
+          "intent_equals": {
+            "event": "Onam",
+            "colour": "white",
+            "product_type": "saree",
+            "gender": "female",
+            "location": "Kerala"
+          },
+          "min_db_products": 1,
+          "min_primary_products": 1,
+          "product_types_all": [
+            "saree"
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "id": "market_aza_green_lehenga_for_mehendi_women",
+    "brand": "aza",
+    "description": "Market-researched workflow coverage case.",
+    "turns": [
+      {
+        "user": "Green lehenga for mehendi women",
+        "expect": {
+          "workflow": "occasion",
+          "needs_clarification": false,
+          "intent_equals": {
+            "occasion": "mehendi",
+            "colour": "green",
+            "product_type": "lehenga",
+            "gender": "female"
+          },
+          "min_db_products": 1,
+          "min_primary_products": 1,
+          "product_types_all": [
+            "lehenga"
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "id": "market_aza_yellow_kurta_for_haldi_women",
+    "brand": "aza",
+    "description": "Market-researched workflow coverage case.",
+    "turns": [
+      {
+        "user": "Yellow kurta for haldi women",
+        "expect": {
+          "workflow": "occasion",
+          "needs_clarification": false,
+          "intent_equals": {
+            "occasion": "haldi",
+            "colour": "yellow",
+            "product_type": "kurta",
+            "gender": "female"
+          },
+          "min_db_products": 1,
+          "min_primary_products": 1,
+          "product_types_all": [
+            "kurta"
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "id": "market_aza_gold_salwar_for_eid_women",
+    "brand": "aza",
+    "description": "Market-researched workflow coverage case.",
+    "turns": [
+      {
+        "user": "Gold salwar for Eid women",
+        "expect": {
+          "workflow": "occasion",
+          "needs_clarification": false,
+          "intent_equals": {
+            "event": "Eid",
+            "colour": "gold",
+            "product_type": "salwar",
+            "gender": "female"
+          },
+          "min_db_products": 1,
+          "min_primary_products": 1,
+          "product_types_all": [
+            "salwar"
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "id": "market_aza_blue_sherwani_for_sangeet_men",
+    "brand": "aza",
+    "description": "Market-researched workflow coverage case.",
+    "turns": [
+      {
+        "user": "Blue sherwani for sangeet men",
+        "expect": {
+          "workflow": "occasion",
+          "needs_clarification": false,
+          "intent_equals": {
+            "occasion": "sangeet",
+            "colour": "blue",
+            "product_type": "sherwani",
+            "gender": "male"
+          },
+          "min_db_products": 1,
+          "min_primary_products": 1,
+          "product_types_all": [
+            "sherwani"
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "id": "market_aza_maroon_lehenga_for_reception_women",
+    "brand": "aza",
+    "description": "Market-researched workflow coverage case.",
+    "turns": [
+      {
+        "user": "Maroon lehenga for general wedding reception women",
+        "expect": {
+          "workflow": "occasion",
+          "needs_clarification": false,
+          "intent_equals": {
+            "occasion": "wedding",
+            "colour": "maroon",
+            "product_type": "lehenga",
+            "gender": "female"
+          },
+          "min_db_products": 1,
+          "min_primary_products": 1,
+          "product_types_all": [
+            "lehenga"
+          ],
+          "intent_absent": [
+            "_needs_religion"
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "id": "market_clarify_generic_outfit_then_kids_diwali",
+    "brand": "kalki",
+    "description": "Generic festival outfit should ask who it is for, then handle kidswear.",
+    "turns": [
+      {
+        "user": "Diwali outfit",
+        "expect": {
+          "workflow": "occasion",
+          "needs_clarification": true,
+          "clarifying_contains": [
+            "women, men, or kids"
+          ],
+          "intent_equals": {
+            "event": "Diwali"
+          },
+          "max_primary_products": 0
+        }
+      },
+      {
+        "user": "kids kurta",
+        "expect": {
+          "workflow": "occasion",
+          "needs_clarification": false,
+          "is_followup": true,
+          "intent_equals": {
+            "event": "Diwali",
+            "agegroup": "child",
+            "product_type": "kurta"
+          },
+          "min_db_products": 1,
+          "min_primary_products": 1,
+          "product_types_all": [
+            "kurta"
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "id": "market_clarify_wedding_then_muslim_salwar",
+    "brand": "kalki",
+    "description": "Generic wedding should ask culture, then a Muslim answer should preserve salwar.",
+    "turns": [
+      {
+        "user": "Wedding salwar women",
+        "expect": {
+          "workflow": "occasion",
+          "needs_clarification": true,
+          "clarifying_contains": [
+            "wedding context"
+          ],
+          "intent_equals": {
+            "occasion": "wedding",
+            "product_type": "salwar",
+            "gender": "female"
+          },
+          "intent_truthy": [
+            "_needs_religion"
+          ],
+          "max_primary_products": 0
+        }
+      },
+      {
+        "user": "Muslim",
+        "expect": {
+          "workflow": "occasion",
+          "needs_clarification": false,
+          "is_followup": true,
+          "intent_equals": {
+            "occasion": "wedding",
+            "religion": "Islam",
+            "product_type": "salwar",
+            "gender": "female"
+          },
+          "intent_absent": [
+            "_needs_religion"
+          ],
+          "min_db_products": 1,
+          "min_primary_products": 1,
+          "product_types_all": [
+            "salwar"
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "id": "market_followup_add_relation_gift_budget",
+    "brand": "aza",
+    "description": "Gift follow-up should add budget without losing relation/product/event.",
+    "turns": [
+      {
+        "user": "Anniversary gift saree for wife",
+        "expect": {
+          "workflow": "gifting",
+          "needs_clarification": false,
+          "intent_equals": {
+            "occasion": "anniversary",
+            "relation": "wife",
+            "gender": "female",
+            "product_type": "saree"
+          },
+          "intent_truthy": [
+            "_is_gift"
+          ],
+          "min_db_products": 1,
+          "min_primary_products": 1,
+          "product_types_all": [
+            "saree"
+          ]
+        }
+      },
+      {
+        "user": "under 25000",
+        "expect": {
+          "workflow": "gifting",
+          "needs_clarification": false,
+          "is_followup": true,
+          "intent_equals": {
+            "occasion": "anniversary",
+            "relation": "wife",
+            "gender": "female",
+            "product_type": "saree",
+            "price_max": 25000
+          },
+          "intent_truthy": [
+            "_is_gift"
+          ],
+          "min_db_products": 1,
+          "min_primary_products": 1,
+          "product_types_all": [
+            "saree"
+          ],
+          "sql_contains": [
+            "price <="
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "id": "market_followup_change_mens_product",
+    "brand": "masaba",
+    "description": "Menswear follow-up should replace kurta with bandi/jacket.",
+    "turns": [
+      {
+        "user": "Diwali kurta men",
+        "expect": {
+          "workflow": "occasion",
+          "needs_clarification": false,
+          "intent_equals": {
+            "event": "Diwali",
+            "product_type": "kurta",
+            "gender": "male"
+          },
+          "min_db_products": 1,
+          "min_primary_products": 1,
+          "product_types_all": [
+            "kurta"
+          ]
+        }
+      },
+      {
+        "user": "actually bandi",
+        "expect": {
+          "workflow": "occasion",
+          "needs_clarification": false,
+          "is_followup": true,
+          "intent_equals": {
+            "event": "Diwali",
+            "product_type": "jacket",
+            "gender": "male"
+          },
+          "min_db_products": 1,
+          "min_primary_products": 1,
+          "product_types_all": [
+            "jacket"
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "id": "market_followup_destination_month_vacation",
+    "brand": "aza",
+    "description": "Vacation follow-up should add month while preserving destination/duration/gender.",
+    "turns": [
+      {
+        "user": "3-day Goa vacation wardrobe women",
+        "expect": {
+          "workflow": "vacation",
+          "needs_clarification": false,
+          "intent_equals": {
+            "location": "Goa",
+            "duration": 3,
+            "gender": "female"
+          },
+          "min_day_plans": 3,
+          "min_unique_primary_products": 2
+        }
+      },
+      {
+        "user": "in December",
+        "expect": {
+          "workflow": "vacation",
+          "needs_clarification": false,
+          "is_followup": true,
+          "intent_equals": {
+            "location": "Goa",
+            "duration": 3,
+            "gender": "female",
+            "month": "December"
+          },
+          "min_day_plans": 3,
+          "min_unique_primary_products": 2
+        }
+      }
+    ]
+  },
+  {
+    "id": "market_followup_negate_color_and_product",
+    "brand": "kalki",
+    "description": "Follow-up should replace product and keep color preference.",
+    "turns": [
+      {
+        "user": "Green lehenga for mehendi women",
+        "expect": {
+          "workflow": "occasion",
+          "needs_clarification": false,
+          "intent_equals": {
+            "occasion": "mehendi",
+            "product_type": "lehenga",
+            "gender": "female",
+            "colour": "green"
+          },
+          "min_db_products": 1,
+          "min_primary_products": 1,
+          "product_types_all": [
+            "lehenga"
+          ]
+        }
+      },
+      {
+        "user": "no lehenga, saree instead",
+        "expect": {
+          "workflow": "occasion",
+          "needs_clarification": false,
+          "is_followup": true,
+          "intent_equals": {
+            "occasion": "mehendi",
+            "product_type": "saree",
+            "gender": "female",
+            "colour": "green",
+            "avoid_product_type": "lehenga"
+          },
+          "min_db_products": 1,
+          "min_primary_products": 1,
+          "product_types_all": [
+            "saree"
+          ],
+          "product_types_none": [
+            "lehenga"
+          ]
         }
       }
     ]

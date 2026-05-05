@@ -224,7 +224,7 @@ class ConversationManager:
         questions = []
         query_lower = query.lower()
 
-        accepted_general_wedding = "general wedding" in query_lower
+        accepted_general_wedding = re.search(r"\bgeneral\b.{0,40}\bwedding\b", query_lower) is not None
         generic_wedding = (
             not accepted_general_wedding
             and "religion" not in intents

@@ -52,6 +52,38 @@ def _product_matches_type(product, canonical_type):
     )
 
 
+def _product_type_matches_value(product, canonical_type):
+    canonical = str(canonical_type or "").strip().lower()
+    if not canonical:
+        return False
+    terms = [canonical] + [a.lower() for a in PRODUCT_TYPE_ALIASES.get(canonical, [])]
+    product_type = str(product.get("product_type", "")).lower()
+    return any(
+        term == product_type
+        or term in product_type
+        or product_type in term
+        or term.rstrip("s") == product_type.rstrip("s")
+        for term in terms
+    )
+
+
+def _product_types_overlap(left, right):
+    left_terms = [str(left or "").lower()] + [
+        a.lower() for a in PRODUCT_TYPE_ALIASES.get(str(left or "").lower(), [])
+    ]
+    right_terms = [str(right or "").lower()] + [
+        a.lower() for a in PRODUCT_TYPE_ALIASES.get(str(right or "").lower(), [])
+    ]
+    return any(
+        l == r
+        or l in r
+        or r in l
+        or l.rstrip("s") == r.rstrip("s")
+        for l in left_terms if l
+        for r in right_terms if r
+    )
+
+
 def form_outfit(candidates, kg_context, intents, comp_graphs=None, gender=None, top_n=3):
     """Build a complete outfit from DB candidates + KG context + complementary graphs.
 
@@ -80,11 +112,17 @@ def form_outfit(candidates, kg_context, intents, comp_graphs=None, gender=None, 
     recommended_types = kg_context.get("product", {}).get("recommended", [])
     acceptable_types = kg_context.get("product", {}).get("acceptable", [])
     avoid_types = kg_context.get("product", {}).get("avoid", [])
-    avoided_types = set(avoid_types + _split_csv(intents.get("avoid_product_type")))
+    kg_avoided_types = {
+        t for t in avoid_types
+        if not any(_product_types_overlap(t, requested) for requested in requested_types)
+    }
+    user_avoided_types = set(_split_csv(intents.get("avoid_product_type")))
 
     scored = []
     for p in candidates:
-        if any(_product_matches_type(p, t) for t in avoided_types):
+        if any(_product_matches_type(p, t) for t in user_avoided_types):
+            continue
+        if any(_product_type_matches_value(p, t) for t in kg_avoided_types):
             continue
 
         score = 0
