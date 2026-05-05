@@ -35,9 +35,9 @@ LOCAL_IMAGE_CATALOG_PREFIXES = {
 }
 
 
-def load_json(path):
-    with open(path) as f:
-        return json.load(f)
+def load_json(json_path):
+    with open(json_path) as json_file:
+        return json.load(json_file)
 
 
 def count_by(items, key_fn):
@@ -51,8 +51,8 @@ def percentile(values, pct):
     if not values:
         return 0
     ordered = sorted(values)
-    idx = min(len(ordered) - 1, round((len(ordered) - 1) * pct))
-    return ordered[idx]
+    percentile_index = min(len(ordered) - 1, round((len(ordered) - 1) * pct))
+    return ordered[percentile_index]
 
 
 BRAND_BASE_URLS = {
@@ -66,9 +66,10 @@ def normalize_product_image_src(value):
     if not value:
         return ""
     if isinstance(value, (list, tuple)):
-        value = next((item for item in value if item), "")
-        if not value:
+        first_image_value = next((item for item in value if item), "")
+        if not first_image_value:
             return ""
+        value = first_image_value
     text = str(value)
     if text.startswith(("http://", "https://", "data:", "file:")):
         return text
@@ -93,10 +94,10 @@ def normalize_product_detail_url(product_url, brand):
 def resolve_local_pdp_image_path(local_image_path):
     if not local_image_path:
         return None
-    path = Path(str(local_image_path))
-    if not path.is_absolute():
-        path = SCRAPER_DATA_DIR / path
-    return path if path.exists() else None
+    image_path = Path(str(local_image_path))
+    if not image_path.is_absolute():
+        image_path = SCRAPER_DATA_DIR / image_path
+    return image_path if image_path.exists() else None
 
 
 def iter_catalog_manifest_items(manifest_path):
@@ -187,7 +188,7 @@ def load_product_media_index(result):
                 chunk = ids[start:start + 800]
                 placeholders = ",".join("?" for _ in chunk)
                 rows = conn.execute(
-                    f"SELECT id, image_url, url FROM products WHERE id IN ({placeholders})",
+                    f"SELECT id, image_url, url, gender FROM products WHERE id IN ({placeholders})",
                     chunk,
                 ).fetchall()
                 for row in rows:
@@ -196,6 +197,7 @@ def load_product_media_index(result):
                     product_media_index[key] = {
                         "image_url": remote_image_url,
                         "url": normalize_product_detail_url(row["url"], brand),
+                        "gender": row["gender"] or "",
                         "image_source": remote_image_url or CATALOG_PATHS.get(brand, db_path),
                         "image_source_type": "remote_url" if remote_image_url.startswith(("http://", "https://")) else "catalog",
                     }
@@ -219,6 +221,7 @@ def compact_product_for_payload(product, product_media_index=None, brand=""):
         "colors": product.get("colors", ""),
         "materials": product.get("materials", ""),
         "patterns": product.get("patterns", ""),
+        "gender": product.get("gender") or indexed_product_media.get("gender", ""),
         "price": product.get("price", ""),
         "image_url": normalize_product_image_src(product_image_url),
         "url": normalize_product_detail_url(product_detail_url, brand),
@@ -321,8 +324,8 @@ def compact_db_trace(turn, product_media_index=None, brand="", media=None):
         "retries": trace.get("retries", [])[:5],
         "candidate_count": len(trace.get("candidates", [])),
         "candidates": [
-            compact_product_for_payload(p, product_media_index=product_media_index, brand=brand)
-            for p in trace.get("candidates", [])[:10]
+            compact_product_for_payload(product, product_media_index=product_media_index, brand=brand)
+            for product in trace.get("candidates", [])[:10]
         ],
         "available_type_count": len(trace.get("available_types", [])),
         "available_types_sample": trace.get("available_types", [])[:50],
@@ -335,16 +338,16 @@ def attach_judges(main_result, judge_results):
     judge_by_case = {}
     for result in judge_results:
         for scenario in result.get("results", []):
-            for idx, turn in enumerate(scenario.get("turns", []), 1):
+            for turn_index, turn in enumerate(scenario.get("turns", []), 1):
                 if turn.get("judges"):
-                    judge_by_case[f"{scenario['id']}::turn_{idx}"] = turn["judges"]
+                    judge_by_case[f"{scenario['id']}::turn_{turn_index}"] = turn["judges"]
 
     if not judge_by_case:
         return
 
     for scenario in main_result.get("results", []):
-        for idx, turn in enumerate(scenario.get("turns", []), 1):
-            case_id = f"{scenario['id']}::turn_{idx}"
+        for turn_index, turn in enumerate(scenario.get("turns", []), 1):
+            case_id = f"{scenario['id']}::turn_{turn_index}"
             if case_id in judge_by_case:
                 turn["judges"] = judge_by_case[case_id]
 
@@ -356,11 +359,11 @@ def build_payload(result, source_paths):
     for scenario in result.get("results", []):
         brand = scenario.get("brand", "")
         compact_turns = []
-        for idx, turn in enumerate(scenario.get("turns", []), 1):
-            case_id = f"{scenario['id']}::turn_{idx}"
+        for turn_index, turn in enumerate(scenario.get("turns", []), 1):
+            case_id = f"{scenario['id']}::turn_{turn_index}"
             compact = {
                 "case_id": case_id,
-                "turn_index": idx,
+                "turn_index": turn_index,
                 "user": turn.get("user", ""),
                 "passed": turn.get("passed", False),
                 "workflow": turn.get("workflow", ""),
@@ -373,8 +376,8 @@ def build_payload(result, source_paths):
                 "primary_product_count": turn.get("primary_product_count", 0),
                 "unique_primary_product_count": turn.get("unique_primary_product_count", 0),
                 "primary_products": [
-                    compact_product_for_payload(p, product_media_index=product_media_index, brand=brand)
-                    for p in turn.get("primary_products", [])
+                    compact_product_for_payload(product, product_media_index=product_media_index, brand=brand)
+                    for product in turn.get("primary_products", [])
                 ],
                 "db_product_count": turn.get("db_product_count", 0),
                 "db_errors": turn.get("db_errors", []),
@@ -409,9 +412,13 @@ def build_payload(result, source_paths):
             "turns": compact_turns,
         })
 
-    elapsed = [t.get("elapsed_ms", 0) for t in turn_payloads if isinstance(t.get("elapsed_ms"), (int, float))]
-    db_counts = [t.get("db_product_count", 0) for t in turn_payloads]
-    primary_counts = [t.get("primary_product_count", 0) for t in turn_payloads]
+    elapsed_ms_values = [
+        turn.get("elapsed_ms", 0)
+        for turn in turn_payloads
+        if isinstance(turn.get("elapsed_ms"), (int, float))
+    ]
+    db_product_counts = [turn.get("db_product_count", 0) for turn in turn_payloads]
+    primary_product_counts = [turn.get("primary_product_count", 0) for turn in turn_payloads]
     judge_counts = Counter()
     judge_classifications = Counter()
     for turn in turn_payloads:
@@ -424,24 +431,30 @@ def build_payload(result, source_paths):
         "source_paths": source_paths,
         "generated_at": result.get("generated_at"),
         "visualized_at": datetime.now().isoformat(timespec="seconds"),
-        "category_counts": count_by(turn_payloads, lambda t: t.get("category") or "unknown"),
-        "workflow_counts": count_by(turn_payloads, lambda t: t.get("workflow") or "unknown"),
-        "catalog_status_counts": count_by(turn_payloads, lambda t: (t.get("catalog_status") or {}).get("label", "unknown")),
-        "followup_counts": count_by(turn_payloads, lambda t: "followup" if t.get("is_followup") else "new_query"),
-        "clarification_counts": count_by(turn_payloads, lambda t: "clarification" if t.get("needs_clarification") else "result"),
-        "passed_turn_counts": count_by(turn_payloads, lambda t: "passed" if t.get("passed") else "failed"),
+        "category_counts": count_by(turn_payloads, lambda turn: turn.get("category") or "unknown"),
+        "workflow_counts": count_by(turn_payloads, lambda turn: turn.get("workflow") or "unknown"),
+        "catalog_status_counts": count_by(
+            turn_payloads,
+            lambda turn: (turn.get("catalog_status") or {}).get("label", "unknown"),
+        ),
+        "followup_counts": count_by(turn_payloads, lambda turn: "followup" if turn.get("is_followup") else "new_query"),
+        "clarification_counts": count_by(
+            turn_payloads,
+            lambda turn: "clarification" if turn.get("needs_clarification") else "result",
+        ),
+        "passed_turn_counts": count_by(turn_payloads, lambda turn: "passed" if turn.get("passed") else "failed"),
         "judge_counts": dict(judge_counts),
         "judge_classifications": dict(judge_classifications),
         "timings": {
-            "avg_elapsed_ms": round(statistics.mean(elapsed), 1) if elapsed else 0,
-            "p95_elapsed_ms": percentile(elapsed, 0.95),
-            "max_elapsed_ms": max(elapsed) if elapsed else 0,
+            "avg_elapsed_ms": round(statistics.mean(elapsed_ms_values), 1) if elapsed_ms_values else 0,
+            "p95_elapsed_ms": percentile(elapsed_ms_values, 0.95),
+            "max_elapsed_ms": max(elapsed_ms_values) if elapsed_ms_values else 0,
         },
         "retrieval": {
-            "avg_db_products": round(statistics.mean(db_counts), 1) if db_counts else 0,
-            "avg_primary_products": round(statistics.mean(primary_counts), 1) if primary_counts else 0,
-            "zero_db_turns": sum(1 for c in db_counts if c == 0),
-            "zero_primary_turns": sum(1 for c in primary_counts if c == 0),
+            "avg_db_products": round(statistics.mean(db_product_counts), 1) if db_product_counts else 0,
+            "avg_primary_products": round(statistics.mean(primary_product_counts), 1) if primary_product_counts else 0,
+            "zero_db_turns": sum(1 for product_count in db_product_counts if product_count == 0),
+            "zero_primary_turns": sum(1 for product_count in primary_product_counts if product_count == 0),
         },
     }
     return {"summary": summary, "scenarios": scenario_payloads, "turns": turn_payloads}
@@ -1263,8 +1276,8 @@ const lower = value => String(value ?? '').toLowerCase();
 const esc = value => String(value ?? '').replace(/[&<>"']/g, char => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[char]));
 const countEntries = obj => Object.entries(obj || {}).sort((a,b) => b[1] - a[1]);
 
-function pill(text, cls='') {
-  return `<span class="pill ${cls}">${esc(text)}</span>`;
+function pill(text, cssClass='') {
+  return `<span class="pill ${cssClass}">${esc(text)}</span>`;
 }
 
 function jsonBlock(obj) {
@@ -1303,24 +1316,24 @@ function judgeState(turn) {
 
 function turnMatches(turn, scenario) {
   const searchText = lower($('#search').value);
-  const category = $('#category').value;
-  const workflow = $('#workflow').value;
-  const catalog = $('#catalog').value;
+  const categoryFilter = $('#category').value;
+  const workflowFilter = $('#workflow').value;
+  const catalogStatusFilter = $('#catalog').value;
   const turnType = $('#turnType').value;
-  const pass = $('#pass').value;
-  const judge = $('#judge').value;
-  if (category && scenario.category !== category) return false;
-  if (workflow && turn.workflow !== workflow) return false;
-  if (catalog && (turn.catalog_status?.label || 'unknown') !== catalog) return false;
+  const passFilter = $('#pass').value;
+  const judgeFilter = $('#judge').value;
+  if (categoryFilter && scenario.category !== categoryFilter) return false;
+  if (workflowFilter && turn.workflow !== workflowFilter) return false;
+  if (catalogStatusFilter && (turn.catalog_status?.label || 'unknown') !== catalogStatusFilter) return false;
   if (turnType === 'followup' && !turn.is_followup) return false;
   if (turnType === 'new' && turn.is_followup) return false;
   if (turnType === 'clarification' && !turn.needs_clarification) return false;
   if (turnType === 'result' && turn.needs_clarification) return false;
-  if (pass === 'passed' && !turn.passed) return false;
-  if (pass === 'failed' && turn.passed) return false;
+  if (passFilter === 'passed' && !turn.passed) return false;
+  if (passFilter === 'failed' && turn.passed) return false;
   const judgeStatus = judgeState(turn);
-  if (judge === 'has' && judgeStatus === 'none') return false;
-  if (judge === 'non_ok' && judgeStatus !== 'non_ok') return false;
+  if (judgeFilter === 'has' && judgeStatus === 'none') return false;
+  if (judgeFilter === 'non_ok' && judgeStatus !== 'non_ok') return false;
   if (!searchText) return true;
   const haystack = [
     scenario.id, scenario.category, scenario.brand, scenario.description,
@@ -1363,11 +1376,11 @@ function scenarioSummary(scenario) {
 }
 
 function turnPills(turn) {
-  const catalog = turn.catalog_status?.label || 'unknown';
-  const catalogCls = catalog === 'covered' ? 'ok' : (catalog.includes('gap') ? 'warn' : 'accent');
+  const catalogStatus = turn.catalog_status?.label || 'unknown';
+  const catalogStatusClass = catalogStatus === 'covered' ? 'ok' : (catalogStatus.includes('gap') ? 'warn' : 'accent');
   return [
     pill(turn.workflow || 'workflow?', 'accent'),
-    pill(catalog, catalogCls),
+    pill(catalogStatus, catalogStatusClass),
     turn.is_followup ? pill('follow-up') : pill('new query'),
     turn.needs_clarification ? pill('clarification', 'warn') : pill('result', 'ok'),
     turn.passed ? pill('passed', 'ok') : pill('failed', 'bad'),
@@ -1420,7 +1433,7 @@ function renderProductStrip(products) {
     <div class="mini-product">
       ${renderProductImage(product)}
       <b title="${esc(product.title || product.id)}">${esc(product.title || product.id)}</b>
-      <span>${esc(product.product_type || '')}${product.price ? ` · ${esc(product.price)}` : ''}</span>
+      <span>${esc(product.product_type || '')}${product.gender ? ` · ${esc(product.gender)}` : ''}${product.price ? ` · ${esc(product.price)}` : ''}</span>
     </div>
   `).join('')}</div>`;
 }
@@ -1473,8 +1486,8 @@ function kgRows(turn) {
     const chips = ['recommended', 'acceptable', 'avoid'].map(group => {
       const values = groups[group] || [];
       if (!values.length) return '';
-      const cls = group === 'avoid' ? 'bad' : (group === 'acceptable' ? '' : 'ok');
-      return `<div class="chip-line">${pill(group, cls)}${values.slice(0, 12).map(value => pill(value, cls)).join('')}</div>`;
+      const groupClass = group === 'avoid' ? 'bad' : (group === 'acceptable' ? '' : 'ok');
+      return `<div class="chip-line">${pill(group, groupClass)}${values.slice(0, 12).map(value => pill(value, groupClass)).join('')}</div>`;
     }).join('');
     return `<div class="kg-row"><b>${esc(tag)}</b><div>${chips}</div></div>`;
   }).join('');
@@ -1498,6 +1511,7 @@ function productRows(products) {
         ${product.url ? `<a href="${esc(product.url)}" target="_blank" rel="noreferrer"><b>${esc(product.title || product.id)}</b></a>` : `<b>${esc(product.title || product.id)}</b>`}
         <div class="product-meta">
           ${pill(product.product_type || 'type')}
+          ${product.gender ? pill(product.gender, product.gender === 'kids' ? 'warn' : 'ok') : ''}
           ${product.colors ? pill(product.colors) : ''}
           ${product.price ? pill(product.price) : ''}
         </div>
@@ -1511,9 +1525,9 @@ function judgeBlocks(turn) {
   const entries = Object.entries(turn.judges || {});
   if (!entries.length) return '<div class="empty">No judge output attached to this turn.</div>';
   return entries.map(([name, judge]) => {
-    const cls = judge.classification === 'ok' ? '' : (Number(judge.score) <= 1 ? 'bad' : 'warn');
-    return `<div class="judge ${cls}">
-      <div class="pill-row">${pill(name, 'accent')}${pill(judge.classification || 'unknown', cls || 'ok')}${pill(`score ${judge.score ?? '?'}`)}</div>
+    const judgeClass = judge.classification === 'ok' ? '' : (Number(judge.score) <= 1 ? 'bad' : 'warn');
+    return `<div class="judge ${judgeClass}">
+      <div class="pill-row">${pill(name, 'accent')}${pill(judge.classification || 'unknown', judgeClass || 'ok')}${pill(`score ${judge.score ?? '?'}`)}</div>
       <div style="margin-top:7px">${esc(judge.rationale || '')}</div>
       ${(judge.labels || []).length ? `<div class="pane-sub">${esc(judge.labels.join(', '))}</div>` : ''}
     </div>`;

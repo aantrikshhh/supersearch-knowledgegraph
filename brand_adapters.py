@@ -253,10 +253,16 @@ class AzaAdapter:
         patterns = [p.lower() for p in (attrs.get("pattern") or [])]
         occasions = [o.lower() for o in (attrs.get("occasion") or [])]
 
-        audience = product.get("audience") or []
+        audience = [str(a).lower() for a in (product.get("audience") or [])]
         gender = "female"
-        if any(a.lower() in ("men", "boys") for a in audience):
+        if any(a in ("girls", "boys", "kids", "children") for a in audience):
+            gender = "kids"
+        elif any(a in ("men", "male") for a in audience) and any(a in ("women", "female") for a in audience):
+            gender = "both"
+        elif any(a in ("men", "male") for a in audience):
             gender = "male"
+        elif any(a in ("women", "female") for a in audience):
+            gender = "female"
 
         price = float(product.get("selling_price") or product.get("price") or 0)
 

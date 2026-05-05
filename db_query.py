@@ -36,7 +36,7 @@ CREATE TABLE products (
     patterns TEXT,         -- comma-separated, e.g. 'embroidered,floral,sequin' (may be NULL)
     materials TEXT,        -- comma-separated, e.g. 'silk,georgette' (may be NULL)
     occasions TEXT,        -- comma-separated (OFTEN NULL — do NOT filter by this)
-    gender TEXT,           -- 'male', 'female', or 'both'
+    gender TEXT,           -- 'male', 'female', 'kids', or 'both'
     price REAL,
     url TEXT,
     image_url TEXT,
@@ -47,7 +47,7 @@ CREATE TABLE products (
 ## Schema Linking — how user terms map to columns
 - "color" / "red" / "blue" → colors column (comma-separated, use ',' || colors || ',' LIKE '%,red,%' OR title LIKE '%red%')
 - "type" / "dress" / "kurta" → product_type column (exact match)
-- "for women" / "men's" → gender column ('male', 'female', 'both')
+- "for women" / "men's" / "kids" → gender column ('male', 'female', 'kids', 'both')
 - "silk" / "cotton" → materials column (comma-separated, use LIKE)
 - "embroidered" / "floral" → patterns column (comma-separated, use LIKE)
 - "under 5000" / "luxury" → price column
@@ -63,10 +63,10 @@ CREATE TABLE products (
 7. Return ONLY the raw SQL — no markdown, no backticks, no explanation
 8. Must be valid SQLite
 9. When KG says "all" for colours, skip color ranking
-10. Apply gender filter only when intents.gender is exactly "female" or "male"; do not infer or default gender
+10. Apply audience filter only when explicit: adult women use gender IN ('female','both'), adult men use gender IN ('male','both'), child/kids/teen queries use gender IN ('kids','both')
 11. Also search the title column with LIKE for color/pattern matching as fallback
 12. Never filter on occasions column — it is almost always NULL
-13. Never invent religion/culture, brand defaults, product types, colors, or gender not present in intents/KG context
+13. Never invent religion/culture, brand defaults, product types, colors, or audience not present in intents/KG context
 14. If intents include "price_max", add WHERE price <= N as a HARD constraint (not just ORDER BY)
 15. If intents include "price_min", add WHERE price >= N as a HARD constraint
 16. Do not use comments, CTEs, multiple statements, INSERT, UPDATE, DELETE, DROP, ALTER, or PRAGMA
@@ -293,7 +293,7 @@ Please generate a LESS RESTRICTIVE query:
 1. Keep product_type and explicit numeric price constraints in WHERE
 2. Use more product_type values from the available list only when the user did not request a specific product_type
 3. Move color, pattern, material, and style filters to ORDER BY
-4. Remove a gender filter only when gender was not explicitly present in intents
+4. Remove an audience/gender filter only when audience was not explicitly present in intents
 5. Make sure product_type values match EXACTLY what's available in the database
 6. Do not assume a specific wedding culture when intents contain "_needs_religion": true
 
@@ -603,7 +603,9 @@ def _deterministic_sql(query, intents, kg_context_str, available_types):
         where.append(f"product_type NOT IN ({', '.join(_sql_string(t) for t in avoided_types[:12])})")
 
     gender = intents.get("gender")
-    if gender in ("female", "male"):
+    if _is_child_agegroup(intents):
+        where.append("gender IN ('kids', 'both')")
+    elif gender in ("female", "male"):
         where.append(f"gender IN ({_sql_string(gender)}, 'both')")
 
     if intents.get("price_max") is not None:
@@ -726,6 +728,13 @@ def generate_sql(query, intents, kg_context_str, brand, available_types):
     if (wedding_context or ambiguous_wedding) and _is_wedding_guest_query(query):
         cultural.append("Wedding guest: Should NOT wear red (bride's color) or white. Prefer jewel tones, pastels, or vibrant colors.")
 
+    if _is_child_agegroup(intents):
+        cultural.append("Audience constraint: child/kids/teen query. Add WHERE gender IN ('kids', 'both'); do not return adult-only products.")
+    elif intents.get("gender") == "female":
+        cultural.append("Audience constraint: adult women query. Add WHERE gender IN ('female', 'both'); do not return kids products.")
+    elif intents.get("gender") == "male":
+        cultural.append("Audience constraint: adult men query. Add WHERE gender IN ('male', 'both'); do not return kids products.")
+
     # Explicit product type request
     if "product_type" in intents:
         from taxonomy import PRODUCT_TYPE_ALIASES
@@ -753,8 +762,7 @@ def generate_sql(query, intents, kg_context_str, brand, available_types):
     }
     functional = intents.get("functional_needs", "")
     if functional:
-        for fn in functional.split(","):
-            fn = fn.strip()
+        for fn in _split_csv(functional):
             if fn in FUNCTIONAL_TO_GUIDANCE:
                 cultural.append(f"Functional requirement ({fn}): {FUNCTIONAL_TO_GUIDANCE[fn]}")
 
@@ -771,8 +779,7 @@ def generate_sql(query, intents, kg_context_str, brand, available_types):
     }
     style = intents.get("style_goals", "")
     if style:
-        for sg in style.split(","):
-            sg = sg.strip()
+        for sg in _split_csv(style):
             if sg in STYLE_TO_GUIDANCE:
                 cultural.append(f"Style goal ({sg}): {STYLE_TO_GUIDANCE[sg]}")
 

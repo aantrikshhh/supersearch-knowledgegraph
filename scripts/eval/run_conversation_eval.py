@@ -85,6 +85,7 @@ def db_debug_for(outfit):
                 "colors": p.get("colors", ""),
                 "patterns": p.get("patterns", ""),
                 "materials": p.get("materials", ""),
+                "gender": p.get("gender", ""),
                 "price": p.get("price", ""),
             }
             for i, p in enumerate(debug.get("products", [])[:20])
@@ -187,6 +188,7 @@ def summarize_turn(result):
             "title": p.get("title", ""),
             "product_type": p.get("product_type", ""),
             "colors": p.get("colors", ""),
+            "gender": p.get("gender", ""),
             "price": p.get("price", ""),
         }
         for p in outfit.primary_products[:5]
@@ -315,6 +317,17 @@ def check_expectations(turn_summary, expect):
             failures.append(f"DB products: expected >= {expect['min_db_products']}, got {actual}")
 
     products = turn_summary.get("primary_products", [])
+    intents = turn_summary["intents"]
+    adult_gender = intents.get("gender") in ("female", "male") and str(intents.get("agegroup", "")).lower() not in {
+        "baby", "child", "infant", "toddler", "tween", "teenager", "youth"
+    }
+    if adult_gender:
+        for product in products:
+            if product.get("gender") == "kids":
+                failures.append(
+                    f"audience mismatch: adult {intents.get('gender')} query returned kids product "
+                    f"{product.get('id')} {product.get('title')!r}"
+                )
     allowed_types = expect.get("product_types_all", [])
     if allowed_types and products:
         for product in products:

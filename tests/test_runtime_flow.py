@@ -6,9 +6,11 @@ clarification state, and deterministic SQL constraints.
 """
 
 import unittest
+from unittest.mock import patch
 
 from conversation import ConversationManager
-from db_query import _deterministic_sql, get_available_types
+from brand_adapters import AzaAdapter
+from db_query import _deterministic_sql, generate_sql, get_available_types
 from intent_extractor import _enrich_intents, normalize_intents
 from knowledge_graph import KnowledgeGraph
 from outfit_builder import OutfitResult
@@ -307,7 +309,88 @@ class RuntimeFlowRegressionTests(unittest.TestCase):
             get_available_types("kalki_products.db"),
         )
         self.assertIn("product_type IN ('kids', 'kidswear', 'lehenga')", sql)
+        self.assertIn("gender IN ('kids', 'both')", sql)
         self.assertIn("LOWER(title) LIKE '%lehenga%'", sql)
+
+    def test_deterministic_sql_excludes_kids_for_adult_women_queries(self):
+        sql = _deterministic_sql(
+            "coord set for office party women not too heavy",
+            {"occasion": "office party", "gender": "female", "product_type": "coord", "functional_needs": "lightweight"},
+            "Recommended products: coord, dress\nRecommended colours: all",
+            get_available_types("aza_products.db"),
+        )
+        self.assertIn("gender IN ('female', 'both')", sql)
+        self.assertNotIn("'kids'", sql)
+
+    def test_aza_adapter_maps_child_audience_to_kids(self):
+        adapter = object.__new__(AzaAdapter)
+        base_product = {
+            "id": "test",
+            "title": "Test Product",
+            "category": {"level1": "Westernwear", "level2": "Co-Ord Sets"},
+            "color": ["Black"],
+            "attributes": {},
+            "selling_price": 1000,
+            "image_url": [],
+            "product_url": "/products/test/1",
+        }
+
+        girls_product = adapter._normalize({**base_product, "audience": ["Girls"]})
+        boys_product = adapter._normalize({**base_product, "audience": ["Boys"]})
+        women_product = adapter._normalize({**base_product, "audience": ["Women"]})
+        men_product = adapter._normalize({**base_product, "audience": ["Men"]})
+
+        self.assertEqual(girls_product.gender, "kids")
+        self.assertEqual(boys_product.gender, "kids")
+        self.assertEqual(women_product.gender, "female")
+        self.assertEqual(men_product.gender, "male")
+
+    def test_generate_sql_accepts_list_style_and_functional_intents(self):
+        with patch(
+            "db_query.call_llm",
+            return_value="SELECT * FROM products WHERE product_type IN ('coord') AND gender IN ('female', 'both') LIMIT 20",
+        ):
+            sql, _, _ = generate_sql(
+                "coord set for office party women not too heavy",
+                {
+                    "product_type": "coord",
+                    "gender": "female",
+                    "functional_needs": ["lightweight"],
+                    "style_goals": ["classic"],
+                },
+                "Recommended products: coord\nRecommended colours: all",
+                "aza",
+                ["coord"],
+            )
+        self.assertIn("gender IN ('female', 'both')", sql)
+
+    def test_conversation_eval_flags_kids_products_for_adult_queries(self):
+        failures = check_expectations(
+            {
+                "workflow": "occasion",
+                "needs_clarification": False,
+                "is_followup": False,
+                "intents": {"gender": "female", "product_type": "coord"},
+                "primary_product_count": 1,
+                "unique_primary_product_count": 1,
+                "day_plan_count": 0,
+                "db_product_count": 1,
+                "primary_products": [
+                    {
+                        "id": "721090",
+                        "title": "Ruffle Sleeve Top & Skirt Set",
+                        "product_type": "coord",
+                        "gender": "kids",
+                    }
+                ],
+                "sql": "",
+                "response_text": "",
+                "clarifying_questions": [],
+                "suggested_followups": [],
+            },
+            {},
+        )
+        self.assertTrue(any("audience mismatch" in failure for failure in failures))
 
     def test_deterministic_sql_uses_apparel_fallback_when_type_only_in_title(self):
         sql = _deterministic_sql(
