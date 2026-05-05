@@ -30,7 +30,7 @@ def run(query, intents, brand, session=None, secondary=None):
     )
 
     # KG lookup with religion awareness
-    kg_result = kg.lookup(intents, gender=gender)
+    kg_result, kg_trace = kg.lookup_with_trace(intents, gender=gender)
     kg_context = kg.format_context(kg_result)
 
     # DB query
@@ -62,6 +62,7 @@ def run(query, intents, brand, session=None, secondary=None):
             primary.query = query
             primary._alternatives = outfits[1:]
             primary.db_debug = db_result
+            primary.kg_trace = kg_trace
             return primary
 
     # Standard single-outfit for less formal occasions
@@ -72,5 +73,6 @@ def run(query, intents, brand, session=None, secondary=None):
     )
     outfit.query = query
     outfit.db_debug = db_result
+    outfit.kg_trace = kg_trace
     outfit.styling_notes.insert(0, f"Formality: {formality}")
     return outfit

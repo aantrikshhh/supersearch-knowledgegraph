@@ -19,6 +19,9 @@ def call_llm(prompt, system_prompt=None, timeout=None):
     Codex CLI writes noisy session logs to stdout. The -o flag gives us the
     final message in a file, which is the only content callers should parse.
     """
+    if os.environ.get("KG_DISABLE_LLM") == "1":
+        raise RuntimeError("LLM disabled by KG_DISABLE_LLM")
+
     full_prompt = prompt
     if system_prompt:
         full_prompt = f"{system_prompt}\n\n{prompt}"

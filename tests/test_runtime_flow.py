@@ -26,6 +26,10 @@ class RuntimeFlowRegressionTests(unittest.TestCase):
         self.assertEqual(intents["price_max"], 2000)
         self.assertEqual(intents["gender"], "female")
 
+    def test_not_too_heavy_maps_to_lightweight_functional_need(self):
+        intents = _enrich_intents({}, "Coord set for office party women not too heavy")
+        self.assertIn("lightweight", intents["functional_needs"])
+
     def test_llm_product_alias_is_canonicalized(self):
         intents = _enrich_intents({"product_type": "bandi"}, "Bandi for Diwali men")
         self.assertEqual(intents["product_type"], "jacket")
@@ -105,6 +109,14 @@ class RuntimeFlowRegressionTests(unittest.TestCase):
         questions = conv._get_clarifying_questions(query, intents, classify(intents, query))
         self.assertTrue(any("wedding context" in q for q in questions))
 
+    def test_explicit_product_wedding_can_proceed_without_religion(self):
+        query = "Sherwani for wedding men"
+        intents = normalize_intents(query)
+        conv = ConversationManager()
+        questions = conv._get_clarifying_questions(query, intents, classify(intents, query))
+        self.assertEqual(intents["product_type"], "sherwani")
+        self.assertFalse(any("wedding context" in q for q in questions))
+
     def test_general_wedding_answer_does_not_reask_religion(self):
         query = "general wedding guest outfit women"
         intents = normalize_intents(query, {"occasion": "wedding", "_needs_religion": True})
@@ -132,10 +144,36 @@ class RuntimeFlowRegressionTests(unittest.TestCase):
         questions = conv._get_clarifying_questions(query, intents, classify(intents, query))
         self.assertTrue(any("women, men, or kids" in q for q in questions))
 
+    def test_retirement_does_not_count_as_men_gender_signal(self):
+        query = "Retirement gift shawl for colleague"
+        intents = normalize_intents(query)
+        conv = ConversationManager()
+        questions = conv._get_clarifying_questions(query, intents, classify(intents, query))
+        self.assertNotIn("gender", intents)
+        self.assertTrue(any("women, men, or kids" in q for q in questions))
+
     def test_traveling_activity_does_not_steal_explicit_place(self):
         query = "Travel-friendly coord for airport women"
         intents = normalize_intents(query)
         self.assertEqual(classify(intents, query).value, "place_profession")
+
+    def test_cafe_brunch_routes_as_place_not_date_night(self):
+        query = "Cafe brunch dress for women"
+        intents = normalize_intents(query)
+        self.assertEqual(intents["place"], "cafe")
+        self.assertNotIn("occasion", intents)
+        self.assertEqual(classify(intents, query).value, "place_profession")
+
+    def test_accessory_and_temple_deictic_followups_are_followups(self):
+        session = Session()
+        session.add_turn(
+            "Show lehengas for sangeet women",
+            {"product_type": "lehenga", "occasion": "sangeet", "gender": "female"},
+            "occasion",
+        )
+        conv = ConversationManager(session=session)
+        self.assertTrue(conv._is_followup("What jewellery works with this?"))
+        self.assertTrue(conv._is_followup("Can I wear this to a temple also?"))
 
     def test_unknown_recipient_gift_does_not_default_female(self):
         query = "Gift dress for colleague"
@@ -238,6 +276,18 @@ class RuntimeFlowRegressionTests(unittest.TestCase):
         )
         self.assertIn("product_type IN ('kurta')", sql)
         self.assertIn("price <= 2000.0", sql)
+
+    def test_negated_colour_becomes_hard_avoidance(self):
+        intents = normalize_intents("Show sarees for sangeet women not red")
+        self.assertEqual(intents["avoid_colour"], "red")
+        sql = _deterministic_sql(
+            "Show sarees for sangeet women not red",
+            intents,
+            "Recommended products: saree\nRecommended colours: red, pink",
+            get_available_types("aza_products.db"),
+        )
+        self.assertIn("NOT", sql)
+        self.assertIn("red", sql)
 
     def test_deterministic_sql_uses_title_backed_broad_catalog_buckets(self):
         sql = _deterministic_sql(

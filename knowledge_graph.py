@@ -53,7 +53,21 @@ class KnowledgeGraph:
         Returns:
             dict with recommended/acceptable/avoid items grouped by tag type
         """
+        result, _trace = self.lookup_with_trace(intents, gender=gender)
+        return result
+
+    def lookup_with_trace(self, intents, gender=None):
+        """Look up the graph and return both aggregate context and provenance."""
         all_items = defaultdict(lambda: defaultdict(list))
+        trace = {
+            "input_intents": dict(intents or {}),
+            "gender_filter": gender,
+            "lookup_keys": [],
+            "matched_entries": [],
+            "skipped_entries": [],
+            "conflicts": [],
+            "missing_keys": [],
+        }
 
         for entity, value in intents.items():
             if str(entity).startswith("_"):
@@ -73,13 +87,45 @@ class KnowledgeGraph:
             entries = []
             for lookup_value in lookup_values:
                 key = (entity, lookup_value)
+                trace["lookup_keys"].append({
+                    "entity": entity,
+                    "value": value,
+                    "resolved_value": resolved,
+                    "lookup_value": lookup_value,
+                    "expanded": bool(expansion),
+                    "matched_count": len(self.graph.get(key, [])),
+                })
+                if key not in self.graph:
+                    trace["missing_keys"].append({
+                        "entity": entity,
+                        "value": value,
+                        "resolved_value": resolved,
+                        "lookup_value": lookup_value,
+                    })
                 entries.extend(self.graph.get(key, []))
 
             for entry in entries:
                 if gender and entry["gender"] and entry["gender"] not in (gender, "both"):
+                    trace["skipped_entries"].append({
+                        "source": f"{entity}:{resolved}",
+                        "category": entry["category"],
+                        "tag": entry["tag"],
+                        "name": entry["name"],
+                        "rank": entry["rank"],
+                        "gender": entry["gender"],
+                        "reason": "gender_filter",
+                    })
                     continue
                 tag = entry["tag"]
                 name = entry["name"]
+                trace["matched_entries"].append({
+                    "source": f"{entity}:{resolved}",
+                    "category": entry["category"],
+                    "tag": tag,
+                    "name": name,
+                    "rank": entry["rank"],
+                    "gender": entry["gender"],
+                })
                 all_items[tag][name].append({
                     "rank": entry["rank"],
                     "source": f"{entity}:{resolved}",
@@ -101,6 +147,14 @@ class KnowledgeGraph:
                     final_rank = -1
                 else:
                     final_rank = max(ranks)
+                if len(set(ranks)) > 1:
+                    trace["conflicts"].append({
+                        "tag": tag,
+                        "name": name,
+                        "ranks": ranks,
+                        "sources": sources,
+                        "final_rank": final_rank,
+                    })
 
                 if final_rank == 1:
                     recommended.append(name)
@@ -115,7 +169,8 @@ class KnowledgeGraph:
                 "avoid": avoid,
             }
 
-        return result
+        trace["result_summary"] = result
+        return result, trace
 
     def format_context(self, kg_result):
         """Format KG lookup results into a readable context string for the LLM."""

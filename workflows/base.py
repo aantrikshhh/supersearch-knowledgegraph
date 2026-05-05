@@ -52,7 +52,7 @@ def run_standard_pipeline(query, intents, brand, gender=None):
 
     enrich_intents_with_weather(intents)
 
-    kg_result = kg.lookup(intents, gender=gender)
+    kg_result, kg_trace = kg.lookup_with_trace(intents, gender=gender)
     kg_context = kg.format_context(kg_result)
 
     db_result = query_products(query, intents, kg_context, brand)
@@ -64,6 +64,7 @@ def run_standard_pipeline(query, intents, brand, gender=None):
             occasion=intents.get("occasion", ""),
             db_debug=db_result,
             kg_context=kg_result,
+            kg_trace=kg_trace,
         )
 
     outfit = form_outfit(
@@ -72,4 +73,5 @@ def run_standard_pipeline(query, intents, brand, gender=None):
     )
     outfit.query = query
     outfit.db_debug = db_result
+    outfit.kg_trace = kg_trace
     return outfit

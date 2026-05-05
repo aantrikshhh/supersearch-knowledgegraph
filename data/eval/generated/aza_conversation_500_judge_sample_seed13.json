@@ -1,0 +1,445 @@
+[
+  {
+    "id": "aza_occasion_032",
+    "brand": "aza",
+    "category": "occasion",
+    "description": "Occasion/festival/wedding shopper query.",
+    "source_tags": [
+      "workflow_doc",
+      "aza_inventory_grounded",
+      "shopper_general",
+      "web_research"
+    ],
+    "turns": [
+      {
+        "user": "coord set for office party women not too heavy",
+        "expect": {
+          "workflow": "occasion",
+          "needs_clarification": false,
+          "min_db_products": 1
+        }
+      }
+    ]
+  },
+  {
+    "id": "aza_occasion_070",
+    "brand": "aza",
+    "category": "occasion",
+    "description": "Occasion/festival/wedding shopper query.",
+    "source_tags": [
+      "workflow_doc",
+      "aza_inventory_grounded",
+      "shopper_general",
+      "web_research"
+    ],
+    "turns": [
+      {
+        "user": "dress for cocktail party women premium but not bridal",
+        "expect": {
+          "workflow": "occasion",
+          "needs_clarification": false,
+          "allow_catalog_gap": true,
+          "min_db_products": 1
+        }
+      }
+    ]
+  },
+  {
+    "id": "aza_gifting_026",
+    "brand": "aza",
+    "category": "gifting",
+    "description": "Recipient-aware gifting query.",
+    "source_tags": [
+      "workflow_doc",
+      "aza_inventory_grounded",
+      "shopper_general",
+      "web_research"
+    ],
+    "turns": [
+      {
+        "user": "wedding gift sherwani for brother traditional",
+        "expect": {
+          "workflow": "gifting",
+          "needs_clarification": false,
+          "intent_equals": {
+            "relation": "brother"
+          },
+          "min_db_products": 1
+        }
+      }
+    ]
+  },
+  {
+    "id": "aza_gifting_041",
+    "brand": "aza",
+    "category": "gifting",
+    "description": "Recipient-aware gifting query.",
+    "source_tags": [
+      "workflow_doc",
+      "aza_inventory_grounded",
+      "shopper_general",
+      "web_research"
+    ],
+    "turns": [
+      {
+        "user": "birthday gift saree for mom not too flashy",
+        "expect": {
+          "workflow": "gifting",
+          "needs_clarification": false,
+          "intent_equals": {
+            "relation": "mom"
+          },
+          "min_db_products": 1
+        }
+      }
+    ]
+  },
+  {
+    "id": "aza_refinement_075",
+    "brand": "aza",
+    "category": "refinement",
+    "description": "Post-result shopper refinement.",
+    "source_tags": [
+      "workflow_doc",
+      "aza_inventory_grounded",
+      "shopper_general",
+      "web_research"
+    ],
+    "turns": [
+      {
+        "user": "Dress for cocktail party women",
+        "expect": {
+          "workflow": "occasion",
+          "needs_clarification": false,
+          "min_db_products": 1
+        }
+      },
+      {
+        "user": "make it lightweight",
+        "expect": {
+          "workflow": "occasion",
+          "needs_clarification": false,
+          "is_followup": true
+        }
+      }
+    ]
+  },
+  {
+    "id": "aza_refinement_027",
+    "brand": "aza",
+    "category": "refinement",
+    "description": "Post-result shopper refinement.",
+    "source_tags": [
+      "workflow_doc",
+      "aza_inventory_grounded",
+      "shopper_general",
+      "web_research"
+    ],
+    "turns": [
+      {
+        "user": "Kurta set for Diwali women under 25000",
+        "expect": {
+          "workflow": "occasion",
+          "needs_clarification": false,
+          "min_db_products": 1
+        }
+      },
+      {
+        "user": "show something more modest",
+        "expect": {
+          "workflow": "occasion",
+          "needs_clarification": false,
+          "is_followup": true
+        }
+      }
+    ]
+  },
+  {
+    "id": "aza_topic_switch_038",
+    "brand": "aza",
+    "category": "topic_switch",
+    "description": "Conversation reset or topic switch.",
+    "source_tags": [
+      "workflow_doc",
+      "aza_inventory_grounded",
+      "shopper_general",
+      "web_research"
+    ],
+    "turns": [
+      {
+        "user": "I need a lehenga for sangeet women",
+        "expect": {
+          "workflow": "occasion",
+          "needs_clarification": false
+        }
+      },
+      {
+        "user": "Actually this is for my dad for Diwali, show kurta",
+        "expect": {
+          "workflow": "occasion",
+          "needs_clarification": false,
+          "is_followup": false
+        }
+      }
+    ]
+  },
+  {
+    "id": "aza_topic_switch_021",
+    "brand": "aza",
+    "category": "topic_switch",
+    "description": "Conversation reset or topic switch.",
+    "source_tags": [
+      "workflow_doc",
+      "aza_inventory_grounded",
+      "shopper_general",
+      "web_research"
+    ],
+    "turns": [
+      {
+        "user": "Show sarees for engagement women",
+        "expect": {
+          "workflow": "occasion",
+          "needs_clarification": false
+        }
+      },
+      {
+        "user": "Now I need a 5-day Goa vacation wardrobe women December",
+        "expect": {
+          "workflow": "vacation",
+          "needs_clarification": false,
+          "is_followup": false
+        }
+      }
+    ]
+  },
+  {
+    "id": "aza_place_profession_011",
+    "brand": "aza",
+    "category": "place_profession",
+    "description": "Place or profession shopping query.",
+    "source_tags": [
+      "workflow_doc",
+      "aza_inventory_grounded",
+      "shopper_general",
+      "web_research"
+    ],
+    "turns": [
+      {
+        "user": "Airport outfit for women that is travel-friendly",
+        "expect": {
+          "workflow": "place_profession",
+          "needs_clarification": false,
+          "min_db_products": 1
+        }
+      }
+    ]
+  },
+  {
+    "id": "aza_place_profession_036",
+    "brand": "aza",
+    "category": "place_profession",
+    "description": "Place or profession shopping query.",
+    "source_tags": [
+      "workflow_doc",
+      "aza_inventory_grounded",
+      "shopper_general",
+      "web_research"
+    ],
+    "turns": [
+      {
+        "user": "Court outfit for lawyer women",
+        "expect": {
+          "workflow": "place_profession",
+          "needs_clarification": false,
+          "min_db_products": 1
+        }
+      }
+    ]
+  },
+  {
+    "id": "aza_vacation_025",
+    "brand": "aza",
+    "category": "vacation",
+    "description": "Vacation or capsule wardrobe query.",
+    "source_tags": [
+      "workflow_doc",
+      "aza_inventory_grounded",
+      "shopper_general",
+      "web_research"
+    ],
+    "turns": [
+      {
+        "user": "6-day destination wedding packing list women Udaipur December",
+        "expect": {
+          "workflow": "vacation",
+          "needs_clarification": false
+        }
+      }
+    ]
+  },
+  {
+    "id": "aza_vacation_014",
+    "brand": "aza",
+    "category": "vacation",
+    "description": "Vacation or capsule wardrobe query.",
+    "source_tags": [
+      "workflow_doc",
+      "aza_inventory_grounded",
+      "shopper_general",
+      "web_research"
+    ],
+    "turns": [
+      {
+        "user": "5-day Europe summer capsule wardrobe for women",
+        "expect": {
+          "workflow": "vacation",
+          "needs_clarification": false
+        }
+      }
+    ]
+  },
+  {
+    "id": "aza_activity_health_009",
+    "brand": "aza",
+    "category": "activity_health",
+    "description": "Functional, activity, comfort, or health query.",
+    "source_tags": [
+      "workflow_doc",
+      "aza_inventory_grounded",
+      "shopper_general",
+      "web_research"
+    ],
+    "turns": [
+      {
+        "user": "Hiking outfit for women but still stylish",
+        "expect": {
+          "workflow": "activity",
+          "needs_clarification": false
+        }
+      }
+    ]
+  },
+  {
+    "id": "aza_activity_health_036",
+    "brand": "aza",
+    "category": "activity_health",
+    "description": "Functional, activity, comfort, or health query.",
+    "source_tags": [
+      "workflow_doc",
+      "aza_inventory_grounded",
+      "shopper_general",
+      "web_research"
+    ],
+    "turns": [
+      {
+        "user": "Lightweight outfit for dancing women",
+        "expect": {
+          "workflow": "activity",
+          "needs_clarification": false
+        }
+      }
+    ]
+  },
+  {
+    "id": "aza_general_008",
+    "brand": "aza",
+    "category": "general",
+    "description": "Sparse discovery query.",
+    "source_tags": [
+      "workflow_doc",
+      "aza_inventory_grounded",
+      "shopper_general",
+      "web_research"
+    ],
+    "turns": [
+      {
+        "user": "Need something flattering for petite women",
+        "expect": {
+          "workflow": "general",
+          "needs_clarification": false,
+          "min_db_products": 1
+        }
+      }
+    ]
+  },
+  {
+    "id": "aza_general_023",
+    "brand": "aza",
+    "category": "general",
+    "description": "Sparse discovery query.",
+    "source_tags": [
+      "workflow_doc",
+      "aza_inventory_grounded",
+      "shopper_general",
+      "web_research"
+    ],
+    "turns": [
+      {
+        "user": "Need a statement piece under 30000 women",
+        "expect": {
+          "workflow": "general",
+          "needs_clarification": false,
+          "min_db_products": 1
+        }
+      }
+    ]
+  },
+  {
+    "id": "aza_comparison_accessory_001",
+    "brand": "aza",
+    "category": "comparison_accessory",
+    "description": "Comparison or accessory follow-up.",
+    "source_tags": [
+      "workflow_doc",
+      "aza_inventory_grounded",
+      "shopper_general",
+      "web_research"
+    ],
+    "turns": [
+      {
+        "user": "Show sarees for general wedding guest women",
+        "expect": {
+          "workflow": "occasion",
+          "needs_clarification": false
+        }
+      },
+      {
+        "user": "Which one is better for evening?",
+        "expect": {
+          "workflow": "occasion",
+          "needs_clarification": false,
+          "is_followup": true
+        }
+      }
+    ]
+  },
+  {
+    "id": "aza_comparison_accessory_016",
+    "brand": "aza",
+    "category": "comparison_accessory",
+    "description": "Comparison or accessory follow-up.",
+    "source_tags": [
+      "workflow_doc",
+      "aza_inventory_grounded",
+      "shopper_general",
+      "web_research"
+    ],
+    "turns": [
+      {
+        "user": "Show sherwanis for groom men",
+        "expect": {
+          "workflow": "occasion",
+          "needs_clarification": false
+        }
+      },
+      {
+        "user": "Can I wear this to a temple also?",
+        "expect": {
+          "workflow": "occasion",
+          "needs_clarification": false,
+          "is_followup": true
+        }
+      }
+    ]
+  }
+]

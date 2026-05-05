@@ -612,6 +612,7 @@ def _deterministic_sql(query, intents, kg_context_str, available_types):
         where.append(f"price >= {float(intents['price_min'])}")
 
     avoid_colours = [c for c in kg.get("colour", {}).get("avoid", []) if c.lower() != "all"]
+    avoid_colours.extend(_split_csv(intents.get("avoid_colour") or intents.get("avoid_color")))
     wedding_context = _has_actionable_wedding_context(intents)
     ambiguous_wedding = intents.get("_needs_religion") and intents.get("occasion") == "wedding"
     if (wedding_context or ambiguous_wedding) and _is_wedding_guest_query(query):
@@ -703,6 +704,13 @@ def generate_sql(query, intents, kg_context_str, brand, available_types):
     # Determine cultural notes
     cultural = []
     query_lower = query.lower()
+
+    if intents.get("avoid_colour") or intents.get("avoid_color"):
+        cultural.append(
+            "User explicitly excluded colour(s): "
+            + ", ".join(_split_csv(intents.get("avoid_colour") or intents.get("avoid_color")))
+            + ". Add a hard WHERE exclusion for these colors."
+        )
 
     wedding_context = _has_actionable_wedding_context(intents)
     ambiguous_wedding = intents.get("_needs_religion") and intents.get("occasion") == "wedding"

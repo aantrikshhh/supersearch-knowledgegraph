@@ -9,8 +9,8 @@ being dispatched to one of the workflow modules.
 import json
 import re
 from session import Session
-from intent_extractor import extract as extract_intents
-from router import classify, classify_with_context, get_workflow
+from intent_extractor import extract as extract_intents, get_last_extraction_trace
+from router import classify_with_trace, get_workflow
 from config import LLM_TIMEOUT
 from llm_client import call_llm
 from outfit_builder import OutfitResult
@@ -33,7 +33,8 @@ FOLLOWUP_SIGNALS = [
     "make it",
     # Accessories
     "matching shoes", "matching bag", "matching jewel", "accessories for",
-    "shoes for", "bag for", "jewellery for",
+    "matching jewellery", "matching jewelry", "jewellery works", "jewelry works",
+    "shoes for", "bag for", "jewellery for", "jewelry for",
     # Vague follow-ups
     "yes", "ok show", "okay", "sure", "go ahead",
     "that one", "this one", "the first", "the second",
@@ -49,7 +50,9 @@ FOLLOWUP_PATTERNS = [
     r"^(only|just)\s+",
     r"^(do you have|is there|are there)",
     r"^(can i|can you)\s+(see|get|have)",
+    r"^(can i|can you)\s+(wear|use|pair|style)",
     r"^(what|how)\s+about",
+    r"^(what|which).+\b(with|for)\s+(this|that)\b",
     r"\bfor (this|that|the)\b",
     r"^(no|nah|nope),?\s+",
 ]
@@ -109,24 +112,51 @@ SUGGESTED_FOLLOWUPS = {
 class ConversationManager:
     def __init__(self, session=None, brand="aza"):
         self.session = session or Session(brand=brand)
+        self._last_response_trace = {}
 
     def process(self, user_message):
         """Process a user message and return structured result."""
-        is_followup = self._is_followup(user_message)
+        prior_intents = dict(self.session.active_intents)
+        prior_workflow = self.session.active_workflow
+        prior_turn_count = len(self.session.turns)
+        is_followup, followup_reason = self._followup_decision(user_message)
 
         if is_followup and self.session.active_intents:
             context = self.session.get_context_for_extraction()
             new_intents, elapsed = extract_intents(user_message, session_context=context)
             self.session.merge_intents(new_intents)
             intents = self.session.active_intents
+            merge_mode = "merge"
         else:
             intents, elapsed = extract_intents(user_message)
             self.session.active_intents = intents
+            new_intents = intents
+            merge_mode = "reset"
 
-        workflow_type, secondary = classify_with_context(intents, user_message)
+        extraction_trace = get_last_extraction_trace()
+        workflow_type, secondary, router_trace = classify_with_trace(intents, user_message)
         clarifying_questions = self._get_clarifying_questions(
             user_message, intents, workflow_type
         )
+        trace = {
+            "prior_turn_count": prior_turn_count,
+            "prior_workflow": prior_workflow,
+            "prior_intents": prior_intents,
+            "is_followup": is_followup,
+            "followup_reason": followup_reason,
+            "merge_mode": merge_mode,
+            "new_intents": dict(new_intents),
+            "final_intents": dict(intents),
+            "intent_diff": self._intent_diff(prior_intents, intents),
+            "extraction": extraction_trace,
+            "router": router_trace,
+            "secondary": secondary,
+            "clarification": {
+                "needed": bool(clarifying_questions),
+                "questions": clarifying_questions,
+                "reasons": self._clarification_reasons(user_message, intents, workflow_type),
+            },
+        }
         if clarifying_questions:
             self.session.active_workflow = workflow_type.value
             self.session.add_turn(user_message, intents, workflow_type.value)
@@ -141,6 +171,7 @@ class ConversationManager:
                 "suggested_followups": [],
                 "needs_clarification": True,
                 "clarifying_questions": clarifying_questions,
+                "trace": trace,
             }
 
         workflow = get_workflow(workflow_type)
@@ -156,6 +187,7 @@ class ConversationManager:
         response_text = self._format_response(
             outfit, user_message, intents, workflow_type, followups,
         )
+        trace["response"] = self._last_response_trace
 
         return {
             "workflow": workflow_type.value,
@@ -167,13 +199,26 @@ class ConversationManager:
             "suggested_followups": followups,
             "needs_clarification": False,
             "clarifying_questions": [],
+            "trace": trace,
         }
 
     def _is_followup(self, message):
         """Detect if this is a follow-up to a previous turn."""
+        return self._followup_decision(message)[0]
+
+    def _followup_decision(self, message):
+        """Detect follow-ups and include the winning reason for eval traces."""
         if not self.session.turns:
-            return False
+            return False, "no_prior_turns"
         msg_lower = message.lower().strip()
+
+        reset_phrases = (
+            "forget that", "ignore that", "start over", "reset",
+            "different question", "new question", "different event",
+            "different occasion",
+        )
+        if any(phrase in msg_lower for phrase in reset_phrases):
+            return False, "explicit_reset_phrase"
 
         # Full queries after a prior turn should reset context, not merge into it.
         # Example: "Kurta set under 2000 for Diwali women" is a new query even
@@ -190,19 +235,39 @@ class ConversationManager:
                 "jacket", "swimwear", "tracksuit", "gown",
             ]
             if any(a in msg_lower for a in query_anchors) and any(g in msg_lower for g in garment_anchors):
-                return False
+                return False, "full_query_with_event_and_product_anchor"
 
         # Short messages after initial turn are likely follow-ups
+        has_reference = any(ref in msg_lower for ref in ("this", "that", "these", "those", "first", "second"))
         if len(msg_lower.split()) <= 4:
-            return True
+            return True, "short_message_after_prior_turn"
+        if has_reference and any(
+            term in msg_lower
+            for term in ("wear", "work", "works", "jewel", "bag", "shoe", "accessor", "pair", "style", "temple")
+        ):
+            return True, "deictic_product_or_styling_reference"
 
-        if any(signal in msg_lower for signal in FOLLOWUP_SIGNALS):
-            return True
+        matched_signal = next((signal for signal in FOLLOWUP_SIGNALS if signal in msg_lower), None)
+        if matched_signal:
+            return True, f"followup_signal:{matched_signal.strip()}"
 
-        if any(re.search(pattern, msg_lower) for pattern in FOLLOWUP_PATTERNS):
-            return True
+        matched_pattern = next((pattern for pattern in FOLLOWUP_PATTERNS if re.search(pattern, msg_lower)), None)
+        if matched_pattern:
+            return True, f"followup_pattern:{matched_pattern}"
 
-        return False
+        return False, "no_followup_signal"
+
+    def _intent_diff(self, before, after):
+        keys = sorted(set(before) | set(after))
+        diff = {"added": {}, "removed": {}, "changed": {}}
+        for key in keys:
+            if key not in before and key in after:
+                diff["added"][key] = after[key]
+            elif key in before and key not in after:
+                diff["removed"][key] = before[key]
+            elif before.get(key) != after.get(key):
+                diff["changed"][key] = {"from": before.get(key), "to": after.get(key)}
+        return diff
 
     def _get_suggested_followups(self, intents, workflow_type):
         """Return up to 3 suggested follow-up actions based on missing intents.
@@ -243,7 +308,8 @@ class ConversationManager:
                 )
             )
         )
-        if workflow_type.value == "occasion" and generic_wedding:
+        product_specific = bool(intents.get("product_type"))
+        if workflow_type.value == "occasion" and generic_wedding and not product_specific:
             questions.append(
                 "Which wedding context should I use: Hindu, Muslim, Christian, Sikh, or general wedding guest?"
             )
@@ -255,6 +321,36 @@ class ConversationManager:
 
         return questions[:2]
 
+    def _clarification_reasons(self, query, intents, workflow_type):
+        """Return machine-readable reasons behind blocking questions."""
+        reasons = []
+        query_lower = query.lower()
+        accepted_general_wedding = re.search(r"\bgeneral\b.{0,40}\bwedding\b", query_lower) is not None
+        generic_wedding = (
+            not accepted_general_wedding
+            and "religion" not in intents
+            and (
+                intents.get("_needs_religion")
+                or intents.get("occasion") == "wedding"
+                or (
+                    "wedding" in query_lower
+                    and not any(
+                        marker in query_lower
+                        for marker in (
+                            "hindu", "muslim", "islam", "nikah", "christian",
+                            "church", "sikh", "gurudwara", "anand karaj",
+                        )
+                    )
+                )
+            )
+        )
+        product_specific = bool(intents.get("product_type"))
+        if workflow_type.value == "occasion" and generic_wedding and not product_specific:
+            reasons.append("generic_wedding_requires_context")
+        if "gender" not in intents and self._gender_is_material(query, intents):
+            reasons.append("gender_material_to_retrieval")
+        return reasons[:2]
+
     def _gender_is_material(self, query, intents):
         """Decide whether retrieval would be too broad without a recipient/gender."""
         if intents.get("relation") and intents.get("gender"):
@@ -263,7 +359,7 @@ class ConversationManager:
             "saree", "lehenga", "salwar", "sherwani", "swimsuit",
         }:
             return False
-        if any(term in query.lower() for term in ("women", "woman", "men", "man", "girl", "boy", "kids", "child")):
+        if re.search(r"\b(women|woman|men|man|girl|boy|kids|child)\b", query.lower()):
             return False
         return True
 
@@ -314,12 +410,29 @@ mentions why they fit the occasion, and suggests accessories. No markdown, keep 
                 f"can explore: {suggested_followups}"
             )
 
+        self._last_response_trace = {
+            "prompt": prompt,
+            "used_fallback": False,
+            "error": None,
+            "raw_response": None,
+        }
+
         try:
-            return call_llm(prompt, timeout=LLM_TIMEOUT)
-        except Exception:
-            pass
+            response = call_llm(prompt, timeout=LLM_TIMEOUT)
+            self._last_response_trace["raw_response"] = response
+            return response
+        except Exception as exc:
+            self._last_response_trace.update({
+                "used_fallback": True,
+                "error": str(exc),
+            })
 
         titles = [p.get("title", "") for p in outfit.primary_products[:3]]
+        if not titles:
+            return (
+                "I could not find an exact product match in this catalog for those constraints. "
+                "Try relaxing the product type, budget, colour, or occasion constraints so I can show the closest available options."
+            )
         return f"Here are my top picks: {', '.join(titles)}. {' '.join(outfit.styling_notes[:2])}"
 
     def _avoid_colours_for_response(self, query, outfit, intents):
@@ -329,6 +442,11 @@ mentions why they fit the occasion, and suggests accessories. No markdown, keep 
             for c in outfit.kg_context.get("colour", {}).get("avoid", [])
             if c and c.lower() != "all"
         }
+        avoid.update(
+            c.strip().lower()
+            for c in str(intents.get("avoid_colour") or intents.get("avoid_color") or "").split(",")
+            if c.strip()
+        )
         query_lower = query.lower()
         wedding_context = "wedding" in query_lower or intents.get("occasion") in {
             "wedding", "hindu wedding", "muslim wedding", "christian wedding",

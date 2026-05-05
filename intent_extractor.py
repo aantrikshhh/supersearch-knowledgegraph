@@ -24,6 +24,13 @@ from taxonomy import (
 from llm_client import call_llm
 from prompts import INTENT_EXTRACTION_SYSTEM, INTENT_EXTRACTION_USER
 
+_LAST_EXTRACTION_TRACE = {}
+
+
+def get_last_extraction_trace():
+    """Return the most recent extraction trace for diagnostics."""
+    return dict(_LAST_EXTRACTION_TRACE)
+
 
 def extract(query, session_context=None):
     """Extract structured intents from a natural language query.
@@ -42,22 +49,50 @@ def extract(query, session_context=None):
         prompt += "\nMerge relevant prior context with new intents from this message."
 
     start = time.time()
+    global _LAST_EXTRACTION_TRACE
+    _LAST_EXTRACTION_TRACE = {
+        "query": query,
+        "session_context": session_context or {},
+        "raw_llm_response": None,
+        "parsed_intents": {},
+        "final_intents": {},
+        "used_fallback": False,
+        "error": None,
+        "elapsed_ms": 0,
+    }
+
     try:
         raw = call_llm(prompt, system_prompt=INTENT_EXTRACTION_SYSTEM, timeout=LLM_TIMEOUT)
-    except Exception:
+    except Exception as exc:
         elapsed = (time.time() - start) * 1000
-        return _enrich_intents({}, query), elapsed
+        final = _enrich_intents({}, query)
+        _LAST_EXTRACTION_TRACE.update({
+            "used_fallback": True,
+            "error": f"LLM extraction failed: {exc}",
+            "elapsed_ms": round(elapsed),
+            "final_intents": dict(final),
+        })
+        return final, elapsed
     elapsed = (time.time() - start) * 1000
+    _LAST_EXTRACTION_TRACE["raw_llm_response"] = raw
+    _LAST_EXTRACTION_TRACE["elapsed_ms"] = round(elapsed)
     match = re.search(r'\{[^{}]*\}', raw)
     if match:
         try:
             intents = json.loads(match.group())
+            _LAST_EXTRACTION_TRACE["parsed_intents"] = dict(intents)
             intents = _enrich_intents(intents, query)
+            _LAST_EXTRACTION_TRACE["final_intents"] = dict(intents)
             return intents, elapsed
         except json.JSONDecodeError:
-            pass
+            _LAST_EXTRACTION_TRACE["error"] = "LLM extraction JSON parse failed"
 
-    return _enrich_intents({}, query), elapsed
+    final = _enrich_intents({}, query)
+    _LAST_EXTRACTION_TRACE.update({
+        "used_fallback": True,
+        "final_intents": dict(final),
+    })
+    return final, elapsed
 
 
 FUNCTIONAL_KEYWORDS = {
@@ -70,6 +105,7 @@ FUNCTIONAL_KEYWORDS = {
     "iron-free": "iron-free", "iron free": "iron-free", "machine-washable": "machine-washable",
     "machine washable": "machine-washable", "travel-friendly": "travel-friendly",
     "travel friendly": "travel-friendly", "warm": "warm", "layerable": "layerable",
+    "not too heavy": "lightweight", "not heavy": "lightweight", "easy to carry": "lightweight",
 }
 
 STYLE_KEYWORDS = {
@@ -112,7 +148,6 @@ OCCASION_KEYWORDS = {
     "bachelorette": "bachelorette",
     "farewell": "farewell party",
     "date": "date night",
-    "brunch": "date night",
     "music festival": "festival",
     "festival": "festival",
     "birthday": "birthday party",
@@ -131,6 +166,8 @@ OCCASION_KEYWORDS = {
     "prom": "prom",
     "concert": "concert",
     "funeral": "funeral",
+    "groom": "wedding",
+    "groomsmen": "wedding",
 }
 
 PLACE_KEYWORDS = {
@@ -297,6 +334,11 @@ def _enrich_intents(intents, query, preserve_existing=False):
 
     if "profession" not in intents:
         for keyword, value in PROFESSION_KEYWORDS.items():
+            if keyword == "designer" and any(
+                _has_phrase(query_lower, phrase)
+                for phrase in ("designer wear", "designer outfit", "designer clothes", "designer clothing")
+            ):
+                continue
             if _has_phrase(query_lower, keyword):
                 intents["profession"] = value
                 break
@@ -390,10 +432,28 @@ def _enrich_intents(intents, query, preserve_existing=False):
         if relation:
             intents["relation"] = relation
 
-    if "colour" not in intents:
-        colors = [c for c in COLOR_KEYWORDS if _has_phrase(query_lower, c)]
+    if "colour" not in intents and "avoid_colour" not in intents:
+        colors = []
+        avoided_colors = []
+        color_negation_patterns = [
+            r"\bnot\s+{}\b", r"\bno\s+{}\b", r"\bavoid\s+{}\b",
+            r"\bwithout\s+{}\b", r"\banything\s+but\s+{}\b",
+        ]
+        for color in COLOR_KEYWORDS:
+            if not _has_phrase(query_lower, color):
+                continue
+            is_negated = any(
+                re.search(pat.format(re.escape(color)), query_lower)
+                for pat in color_negation_patterns
+            )
+            if is_negated:
+                avoided_colors.append(color)
+            else:
+                colors.append(color)
         if colors:
             intents["colour"] = ",".join(colors)
+        if avoided_colors:
+            intents["avoid_colour"] = ",".join(sorted(set(avoided_colors)))
 
     # Infer gender from relation
     relation = intents.get("relation", "")

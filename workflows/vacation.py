@@ -84,7 +84,7 @@ def run(query, intents, brand, session=None, secondary=None):
             day_intents["weather"] = weather
 
         # KG + DB
-        kg_result = kg.lookup(day_intents, gender=gender)
+        kg_result, kg_trace = kg.lookup_with_trace(day_intents, gender=gender)
         kg_context = kg.format_context(kg_result)
         db_result = query_products(
             f"outfit for {activity} in {location}",
@@ -100,10 +100,12 @@ def run(query, intents, brand, session=None, secondary=None):
                 products, kg_result, day_intents,
                 comp_graphs=comp, gender=gender, top_n=1,
             )
+            outfit.kg_trace = kg_trace
+            outfit.db_debug = db_result
             for p in outfit.primary_products:
                 all_used_ids.add(p["id"])
         else:
-            outfit = OutfitResult()
+            outfit = OutfitResult(kg_context=kg_result, kg_trace=kg_trace, db_debug=db_result)
 
         day_plans.append({
             "day": i + 1,

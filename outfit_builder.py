@@ -25,6 +25,8 @@ class OutfitResult:
     query: str = ""
     db_debug: dict = field(default_factory=dict)
     kg_context: dict = field(default_factory=dict)
+    kg_trace: dict = field(default_factory=dict)
+    outfit_debug: dict = field(default_factory=dict)
 
 
 def _split_csv(value):
@@ -119,21 +121,39 @@ def form_outfit(candidates, kg_context, intents, comp_graphs=None, gender=None, 
     user_avoided_types = set(_split_csv(intents.get("avoid_product_type")))
 
     scored = []
+    rejected = []
     for p in candidates:
         if any(_product_matches_type(p, t) for t in user_avoided_types):
+            rejected.append({
+                "id": p.get("id"),
+                "title": p.get("title", ""),
+                "product_type": p.get("product_type", ""),
+                "reason": "user_avoid_product_type",
+            })
             continue
         if any(_product_type_matches_value(p, t) for t in kg_avoided_types):
+            rejected.append({
+                "id": p.get("id"),
+                "title": p.get("title", ""),
+                "product_type": p.get("product_type", ""),
+                "reason": "kg_avoid_product_type",
+            })
             continue
 
         score = 0
+        score_reasons = []
         if requested_types and any(_product_matches_type(p, t) for t in requested_types):
             score = 12
+            score_reasons.append("requested_product_type")
         elif any(_product_matches_type(p, t) for t in recommended_types):
             score = 10
+            score_reasons.append("kg_recommended_product")
         elif any(_product_matches_type(p, t) for t in acceptable_types):
             score = 5
+            score_reasons.append("kg_acceptable_product")
         else:
             score = 3
+            score_reasons.append("fallback_candidate")
 
         # Boost for color match
         rec_colors = set(kg_context.get("colour", {}).get("recommended", []))
@@ -141,21 +161,23 @@ def form_outfit(candidates, kg_context, intents, comp_graphs=None, gender=None, 
             p_colors = set((p.get("colors") or "").split(","))
             if p_colors & rec_colors:
                 score += 3
+                score_reasons.append("kg_colour_match")
 
         # Boost for material match
         rec_materials = set(kg_context.get("material", {}).get("recommended", []))
         p_materials = set((p.get("materials") or "").split(","))
         if p_materials & rec_materials:
             score += 2
+            score_reasons.append("kg_material_match")
 
-        scored.append((p, score))
+        scored.append((p, score, score_reasons))
 
     scored.sort(key=lambda x: -x[1])
 
     # Diversify — don't pick 3 of the same type
     primary = []
     types_used = set()
-    for p, s in scored:
+    for p, s, score_reasons in scored:
         ptype = p.get("product_type", "")
         if len(primary) >= top_n:
             break
@@ -228,6 +250,30 @@ def form_outfit(candidates, kg_context, intents, comp_graphs=None, gender=None, 
         occasion=occasion,
         query="",
         kg_context=kg_context,
+        outfit_debug={
+            "candidate_count": len(candidates),
+            "requested_types": requested_types,
+            "recommended_types": recommended_types,
+            "acceptable_types": acceptable_types,
+            "kg_avoided_types": sorted(kg_avoided_types),
+            "user_avoided_types": sorted(user_avoided_types),
+            "scored_candidates": [
+                {
+                    "rank": idx + 1,
+                    "id": p.get("id"),
+                    "title": p.get("title", ""),
+                    "product_type": p.get("product_type", ""),
+                    "colors": p.get("colors", ""),
+                    "materials": p.get("materials", ""),
+                    "price": p.get("price", ""),
+                    "score": score,
+                    "score_reasons": reasons,
+                }
+                for idx, (p, score, reasons) in enumerate(scored[:20])
+            ],
+            "rejected_candidates": rejected[:20],
+            "selected_product_ids": [p.get("id") for p in primary],
+        },
     )
 
 
