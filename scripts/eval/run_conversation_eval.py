@@ -63,6 +63,31 @@ def db_debug_for(outfit):
     }
 
 
+def kg_context_for(outfit):
+    """Return KG lookup context used by the workflow.
+
+    Standard workflows attach the KG lookup result directly to OutfitResult.
+    Vacation builds one child outfit per day, so preserve each day's KG context
+    as well as any top-level context present on the combined result.
+    """
+    context = getattr(outfit, "kg_context", {}) or {}
+    day_plans = getattr(outfit, "_day_plans", [])
+    if not day_plans:
+        return context
+
+    return {
+        "combined": context,
+        "days": [
+            {
+                "day": day.get("day"),
+                "activity": day.get("activity"),
+                "kg_context": getattr(day.get("outfit"), "kg_context", {}) or {},
+            }
+            for day in day_plans
+        ],
+    }
+
+
 def summarize_turn(result):
     outfit = result["outfit"]
     db_debug = db_debug_for(outfit)
@@ -97,6 +122,7 @@ def summarize_turn(result):
         "db_product_count": db_debug["product_count"],
         "sql": db_debug["sql"],
         "db_errors": db_debug["errors"],
+        "kg_context": kg_context_for(outfit),
         "styling_notes": outfit.styling_notes,
     }
 
